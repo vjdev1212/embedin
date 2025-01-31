@@ -104,7 +104,7 @@ const SeriesDetails = () => {
 
   const handleEpisodeSelect = (season: number, episode: number) => {
     router.push({
-      pathname: '/stream/list',
+      pathname: '/stream/embed',
       params: { imdbid: imdbid, type: 'series', name: data.name, season: season, episode: episode },
     });
   };
