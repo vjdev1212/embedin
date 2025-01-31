@@ -3,7 +3,7 @@ import { Pressable, Text, StyleSheet } from 'react-native';
 
 const PlayButton = ({ onPress }: { onPress: () => void }) => (
   <Pressable style={styles.button} onPress={onPress}>
-    <Text style={styles.text}>Search Movie</Text>
+    <Text style={styles.text}>Play Movie</Text>
   </Pressable>
 );
 
