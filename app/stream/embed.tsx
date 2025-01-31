@@ -1,7 +1,8 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
+import { Iframe } from "@bounceapp/iframe"
 
 const EmbedPlayer = () => {
     const { imdbid, type, season, episode } = useLocalSearchParams();
@@ -21,7 +22,7 @@ const EmbedPlayer = () => {
         }
     }, [imdbid, season, episode]);
 
-    // HTML structure with iframe and custom CSS
+    // HTML structure with iframe and popup-blocking JavaScript
     const iframeHtml = `
         <!DOCTYPE html>
         <html lang="en">
@@ -30,9 +31,6 @@ const EmbedPlayer = () => {
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <title>Embed Video Player</title>
             <style>
-                /* Import your external CSS file if necessary */
-                /* Example: @import url('your-stylesheet.css'); */
-                
                 body {
                     padding: 0 !important;
                     margin: 0 !important;
@@ -65,6 +63,11 @@ const EmbedPlayer = () => {
                     allowfullscreen>
                 </iframe>
             </div>
+
+            <script>
+                // Block popups by overriding window.open
+                window.open = function() { return null; };
+            </script>
         </body>
         </html>
     `;
@@ -72,17 +75,21 @@ const EmbedPlayer = () => {
     return (
         <View style={styles.container}>
             {videoUrl ? (
-                <WebView
-                    originWhitelist={['*']}
-                    source={{ html: iframeHtml }}
-                    style={{ flex: 1 }}
-                    javaScriptEnabled
-                    domStorageEnabled
-                    startInLoadingState
-                    javaScriptEnabledAndroid
-                    allowUniversalAccessFromFileURLs
-                    allowFileAccess
-                />
+                Platform.OS === 'web' ? (
+                    <Iframe uri={videoUrl} style={{ flex: 1 }} />
+                ) : (
+                    <WebView
+                        originWhitelist={['*']}
+                        source={{ html: iframeHtml }}
+                        style={{ flex: 1 }}
+                        javaScriptEnabled
+                        domStorageEnabled
+                        startInLoadingState
+                        javaScriptEnabledAndroid
+                        allowUniversalAccessFromFileURLs
+                        allowFileAccess
+                    />
+                )
             ) : (
                 <Text>No video URL available.</Text>
             )}
@@ -93,6 +100,7 @@ const EmbedPlayer = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        paddingTop: 40,
     },
 });
 
