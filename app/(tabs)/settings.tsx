@@ -12,10 +12,6 @@ const SettingsScreen = () => {
   const router = useRouter();
   
   const colorScheme = useColorScheme();
-  const serversList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
-    { title: 'Stremio Server', route: '/settings/stremioserver', icon: 'server-outline' },
-    { title: 'TorrServer', route: '/settings/torrserver', icon: 'server-outline' },
-  ];
 
   const contactList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
     { title: 'Contact', route: '/settings/contact', icon: 'mail-outline' },
@@ -42,22 +38,6 @@ const SettingsScreen = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <View>
-          <Text style={styles.header}>Servers</Text>
-          <View style={[styles.settingsGroup, {
-            backgroundColor: colorScheme === 'dark' ? '#101010' : '#f6f6f6',
-          }]}>
-            {serversList.map((item, index) => (
-              <SettingItem
-                key={index}
-                title={item.title}
-                icon={item.icon}
-                onPress={() => onSettingsItemPress(item)}
-              />
-            ))}
-          </View>
-        </View>
-
         <View>
           <Text style={styles.header}>Contact</Text>
           <View style={[styles.settingsGroup, {
