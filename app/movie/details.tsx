@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Platform, ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, StatusBar, Text, View } from '../../components/Themed';
 import MediaContentDescription from '@/components/MediaContentDescription';
-import MediaContentDetailsList from '@/components/MediaContentDetailsList';
 import MediaContentHeader from '@/components/MediaContentHeader';
 import MediaContentPoster from '@/components/MediaContentPoster';
-import PlayButton from '@/components/PlayButton';
 import * as Haptics from 'expo-haptics';
 import BottomSpacing from '@/components/BottomSpacing';
 import { isHapticsSupported } from '@/utils/platform';
+import MediaLogo from '@/components/MediaLogo';
+import MediaCastAndCrews from '@/components/MediaCastAndCrews';
+import PlayButton from '@/components/PlayButton';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -18,6 +19,9 @@ const MovieDetails = () => {
   const [data, setData] = useState<any>(null);
   const [imdbid, setImdbId] = useState<string>('');
   const [loading, setLoading] = useState(true);
+  const [cast, setCast] = useState<any[]>([]);
+  const { width, height } = useWindowDimensions();
+  const isPortrait = height > width;
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -28,18 +32,20 @@ const MovieDetails = () => {
         const result = await response.json();
         if (result) {
           const externalIds = await getExternalIds();
+          const castAndCrews = await getCastandCrew();
+          setCast(castAndCrews);
           setImdbId(externalIds.imdb_id);
           const logo = `https://images.metahub.space/logo/medium/${externalIds.imdb_id}/img`
           const movie = result;
           const movieData = {
             name: movie.title,
-            background: `https://image.tmdb.org/t/p/original${movie.backdrop_path}`,
-            poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+            background: `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`,
+            poster: `https://image.tmdb.org/t/p/w780${movie.poster_path}`,
             logo: logo,
             genre: movie.genres.map((genre: any) => genre.name),
             released: movie.release_date,
             runtime: movie.runtime,
-            imdbRating: movie.vote_average,
+            imdbRating: movie.vote_average?.toFixed(1),
             releaseInfo: movie.release_date,
             description: movie.overview
           };
@@ -61,6 +67,14 @@ const MovieDetails = () => {
     );
     const externalIdsResult = await externalIdsResponse.json();
     return externalIdsResult;
+  }
+
+  const getCastandCrew = async () => {
+    const castAndCrewsResponse = await fetch(
+      `https://api.themoviedb.org/3/movie/${moviedbid}/credits?api_key=${EXPO_PUBLIC_TMDB_API_KEY}`
+    );
+    const castAndCrewResult = await castAndCrewsResponse.json();
+    return castAndCrewResult.cast || [];
   }
 
   if (loading) {
@@ -93,18 +107,47 @@ const MovieDetails = () => {
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
       <StatusBar />
-      <MediaContentPoster background={data.background} logo={data.logo} />
-      <MediaContentHeader
-        name={data.name}
-        genre={data.genre || data.genres}
-        released={data.released}
-        runtime={data.runtime}
-        imdbRating={data.imdbRating}
-        releaseInfo={data.releaseInfo}
-      />
-      <PlayButton onPress={handlePlayPress} />
-      <MediaContentDescription description={data.description} />
-      <BottomSpacing space={50} />
+
+      <View style={[{
+        flex: 1,        
+        flexDirection: isPortrait ? 'column' : 'row',
+        marginTop: isPortrait ? 0 : '5%',
+        justifyContent: 'center',
+      }]}>
+        <View style={[styles.posterContainer, {
+          width: isPortrait ? '100%' : '30%',
+          padding: isPortrait ? null : '3%'
+        }]}>
+          <MediaContentPoster background={isPortrait ? data.background : data.poster} isPortrait={isPortrait} />
+        </View>
+
+        <View style={[styles.detailsContainer, {
+          width: isPortrait ? '100%' : '60%',
+          paddingHorizontal: isPortrait ? null : 5
+        }]}>
+          <MediaLogo logo={data.logo} />
+          <MediaContentHeader
+            name={data.name}
+            genre={data.genre || data.genres}
+            released={data.released}
+            runtime={data.runtime}
+            imdbRating={data.imdbRating}
+            releaseInfo={data.releaseInfo}
+          />
+          <PlayButton onPress={handlePlayPress} />
+          <MediaContentDescription description={data.description} />
+          {/* <MediaContentDetailsList
+            released={data.released}
+            country={data.country}
+            director={data.director}
+            writer={data.writer}
+            cast={data.cast}
+            releaseInfo={data.releaseInfo}
+          /> */}
+          <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
+        </View>
+        <BottomSpacing space={50} />
+      </View>
     </ScrollView>
   );
 };
@@ -112,6 +155,17 @@ const MovieDetails = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  posterContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  landscapePosterContainer: {
+  },
+  detailsContainer: {
+  },
+  landscapeDetailsContainer: {
+    flexWrap: 'wrap',
   },
   activityIndicator: {
     marginBottom: 10,

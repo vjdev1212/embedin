@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { StyleSheet, Alert, Switch, TextInput, Pressable, useColorScheme, Platform } from 'react-native';
+import { StyleSheet, Switch, TextInput, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text } from '@/components/Themed';
 import { showAlert } from '@/utils/platform';
+import { useColorScheme } from './useColorScheme';
 
 interface ServerConfigProps {
   serverName: string;
@@ -20,8 +21,8 @@ export interface ServerConfig {
 }
 
 const ServerConfiguration: React.FC<ServerConfigProps> = ({ serverName, serverType, defaultUrl }) => {
-  const isWeb = Platform.OS === 'web';
-  const colorScheme = isWeb ? 'dark' : useColorScheme() || 'light';
+
+  const colorScheme = useColorScheme();
   const [serverUrl, setServerUrl] = useState<string>(defaultUrl);
   const [isDefault, setIsDefault] = useState<boolean>(false);
   const [isEnabled, setIsEnabled] = useState<boolean>(true);
@@ -230,6 +231,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 15,
+    marginHorizontal: 15
   },
 });
 

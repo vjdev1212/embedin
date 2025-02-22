@@ -5,24 +5,24 @@ import {
   Pressable,
   View as RNView,
   Animated,
-  useColorScheme,
-  Platform,
   useWindowDimensions,
 } from 'react-native';
-import { Text } from './Themed';
+import { Text, View } from './Themed';
 import { router } from 'expo-router';
-import * as Haptics from 'expo-haptics'; // Importing Haptics for haptic feedback
+import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { getYear } from '@/utils/Date';
+import { useColorScheme } from './useColorScheme';
+import { SvgXml } from 'react-native-svg';
+import { DefaultPosterImgXml } from '@/utils/Svg';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
 const SkeletonLoader = () => {
-  const isWeb = Platform.OS === 'web';
-  const colorScheme = isWeb ? 'dark' : useColorScheme();
+  const colorScheme = useColorScheme();
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
-  
+
   return (
     <RNView style={styles.skeletonContainer}>
       <RNView
@@ -39,6 +39,102 @@ const SkeletonLoader = () => {
   );
 };
 
+const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' | 'vertical', type: string }) => {
+  const [imgError, setImgError] = useState(false);
+  const fadeAnim = useState(new Animated.Value(0))[0];
+  const colorScheme = useColorScheme();
+  const { width, height } = useWindowDimensions();
+  const isPortrait = height > width;
+
+  const year =
+    item.year && typeof item.year === 'string' && item.year.includes('–')
+      ? item.year.split('–')[0]
+      : item.year;
+
+  const posterUri = isPortrait ? item.poster : item.background;
+
+  const handleImageLoad = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePress = async () => {
+    if (isHapticsSupported()) {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+    }
+    router.push({
+      pathname: type === 'movie' ? '/movie/details' : '/series/details',
+      params: { moviedbid: item.moviedbid },
+    });
+  };
+
+  return (
+    <Pressable
+      style={[
+        styles.posterContainer,
+        layout === 'vertical' && styles.verticalContainer,
+      ]}
+      onPress={handlePress}
+    >
+      <View>
+        {!imgError ? (
+          <Animated.Image
+            source={{ uri: posterUri }}
+            onError={() => setImgError(true)}
+            style={[
+              styles.posterImage,
+              layout === 'vertical' ? styles.verticalImage : styles.horizontalImage,
+              {
+                opacity: fadeAnim,
+                backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
+                width: isPortrait ? 100 : 200,
+                height: isPortrait ? 150 : 110,
+              },
+            ]}
+            onLoad={handleImageLoad}
+          />
+        ) : (
+          <View style={[styles.posterImagePlaceHolder,
+          layout === 'vertical' ? styles.verticalImage : styles.horizontalImage,
+          {
+            opacity: fadeAnim,
+            backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
+            width: isPortrait ? 100 : 200,
+            height: isPortrait ? 150 : 110,
+          }]}>
+            <SvgXml xml={DefaultPosterImgXml} />
+          </View>
+        )}
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          style={[
+            styles.posterTitle,
+            {
+              maxWidth: isPortrait ? 100 : 200,
+            },
+          ]}
+        >
+          {item.name}
+        </Text>
+        <Text
+          style={[
+            styles.posterYear,
+            {
+              color: colorScheme === 'dark' ? '#afafaf' : '#303030',
+            },
+          ]}
+        >
+          {`★ ${item.imdbRating}   ${year}`}
+        </Text>
+      </View>
+    </Pressable >
+  );
+};
+
 const PosterList = ({
   apiUrl,
   title,
@@ -51,37 +147,36 @@ const PosterList = ({
   layout?: 'horizontal' | 'vertical';
 }) => {
   const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [fadeAnim] = useState(new Animated.Value(0));
-  const isWeb = Platform.OS === 'web';
-  const colorScheme = isWeb ? 'dark' : useColorScheme();
-  const { width, height } = useWindowDimensions();
-  const isPortrait = height > width;
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`${apiUrl}?api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
         const result = await response.json();
-        const collection = result.results.slice(0, 20);
+        const collection = result.results;
         let list = [];
+
         if (type === 'movie') {
           list = collection.map((movie: any) => ({
             moviedbid: movie.id,
             name: movie.title,
-            poster: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
-            background: `https://image.tmdb.org/t/p/original${movie.backdrop_path}`,
+            poster: `https://image.tmdb.org/t/p/w780${movie.poster_path}`,
+            background: `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`,
             year: getYear(movie.release_date),
+            imdbRating: movie.vote_average?.toFixed(1),
           }));
         } else {
           list = collection.map((series: any) => ({
             moviedbid: series.id,
             name: series.name,
-            poster: `https://image.tmdb.org/t/p/w500${series.poster_path}`,
-            background: `https://image.tmdb.org/t/p/original${series.backdrop_path}`,
+            poster: `https://image.tmdb.org/t/p/w780${series.poster_path}`,
+            background: `https://image.tmdb.org/t/p/w1280${series.backdrop_path}`,
             year: getYear(series.first_air_date),
+            imdbRating: series.vote_average?.toFixed(1),
           }));
         }
+
         setData(list);
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -92,61 +187,6 @@ const PosterList = ({
 
     fetchData();
   }, [apiUrl]);
-
-  const handlePress = async (item: any) => {
-    if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-    }
-    router.push({
-      pathname: type === 'movie' ? '/movie/details' : '/series/details',
-      params: { moviedbid: item.moviedbid },
-    });
-  };
-
-  const renderItem = ({ item }: any) => {
-    const year =
-      item.year && typeof item.year === 'string' && item.year.includes('–')
-        ? item.year.split('–')[0]
-        : item.year;
-
-    // Trigger the fade-in animation when image is loaded
-    const handleImageLoad = () => {
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
-    };
-
-    return (
-      <Pressable
-        style={[
-          styles.posterContainer,
-          layout === 'vertical' && styles.verticalContainer,
-        ]}
-        onPress={() => handlePress(item)}
-      >
-        <Animated.Image
-          source={{ uri: item.poster }}
-          style={[
-            styles.posterImage,
-            layout === 'vertical' ? styles.verticalImage : styles.horizontalImage,
-            {
-              opacity: fadeAnim,
-              backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
-              width: isPortrait ? 100 : 140,
-              height: isPortrait ? 150 : 200,
-            },
-          ]}
-          onLoad={handleImageLoad}
-        />
-        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
-          {item.name}
-        </Text>
-        <Text style={styles.posterYear}>{year}</Text>
-      </Pressable>
-    );
-  };
 
   const handleSeeAllPress = async () => {
     if (isHapticsSupported()) {
@@ -169,7 +209,7 @@ const PosterList = ({
 
       {loading ? (
         <FlatList
-          data={new Array(10).fill(null)} // Skeleton loader
+          data={new Array(10).fill(null)}
           renderItem={() => <SkeletonLoader />}
           keyExtractor={(_, index) => index.toString()}
           horizontal={layout === 'horizontal'}
@@ -179,7 +219,7 @@ const PosterList = ({
       ) : (
         <FlatList
           data={data}
-          renderItem={renderItem}
+          renderItem={({ item }) => <PosterItem item={item} layout={layout} type={type} />}
           keyExtractor={(item, index) => index.toString()}
           horizontal={layout === 'horizontal'}
           showsHorizontalScrollIndicator={false}
@@ -218,6 +258,10 @@ const styles = StyleSheet.create({
     flex: 1,
     marginBottom: 10,
   },
+  posterImagePlaceHolder: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   posterImage: {
     borderRadius: 8,
   },
@@ -232,8 +276,9 @@ const styles = StyleSheet.create({
   },
   posterTitle: {
     marginTop: 8,
+    width: '100%',
+    overflow: 'hidden',
     fontSize: 14,
-    maxWidth: 100,
   },
   posterYear: {
     marginTop: 4,

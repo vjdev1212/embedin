@@ -1,21 +1,22 @@
 import React from 'react';
 import { StyleSheet, Pressable, Linking, SafeAreaView, ScrollView } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { AntDesign } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { View, Text, StatusBar } from '@/components/Themed';
 import { isHapticsSupported } from '@/utils/platform';
 
 const ContactScreen = () => {
+    const feedbackUrl = 'https://form.jotform.com/250372743622454'
     const contactInfo = [
         {
-            type: 'Email',
-            value: 'vcmvijay@gmail.com',
-            icon: 'mail-outline',
+            type: 'Feedback',
+            value: 'Submit your feedback',
+            icon: 'form' as 'form',
             action: async () => {
                 if (isHapticsSupported()) {
                     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
                 }
-                Linking.openURL('mailto:vcmvijay@gmail.com');
+                Linking.openURL(feedbackUrl);
             },
         }
     ];
@@ -23,14 +24,14 @@ const ContactScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar />
-            <ScrollView style={styles.contactList}>
+            <ScrollView style={styles.contactList} showsVerticalScrollIndicator={false}>
                 {contactInfo.map((item, index) => (
                     <Pressable
                         key={index}
                         style={styles.contactItem}
                         onPress={item.action}
                     >
-                        <Ionicons name={item.icon as keyof typeof Ionicons.glyphMap} size={30} color="#535aff" style={styles.icon} />
+                        <AntDesign name={item.icon} size={30} color="#535aff" style={styles.icon} />
                         <View style={styles.info}>
                             <Text style={styles.type}>{item.type}</Text>
                             <Text style={styles.value}>{item.value}</Text>
@@ -46,7 +47,10 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         padding: 20,
-        marginTop: 30
+        width: '100%',
+        maxWidth: 780,
+        margin: 'auto',
+        marginTop: 30,       
     },
     header: {
         fontSize: 20,

@@ -8,10 +8,9 @@ import {
   TextInput as DefaultTextInput,
   Text as DefaultText,
   View as DefaultView,
-  StatusBar as DefaultStatusBar,
   Platform
 } from 'react-native';
-
+import { StatusBar as DefaultStatusBar } from 'expo-status-bar';
 import Colors from '@/constants/Colors';
 import { useColorScheme } from './useColorScheme';
 
@@ -23,14 +22,14 @@ type ThemeProps = {
 export type TextProps = ThemeProps & DefaultText['props'];
 export type TextInputProps = ThemeProps & DefaultTextInput['props'];
 export type ViewProps = ThemeProps & DefaultView['props'];
-export type StatusBarProps = ThemeProps & DefaultStatusBar['props'];
+export type StatusBarProps = ThemeProps & React.ComponentProps<typeof DefaultStatusBar>;
 export type ActivityIndicatorProps = ThemeProps & DefaultActivityIndicator['props'];
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark
 ) {
-  const theme = Platform.OS === 'web' ? 'dark' : useColorScheme() ?? 'dark';
+  const theme = useColorScheme() ?? 'dark';
   const colorFromProps = props[theme];
 
   if (colorFromProps) {
@@ -79,9 +78,8 @@ export function Card(props: ViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
 
   // Dynamically adjust border and shadow based on the color scheme
-  const isWeb = Platform.OS === 'web';
-  const colorScheme = isWeb ? 'dark' : useColorScheme();
-  
+
+  const colorScheme = useColorScheme();
   const backgroundColor = colorScheme === 'dark' ? '#101010' : '#FAFAFA';
   const borderColor = colorScheme === 'dark' ? '#101010' : '#DDDDDD';
   const shadowColor = colorScheme === 'dark' ? '#101010' : '#EFEFEF';

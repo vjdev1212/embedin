@@ -5,6 +5,7 @@ import * as Haptics from 'expo-haptics';
 import { useColorScheme } from '@/components/useColorScheme';
 import { Platform } from 'react-native';
 import { isHapticsSupported } from '@/utils/platform';
+import { Ionicons } from '@expo/vector-icons';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -13,10 +14,16 @@ function TabBarIcon(props: {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-export default function TabLayout() {
-  const isWeb = Platform.OS === 'web';
-  const colorScheme = isWeb ? 'dark' : useColorScheme();
+function TabBarIconIonIcon(props: {
+  name: React.ComponentProps<typeof Ionicons>['name'];
+  color: string;
+}) {
+  return <Ionicons size={28} style={{ marginBottom: -3 }} {...props} />;
+}
 
+export default function TabLayout() {
+
+  const colorScheme = useColorScheme();
   const getTabBarHeight = () => {
     switch (Platform.OS) {
       case 'web':
@@ -65,7 +72,22 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
           tabBarIconStyle: { marginVertical: 5 },
         }}
-      />      
+      />
+      <Tabs.Screen
+        name="addons"
+        listeners={{
+          tabPress: () => {
+            if (isHapticsSupported()) {
+              Haptics.selectionAsync();
+            }
+          },
+        }}
+        options={{
+          title: 'Addons',
+          tabBarIcon: ({ color }) => <TabBarIconIonIcon name="extension-puzzle-sharp" color={color} />,
+          tabBarIconStyle: { marginVertical: 5 },
+        }}
+      />
       <Tabs.Screen
         name="settings"
         listeners={{

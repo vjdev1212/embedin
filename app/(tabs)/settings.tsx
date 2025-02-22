@@ -1,20 +1,25 @@
 import React from 'react';
-import { Platform, StyleSheet, Pressable, View, ScrollView, useColorScheme } from 'react-native';
+import { StyleSheet, Pressable, View, ScrollView } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons'; // Import icons from Expo
 import { StatusBar, Text } from '@/components/Themed'; // Assuming you have a Themed Text component
 import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics'
 import { isHapticsSupported } from '@/utils/platform';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useColorScheme } from '@/components/useColorScheme';
 
 const SettingsScreen = () => {
   const router = useRouter();
-  const isWeb = Platform.OS === 'web';
-  const colorScheme = isWeb ? 'dark' : useColorScheme();
+  
+  const colorScheme = useColorScheme();
+  const serversList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
+    { title: 'Stremio Server', route: '/settings/stremioserver', icon: 'server-outline' },
+    { title: 'TorrServer', route: '/settings/torrserver', icon: 'server-outline' },
+  ];
 
   const contactList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
     { title: 'Contact', route: '/settings/contact', icon: 'mail-outline' },
-    { title: 'Donate', route: '/settings/donate', icon: 'cash-outline' },
+    { title: 'Support', route: '/settings/donate', icon: 'cash-outline' },
   ];
 
   // SettingItem Component
@@ -37,18 +42,36 @@ const SettingsScreen = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        <Text style={styles.header}>Contact</Text>
-        <View style={[styles.settingsGroup, {
-          backgroundColor: colorScheme === 'dark' ? '#101010' : '#f0f0f0',
-        }]}>
-          {contactList.map((item, index) => (
-            <SettingItem
-              key={index}
-              title={item.title}
-              icon={item.icon}
-              onPress={() => onSettingsItemPress(item)}
-            />
-          ))}
+        <View>
+          <Text style={styles.header}>Servers</Text>
+          <View style={[styles.settingsGroup, {
+            backgroundColor: colorScheme === 'dark' ? '#101010' : '#f6f6f6',
+          }]}>
+            {serversList.map((item, index) => (
+              <SettingItem
+                key={index}
+                title={item.title}
+                icon={item.icon}
+                onPress={() => onSettingsItemPress(item)}
+              />
+            ))}
+          </View>
+        </View>
+
+        <View>
+          <Text style={styles.header}>Contact</Text>
+          <View style={[styles.settingsGroup, {
+            backgroundColor: colorScheme === 'dark' ? '#101010' : '#f6f6f6',
+          }]}>
+            {contactList.map((item, index) => (
+              <SettingItem
+                key={index}
+                title={item.title}
+                icon={item.icon}
+                onPress={() => onSettingsItemPress(item)}
+              />
+            ))}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -58,6 +81,9 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
+    maxWidth: 780,
+    margin: 'auto'
   },
   scrollViewContent: {
     marginTop: 20,
@@ -69,7 +95,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 20,
     marginTop: 25,
-    marginLeft: 10,
+    marginLeft: 25,
   },
   settingsGroup: {
     marginVertical: 10,
@@ -78,7 +104,6 @@ const styles = StyleSheet.create({
   },
   settingItem: {
     flexDirection: 'row',
-    alignItems: 'center',
     paddingVertical: 15,
     marginHorizontal: 5,
     justifyContent: 'space-between',

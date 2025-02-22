@@ -6,7 +6,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { useColorScheme } from '@/components/useColorScheme';
-import { Platform } from 'react-native';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,8 +45,6 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
-  const isWeb = Platform.OS === 'web';
-  const colorScheme = isWeb ? 'dark' : useColorScheme();
 
   const LightTheme: Theme = {
     dark: false,
@@ -79,9 +76,7 @@ function RootLayoutNav() {
     }
   };
 
-  const theme = Platform.OS === 'web'
-    ? DarkTheme
-    : (useColorScheme() === 'dark' ? DarkTheme : LightTheme);
+  const theme = (useColorScheme() === 'dark' ? DarkTheme : LightTheme);
 
   return (
     <ThemeProvider value={theme}>
@@ -92,7 +87,7 @@ function RootLayoutNav() {
         <Stack.Screen name="movie/list" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
         <Stack.Screen name="series/details" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
         <Stack.Screen name="series/list" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
-        <Stack.Screen name="stream/embed" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
+        <Stack.Screen name="stream/embed" options={{ headerShown: false, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
         <Stack.Screen name="settings/contact" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
         <Stack.Screen name="settings/donate" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
       </Stack>
