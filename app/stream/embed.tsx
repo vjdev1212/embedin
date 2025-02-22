@@ -59,7 +59,7 @@ const EmbedPlayer = () => {
                     style="width: 100%; height: 100%;"
                     allow="autoplay; fullscreen" 
                     referrerPolicy="no-referrer-when-downgrade"
-                    sandbox="allow-forms allow-scripts allow-same-origin"
+                    sandbox="allow-forms allow-scripts allow-same-origin allowfullscreen"
                     allowfullscreen>
                 </iframe>
             </div>
