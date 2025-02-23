@@ -1,7 +1,6 @@
 ## Overview
 
-A frontend for VidSrc or any other sites that offer embed for movies and TV show.
-
+A simple and sleek frontend for VidSrc and similar services that provide embedded movies and TV shows. Easily search, browse, and watch content with a user-friendly interface.
 
 ## Screenshots
 
