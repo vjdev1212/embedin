@@ -13,6 +13,13 @@
         "buildType": "apk"
       }
     },
+    "preview_tv": {
+      "extends": "preview",
+      "env": {
+        "EXPO_TV": "1"
+      },
+      "channel": "preview"
+    },    
     "production": {
       "autoIncrement": true,
       "android": {
