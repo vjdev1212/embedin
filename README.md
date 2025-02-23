@@ -5,6 +5,13 @@ A frontend for VidSrc or any other sites that offer embed for movies and TV show
 
 ## Screenshots
 
-[url=https://postimg.cc/SJZZ9Bp7][img]https://i.postimg.cc/SJZZ9Bp7/1.png[/img][/url] [url=https://postimg.cc/H8Y2c2Zh][img]https://i.postimg.cc/H8Y2c2Zh/2.png[/img][/url] [url=https://postimg.cc/zb1p55n5][img]https://i.postimg.cc/zb1p55n5/3.png[/img][/url] [url=https://postimg.cc/rD3Qn5sD][img]https://i.postimg.cc/rD3Qn5sD/4.png[/img][/url]
+## Screenshots
 
-[url=https://postimg.cc/ygXj85PR][img]https://i.postimg.cc/ygXj85PR/5.png[/img][/url] 
+<p align="center">
+  <img src="https://i.postimg.cc/bwP47PCM/1.png" width="18%" />
+  <img src="https://i.postimg.cc/XqFDP1w4/2.png" width="18%" />
+  <img src="https://i.postimg.cc/vB4KrZT1/3.png" width="18%" />
+  <img src="https://i.postimg.cc/CKLXKNVs/4.png" width="18%" />
+  <img src="https://i.postimg.cc/W3xHXcq5/5.png" width="18%" />
+</p>
+
