@@ -54,6 +54,12 @@
         "projectId": "27d9ba1d-de27-4115-81a7-ef702e068e34"
       }
     },
-    "owner": "vijayvcm"
+    "owner": "vijayvcm",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/27d9ba1d-de27-4115-81a7-ef702e068e34"
+    }
   }
 }
