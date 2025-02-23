@@ -88,6 +88,8 @@ function RootLayoutNav() {
         <Stack.Screen name="series/details" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
         <Stack.Screen name="series/list" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
         <Stack.Screen name="stream/embed" options={{ headerShown: false, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
+        <Stack.Screen name="settings/embed" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
+        <Stack.Screen name="settings/preferences" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
         <Stack.Screen name="settings/contact" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
         <Stack.Screen name="settings/donate" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
       </Stack>

@@ -18,6 +18,11 @@ const SettingsScreen = () => {
     { title: 'Support', route: '/settings/donate', icon: 'cash-outline' },
   ];
 
+  const preferencesList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
+    { title: 'Preferences', route: '/settings/preferences', icon: 'build-outline' },
+    { title: 'Embed Settings', route: '/settings/embed', icon: 'options-outline' },
+  ];
+
   // SettingItem Component
   const SettingItem = ({ title, icon, onPress }: { title: string, icon: keyof typeof Ionicons.glyphMap, onPress: () => void }) => (
     <Pressable style={styles.settingItem} onPress={onPress}>
@@ -38,6 +43,21 @@ const SettingsScreen = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
+      <View>
+          <Text style={styles.header}>Preferences</Text>
+          <View style={[styles.settingsGroup, {
+            backgroundColor: colorScheme === 'dark' ? '#101010' : '#f6f6f6',
+          }]}>
+            {preferencesList.map((item, index) => (
+              <SettingItem
+                key={index}
+                title={item.title}
+                icon={item.icon}
+                onPress={() => onSettingsItemPress(item)}
+              />
+            ))}
+          </View>
+        </View>
         <View>
           <Text style={styles.header}>Contact</Text>
           <View style={[styles.settingsGroup, {
