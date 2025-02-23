@@ -12,10 +12,10 @@ const EmbedPlayer = () => {
         if (imdbid) {
             let url = '';
             if (type === 'movie') {
-                url = `https://vidsrc.cc/v2/embed/movie/${imdbid}?poster=true`;
+                url = `https://vidsrc.cc/v2/embed/movie/${imdbid}?poster=true&autoPlay=false`;
             }
             if (type === 'series' && season && episode) {
-                url = `https://vidsrc.cc/v2/embed/tv/${imdbid}/${season}/${episode}?poster=true`;
+                url = `https://vidsrc.cc/v2/embed/tv/${imdbid}/${season}/${episode}?poster=true&autoPlay=false`;
             }
             setVideoUrl(url);
             console.log('Video URL:', url);
