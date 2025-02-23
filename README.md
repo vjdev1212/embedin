@@ -4,13 +4,16 @@ A simple and sleek frontend for VidSrc and similar services that provide embedde
 
 ## Screenshots
 
+## Screenshots
+
 <p align="center">
-  <img src="https://i.postimg.cc/tgbyNfVd/1.png" width="18%" />
-  <img src="https://i.postimg.cc/XqFDP1w4/2.png" width="18%" />
-  <img src="https://i.postimg.cc/vB4KrZT1/3.png" width="18%" />
-  <img src="https://i.postimg.cc/CKLXKNVs/4.png" width="18%" />
-  <img src="https://i.postimg.cc/W3xHXcq5/5.png" width="18%" />
+  <img src="https://postimg.cc/ZvRWQbTV" width="18%" />
+  <img src="https://postimg.cc/8jx7ygxm" width="18%" />
+  <img src="https://postimg.cc/87Wj9nSQ" width="18%" />
+  <img src="https://postimg.cc/zVyLSG2f" width="18%" />
 </p>
+
+
 
 ## LICENSE
 
