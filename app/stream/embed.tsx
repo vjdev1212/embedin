@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Iframe } from "@bounceapp/iframe"
+import { movieUrlTemplate, seriesUrlTemplate } from '@/constants/Embed';
 
 const EmbedPlayer = () => {
     const { imdbid, type, season, episode } = useLocalSearchParams();
@@ -12,15 +13,29 @@ const EmbedPlayer = () => {
         if (imdbid) {
             let url = '';
             if (type === 'movie') {
-                url = `https://vidsrc.cc/v2/embed/movie/${imdbid}?poster=true&autoPlay=false`;
+                url = generateUrl(movieUrlTemplate, { imdbid: imdbid as string });
             }
             if (type === 'series' && season && episode) {
-                url = `https://vidsrc.cc/v2/embed/tv/${imdbid}/${season}/${episode}?poster=true&autoPlay=false`;
+                url = generateUrl(seriesUrlTemplate,
+                    {
+                        imdbid: imdbid as string,
+                        season: season as string,
+                        episode: episode as string
+                    }
+                );
             }
             setVideoUrl(url);
             console.log('Video URL:', url);
         }
     }, [imdbid, season, episode]);
+
+    const generateUrl = (template: string, { imdbid, season = '1', episode = '1' }: { imdbid: string; season?: string; episode?: string; }) => {
+        let url = template;
+        url = url.split('{IMDBID}').join(imdbid);
+        url = url.split('{SEASON}').join(season.toString());
+        url = url.split('{EPISODE}').join(episode.toString());
+        return url;
+    };
 
     // HTML structure with iframe and popup-blocking JavaScript
     const iframeHtml = `
