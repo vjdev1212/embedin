@@ -1,8 +1,25 @@
 ## Overview
 
-A frontend for VidSrc or any other sites that offer embed for movies and TV show.
-
+A simple and sleek frontend for VidSrc and similar services that provide embedded movies and TV shows. Easily search, browse, and watch content with a user-friendly interface.
 
 ## Screenshots
 
-![Screenshot](https://raw.githubusercontent.com/jarvisnexus/vidsrcstream/refs/heads/main/screenshots/iPhone%2013%20Pro/iPhone-13-PRO-vidsrcstream.web.app.png?token=GHSAT0AAAAAAC7MWTT3YQRUJMXJUBIIHLECZ526IUQ)
+<p align="center">
+  <img src="https://i.postimg.cc/Wzm0hzxL/1.png" width="18%" />
+  <img src="https://i.postimg.cc/7ZZSZxVd/2.png" width="18%" />
+  <img src="https://i.postimg.cc/XY1dZT1J/3.png" width="18%" />
+  <img src="https://i.postimg.cc/Yq31741Q/4.png" width="18%" />
+</p>
+
+<p align="center">
+  <img src="https://i.postimg.cc/5jd1kNt0/1.png" width="18%" />
+  <img src="https://i.postimg.cc/t4zZP8rP/2.png" width="18%" />  
+  <img src="https://i.postimg.cc/Kz1R6jmr/4.png" width="18%" />
+  <img src="https://i.postimg.cc/FFZ00d71/3.png" width="18%" />
+</p>
+
+
+
+## LICENSE
+
+Licensed under the GNU General Public License v3.0 (GPL-3.0).
