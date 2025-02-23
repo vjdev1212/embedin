@@ -1,6 +1,6 @@
 import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import PosterList from '@/components/PosterList';
-import { CatalogUrl } from '@/constants/Stremio';
+import { CatalogUrl } from '@/constants/Tmdb';
 import { StatusBar, View } from '@/components/Themed';
 
 export default function HomeScreen() {
