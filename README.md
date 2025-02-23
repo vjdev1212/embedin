@@ -12,3 +12,6 @@ A simple and sleek frontend for VidSrc and similar services that provide embedde
   <img src="https://i.postimg.cc/W3xHXcq5/5.png" width="18%" />
 </p>
 
+## LICENSE
+
+Licensed under the GNU General Public License v3.0 (GPL-3.0).
