@@ -40,7 +40,8 @@
     "plugins": [
       "expo-router",
       "expo-font",
-      "expo-video"
+      "expo-video",
+      "@react-native-tvos/config-tv"
     ],
     "experiments": {
       "typedRoutes": true
