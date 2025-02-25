@@ -44,6 +44,24 @@ This app is built using the Expo React Native framework.
 
 To stop the running process, press `Ctrl + C` in the terminal.
 
+## Docker support
+
+This project is available as docker container. Use the below yaml script.
+
+```yaml
+version: '3.0'
+
+name: VidSrcStream
+services:
+  vidsrcstream:
+    container_name: vidsrcstream
+    hostname: vidsrcstream
+    image: jarvisnexus/vidsrcstream:latest
+    ports:
+      - "4444:80"
+    restart: unless-stopped
+```
+
 ## Screenshots
 
 <p align="center">
