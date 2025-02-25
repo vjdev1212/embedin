@@ -19,9 +19,9 @@ This app is built using the Expo React Native framework.
    git clone https://github.com/jarvisnexus/vidsrcstream.git
    cd vidsrcstream
    ```
-2. Create a `.env` file in the project root:
+2. Create a `.env` file in the project root and set the TMDB API Key
    ```cmd
-   echo "EXPO_PUBLIC_TMDB_API_KEY=your_api_key_here" > .env
+   EXPO_PUBLIC_TMDB_API_KEY=your_api_key_here
    ```
 3. Install dependencies:
    ```cmd
