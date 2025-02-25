@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, StatusBar, Text, View } from '../../components/Themed';
 import MediaContentDescription from '@/components/MediaContentDescription';
 import MediaContentHeader from '@/components/MediaContentHeader';
@@ -10,6 +10,7 @@ import BottomSpacing from '@/components/BottomSpacing';
 import { isHapticsSupported } from '@/utils/platform';
 import MediaLogo from '@/components/MediaLogo';
 import MediaCastAndCrews from '@/components/MediaCastAndCrews';
+import PosterList from '@/components/PosterList';
 import PlayButton from '@/components/PlayButton';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
@@ -22,6 +23,13 @@ const MovieDetails = () => {
   const [cast, setCast] = useState<any[]>([]);
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
+  const ref = useRef<ScrollView | null>(null);
+
+  useFocusEffect(() => {
+    if (ref.current) {
+      ref.current.scrollTo({ y: 0, animated: true });
+    }
+  });
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -53,7 +61,7 @@ const MovieDetails = () => {
         }
       } catch (error) {
         console.error('Error fetching movie details:', error);
-      } finally {
+      } finally {       
         setLoading(false);
       }
     };
@@ -105,11 +113,11 @@ const MovieDetails = () => {
   };
 
   return (
-    <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
+    <ScrollView showsVerticalScrollIndicator={false} style={styles.container} ref={ref}>
       <StatusBar />
 
       <View style={[{
-        flex: 1,        
+        flex: 1,
         flexDirection: isPortrait ? 'column' : 'row',
         marginTop: isPortrait ? 0 : '5%',
         justifyContent: 'center',
@@ -146,6 +154,10 @@ const MovieDetails = () => {
           /> */}
           <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
         </View>
+        <BottomSpacing space={20} />
+      </View>
+      <View style={styles.recommendationsContainer}>
+        <PosterList apiUrl={`https://api.themoviedb.org/3/movie/${moviedbid}/recommendations`} title='More like this' type='movie' />
         <BottomSpacing space={50} />
       </View>
     </ScrollView>
@@ -181,6 +193,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     textAlign: 'center',
   },
+  recommendationsContainer: {
+  }
 });
 
 export default MovieDetails;
