@@ -2,6 +2,48 @@
 
 A simple and sleek frontend for VidSrc and similar services that provide embedded movies and TV shows. Easily search, browse, and watch content with a user-friendly interface.
 
+# VidSrcStream App
+
+This app is built using the Expo React Native framework. 
+
+## Prerequisites
+
+- Node.js and npm installed
+- Expo CLI installed (`npm install -g expo-cli`)
+- `.env` file with the required API key
+
+## Setup
+
+1. Clone the repository:
+   ```sh
+   git clone https://github.com/jarvisnexus/vidsrcstream.git
+   cd vidsrcstream
+   ```
+2. Create a `.env` file in the project root:
+   ```cmd
+   echo "EXPO_PUBLIC_TMDB_API_KEY=your_api_key_here" > .env
+   ```
+3. Install dependencies:
+   ```cmd
+   npm install
+   ```
+4. Start the Expo development server:
+   ```cmd
+   npx expo start
+   ```
+
+## Running on Expo Go
+
+- Scan the QR code from the Expo CLI output using the Expo Go app on your mobile device.
+
+## Configuration
+
+- Modify the `.env` file to set your API key.
+
+## Stopping the Development Server
+
+To stop the running process, press `Ctrl + C` in the terminal.
+
 ## Screenshots
 
 <p align="center">
