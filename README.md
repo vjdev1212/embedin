@@ -10,7 +10,7 @@ This app is built using the Expo React Native framework.
 
 - Node.js and npm installed
 - Expo CLI installed (`npm install -g expo-cli`)
-- `.env` file with the required API key
+- `.env` file with the required TMDB API key
 
 ## Setup
 
@@ -21,7 +21,7 @@ This app is built using the Expo React Native framework.
    ```
 2. Create a `.env` file in the project root and set the TMDB API Key
    ```cmd
-   EXPO_PUBLIC_TMDB_API_KEY=your_api_key_here
+   EXPO_PUBLIC_TMDB_API_KEY=api_key_here
    ```
 3. Install dependencies:
    ```cmd
@@ -31,18 +31,51 @@ This app is built using the Expo React Native framework.
    ```cmd
    npx expo start
    ```
-
+   
 ## Running on Expo Go
 
 - Scan the QR code from the Expo CLI output using the Expo Go app on your mobile device.
 
-## Configuration
-
-- Modify the `.env` file to set your API key.
-
 ## Stopping the Development Server
 
 To stop the running process, press `Ctrl + C` in the terminal.
+
+## Embed URL Templates
+
+The embed URL templates can be modified in `constants/Embed.ts`. Update this file if you need to customize the embed URLs.
+
+Use the following URL templates for embedding movie and TV show content from any provider:
+
+- **Movies:**
+  ```sh
+  https://vidsrc.cc/v2/embed/movie/{IMDBID}?poster=true&autoPlay=false
+  ```
+
+- **TV Shows:**
+  ```sh
+  https://vidsrc.cc/v2/embed/tv/{IMDBID}/{SEASON}/{EPISODE}?poster=true&autoPlay=false
+  ```
+
+The placeholders `{IMDBID}`, `{SEASON}`, and `{EPISODE}` are required in the URL.
+
+
+## Docker support
+
+This project is available as docker container. Use the below yaml script.
+
+```yaml
+version: '3.0'
+
+name: VidSrcStream
+services:
+  vidsrcstream:
+    container_name: vidsrcstream
+    hostname: vidsrcstream
+    image: jarvisnexus/vidsrcstream:latest
+    ports:
+      - "4444:80"
+    restart: unless-stopped
+```
 
 ## Screenshots
 
