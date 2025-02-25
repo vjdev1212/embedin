@@ -1,8 +1,8 @@
-## Overview
+# VidSrcStream
 
 A simple and sleek frontend for VidSrc and similar services that provide embedded movies and TV shows. Easily search, browse, and watch content with a user-friendly interface.
 
-# VidSrcStream App
+## Framework
 
 This app is built using the Expo React Native framework. 
 
