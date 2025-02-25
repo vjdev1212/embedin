@@ -1,0 +1,11 @@
+version: '3.0'
+
+name: VidSrcStream
+services:
+  vidsrcstream:
+    container_name: vidsrcstream
+    hostname: vidsrcstream
+    image: jarvisnexus/vidsrcstream:latest
+    ports:
+      - "4444:80"
+    restart: unless-stopped
