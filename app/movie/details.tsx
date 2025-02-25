@@ -61,7 +61,7 @@ const MovieDetails = () => {
         }
       } catch (error) {
         console.error('Error fetching movie details:', error);
-      } finally {       
+      } finally {
         setLoading(false);
       }
     };
@@ -154,8 +154,8 @@ const MovieDetails = () => {
           /> */}
           <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
         </View>
-        <BottomSpacing space={20} />
       </View>
+      <BottomSpacing space={20} />
       <View style={styles.recommendationsContainer}>
         <PosterList apiUrl={`https://api.themoviedb.org/3/movie/${moviedbid}/recommendations`} title='More like this' type='movie' />
         <BottomSpacing space={50} />
@@ -194,6 +194,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   recommendationsContainer: {
+    marginHorizontal: '2%'
   }
 });
 
