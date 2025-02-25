@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { Iframe } from "@bounceapp/iframe"
-import { movieUrlTemplate, seriesUrlTemplate } from '@/constants/Embed';
+import { movieUrlTemplate, sanboxAllowed, seriesUrlTemplate } from '@/constants/Embed';
 
 const EmbedPlayer = () => {
     const { imdbid, type, season, episode } = useLocalSearchParams();
@@ -61,7 +61,7 @@ const EmbedPlayer = () => {
 
                 @media (orientation: portrait) {
                     .iframe-container {
-                        height: 95vh;
+                        height: 100vh;
                     }
                 }
             </style>
@@ -73,7 +73,7 @@ const EmbedPlayer = () => {
                     frameborder="0" 
                     style="width: 100%; height: 100%;"
                     allow="autoplay; fullscreen" 
-                    referrerPolicy="no-referrer-when-downgrade"
+                    referrerPolicy="no-referrer-when-downgrade"                    
                     sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"
                     allowfullscreen>
                 </iframe>
@@ -91,7 +91,30 @@ const EmbedPlayer = () => {
         <View style={styles.container}>
             {videoUrl ? (
                 Platform.OS === 'web' ? (
-                    <Iframe uri={videoUrl} style={{ flex: 1 }} />
+                    <>
+                        {
+                            sanboxAllowed ? (
+                                <iframe
+                                    src={videoUrl as string}
+                                    style={{ flex: 1, width: "100%", height: "100%" }}
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                    sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"
+                                    allow="autoplay; fullscreen"
+                                    frameBorder={0}
+                                    allowFullScreen
+                                />
+                            ) : (
+                                <iframe
+                                    src={videoUrl as string}
+                                    style={{ flex: 1, width: "100%", height: "100%" }}
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                    allow="autoplay; fullscreen"
+                                    frameBorder={0}
+                                    allowFullScreen
+                                />
+                            )
+                        }
+                    </>
                 ) : (
                     <WebView
                         originWhitelist={['*']}
