@@ -27,14 +27,12 @@ const PreferencesScreen = () => {
         loadPreferences();
     }, []);
 
-    const savePreferences = async (key: string, value: string) => {
+    const savePreferences = async () => {
         try {
             if (isHapticsSupported()) {
                 await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
             }
-            const currentPreferences = await AsyncStorage.getItem('preferences');
-            const preferences = currentPreferences ? JSON.parse(currentPreferences) : {};
-            preferences[key] = value;
+            const preferences = { language, region };
             await AsyncStorage.setItem('preferences', JSON.stringify(preferences));
             showAlert('Preferences Saved', 'Your preferences have been saved.');
         } catch (error) {
@@ -55,10 +53,7 @@ const PreferencesScreen = () => {
                             colorScheme === 'dark' ? styles.darkSearchInput : styles.lightSearchInput,
                         ]}
                         value={language}
-                        onChangeText={(text) => {
-                            setLanguage(text);
-                            savePreferences('language', text);
-                        }}
+                        onChangeText={(text) => setLanguage(text)}
                         maxLength={2}
                         autoCapitalize="none"
                     />
@@ -71,27 +66,18 @@ const PreferencesScreen = () => {
                             colorScheme === 'dark' ? styles.darkSearchInput : styles.lightSearchInput,
                         ]}
                         value={region}
-                        onChangeText={(text) => {
-                            setRegion(text.toUpperCase());
-                            savePreferences('region', text.toUpperCase());
-                        }}
+                        onChangeText={(text) => setRegion(text.toUpperCase())}
                         maxLength={2}
                         autoCapitalize="characters"
                     />
                 </View>
-
-                <View style={styles.saveButton}     >
-                    <TouchableOpacity
-                        onPress={async () => {
-                            await savePreferences('language', language);
-                            await savePreferences('region', region);
-                        }}
-                    >
+                <View style={styles.saveButton}>
+                    <TouchableOpacity onPress={savePreferences}>
                         <Text style={styles.saveButtonText}>Save</Text>
                     </TouchableOpacity>
                 </View>
-            </ScrollView >
-        </SafeAreaView >
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 
