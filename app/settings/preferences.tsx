@@ -30,15 +30,16 @@ const PreferencesScreen = () => {
     const savePreferences = async () => {
         try {
             if (isHapticsSupported()) {
-                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft); // Don't await
             }
             const preferences = { language, region };
             await AsyncStorage.setItem('preferences', JSON.stringify(preferences));
-            showAlert('Preferences Saved', 'Your preferences have been saved.');
         } catch (error) {
             console.error('Failed to save preferences:', error);
             showAlert('Error', 'Failed to save preferences.');
+            return;
         }
+        showAlert('Preferences Saved', 'Your preferences have been saved.'); // Moved outside the try-catch
     };
 
     return (

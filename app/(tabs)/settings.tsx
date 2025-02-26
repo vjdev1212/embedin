@@ -19,7 +19,7 @@ const SettingsScreen = () => {
   ];
 
   const preferencesList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
-    { title: 'Preferences', route: '/settings/preferences', icon: 'build-outline' },
+    //{ title: 'Preferences', route: '/settings/preferences', icon: 'build-outline' },
     { title: 'Embed Settings', route: '/settings/embed', icon: 'options-outline' },
   ];
 
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 17,
     paddingVertical: 5,
-    paddingHorizontal: 20,
+    paddingHorizontal: 5,
     marginTop: 25,
     marginLeft: 25,
   },
