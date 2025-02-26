@@ -3,6 +3,8 @@ import { SafeAreaView, ScrollView, StyleSheet, TextInput, Text, View, TouchableO
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from '@/components/Themed';
 import { useColorScheme } from '@/components/useColorScheme';
+import { isHapticsSupported, showAlert } from '@/utils/platform';
+import * as Haptics from 'expo-haptics';
 
 const PreferencesScreen = () => {
     const [language, setLanguage] = useState('en');
@@ -27,12 +29,17 @@ const PreferencesScreen = () => {
 
     const savePreferences = async (key: string, value: string) => {
         try {
+            if (isHapticsSupported()) {
+                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+            }
             const currentPreferences = await AsyncStorage.getItem('preferences');
             const preferences = currentPreferences ? JSON.parse(currentPreferences) : {};
             preferences[key] = value;
             await AsyncStorage.setItem('preferences', JSON.stringify(preferences));
+            showAlert('Preferences Saved', 'Your preferences have been saved.');
         } catch (error) {
             console.error('Failed to save preferences:', error);
+            showAlert('Error', 'Failed to save preferences.');
         }
     };
 
@@ -91,7 +98,7 @@ const PreferencesScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: 50,
+        marginTop: 30,
         width: '100%',
         maxWidth: 780,
         alignSelf: 'center',
@@ -100,11 +107,9 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     searchInputContainer: {
-        marginTop: 30,
-        paddingHorizontal: 20,
-        width: '100%',
-        maxWidth: 780,
-        margin: 'auto',
+        marginBottom: 30,
+        paddingHorizontal: 10,
+        width: '100%'
     },
     searchInput: {
         height: 40,
@@ -121,7 +126,7 @@ const styles = StyleSheet.create({
         color: '#fff',
     },
     saveButton: {
-        marginTop: 50,
+        marginTop: 20,
         backgroundColor: '#535aff',
         padding: 12,
         borderRadius: 30,
