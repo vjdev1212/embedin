@@ -42,9 +42,9 @@ To stop the running process, press `Ctrl + C` in the terminal.
 
 ## Embed URL Templates
 
-The embed URL templates can be modified in `constants/Embed.ts`. Update this file if you need to customize the embed URLs.
+The embed URL templates can be modified in the Settings > Embed Settings page. Update them as needed to customize the embed URLs.
 
-Use the following URL templates for embedding movie and TV show content from any provider:
+Use the following URL templates to embed movie and TV show content from any provider:
 
 - **Movies:**
   ```sh
@@ -56,8 +56,7 @@ Use the following URL templates for embedding movie and TV show content from any
   https://vidsrc.cc/v2/embed/tv/{IMDBID}/{SEASON}/{EPISODE}?poster=true&autoPlay=false
   ```
 
-The placeholders `{IMDBID}`, `{SEASON}`, and `{EPISODE}` are required in the URL.
-
+Ensure that {IMDBID}, {SEASON}, and {EPISODE} are included in the TV show URL; otherwise, it will not work. The {SEASON} and {EPISODE} parameters are not required for the movie template.
 
 ## Docker support
 
