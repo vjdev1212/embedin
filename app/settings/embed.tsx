@@ -64,7 +64,6 @@ const EmbedSettingsScreen = () => {
                         value={movieUrlTemplate}
                         onChangeText={setMovieUrlTemplate}
                         multiline
-                        numberOfLines={5}
                     />
                 </View>
                 <View style={styles.textInputContainer}>
@@ -77,7 +76,6 @@ const EmbedSettingsScreen = () => {
                         value={tvShowsUrlTemplate}
                         onChangeText={setTvShowsUrlTemplate}
                         multiline
-                        numberOfLines={5}
                     />
                 </View>
                 <View style={styles.textInputContainer}>
