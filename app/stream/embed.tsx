@@ -10,7 +10,7 @@ import {
 } from '@/constants/Embed';
 
 const EmbedPlayer = () => {
-    const { imdbid, type, season, episode } = useLocalSearchParams();
+    const { imdbid, tmdbid, type, season, episode } = useLocalSearchParams();
     const [videoUrl, setVideoUrl] = useState<string>('');
     const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
     const [seriesUrlTemplate, setSeriesUrlTemplate] = useState<string>(defaultSeriesUrlTemplate);
@@ -38,12 +38,13 @@ const EmbedPlayer = () => {
         if (imdbid) {
             let url = '';
             if (type === 'movie') {
-                url = generateUrl(movieUrlTemplate, { imdbid: imdbid as string });
+                url = generateUrl(movieUrlTemplate, { imdbid: imdbid as string, tmdbid : tmdbid as string });
             }
             if (type === 'series' && season && episode) {
                 url = generateUrl(seriesUrlTemplate,
                     {
                         imdbid: imdbid as string,
+                        tmdbid: tmdbid as string,
                         season: season as string,
                         episode: episode as string
                     }
@@ -51,10 +52,11 @@ const EmbedPlayer = () => {
             }
             setVideoUrl(url);
         }
-    }, [imdbid, season, episode, movieUrlTemplate, seriesUrlTemplate]);
+    }, [imdbid, tmdbid, season, episode, movieUrlTemplate, seriesUrlTemplate]);
 
-    const generateUrl = (template: string, { imdbid, season = '1', episode = '1' }: { imdbid: string; season?: string; episode?: string; }) => {
+    const generateUrl = (template: string, { imdbid, tmdbid, season = '1', episode = '1' }: { imdbid: string; tmdbid: string; season?: string; episode?: string; }) => {
         return template
+            .replace(/(\{TMDBID\})/gi, tmdbid)
             .replace(/(\{IMDBID\})/gi, imdbid)
             .replace(/(\{SEASON\})/gi, season.toString())
             .replace(/(\{EPISODE\})/gi, episode.toString());
