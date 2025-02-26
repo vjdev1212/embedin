@@ -51,6 +51,7 @@ const EmbedPlayer = () => {
                 );
             }
             setVideoUrl(url);
+            console.log('Video URL:', url);
         }
     }, [imdbid, tmdbid, season, episode, movieUrlTemplate, seriesUrlTemplate]);
 
