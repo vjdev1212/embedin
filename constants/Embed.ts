@@ -6,4 +6,4 @@
 
 export const movieUrlTemplate = "https://vidsrc.to/embed/movie/{IMDBID}";
 export const seriesUrlTemplate = "https://vidsrc.to/embed/tv/{IMDBID}/{SEASON}/{EPISODE}";
-export const sanboxAllowed = true;
+export const sanboxAllowed = false;
