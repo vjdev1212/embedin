@@ -72,22 +72,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
           tabBarIconStyle: { marginVertical: 5 },
         }}
-      />
-      <Tabs.Screen
-        name="addons"
-        listeners={{
-          tabPress: () => {
-            if (isHapticsSupported()) {
-              Haptics.selectionAsync();
-            }
-          },
-        }}
-        options={{
-          title: 'Addons',
-          tabBarIcon: ({ color }) => <TabBarIconIonIcon name="extension-puzzle-sharp" color={color} />,
-          tabBarIconStyle: { marginVertical: 5 },
-        }}
-      />
+      />      
       <Tabs.Screen
         name="settings"
         listeners={{
