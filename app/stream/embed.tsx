@@ -2,12 +2,37 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { Iframe } from "@bounceapp/iframe"
-import { movieUrlTemplate, sanboxAllowed, seriesUrlTemplate } from '@/constants/Embed';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+    defaultMovieUrlTemplate,
+    defaultSeriesUrlTemplate,
+    defaultSandboxAllowed
+} from '@/constants/Embed';
 
 const EmbedPlayer = () => {
     const { imdbid, type, season, episode } = useLocalSearchParams();
-    const [videoUrl, setVideoUrl] = useState('');
+    const [videoUrl, setVideoUrl] = useState<string>('');
+    const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
+    const [seriesUrlTemplate, setSeriesUrlTemplate] = useState<string>(defaultSeriesUrlTemplate);
+    const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(defaultSandboxAllowed);
+
+    useEffect(() => {
+        const loadEmbedSettings = async () => {
+            try {
+                const storedSettings = await AsyncStorage.getItem('embedSettings');
+                if (storedSettings) {
+                    const parsedSettings = JSON.parse(storedSettings);
+                    setMovieUrlTemplate(parsedSettings.movieUrlTemplate ?? defaultMovieUrlTemplate);
+                    setSeriesUrlTemplate(parsedSettings.tvShowsUrlTemplate ?? defaultSeriesUrlTemplate);
+                    setSandboxAllowed(parsedSettings.sandboxAllowed ?? defaultSandboxAllowed);
+                }
+            } catch (error) {
+                console.error('Failed to load embed settings:', error);
+            }
+        };
+
+        loadEmbedSettings();
+    }, []);
 
     useEffect(() => {
         if (imdbid) {
@@ -25,16 +50,14 @@ const EmbedPlayer = () => {
                 );
             }
             setVideoUrl(url);
-            console.log('Video URL:', url);
         }
-    }, [imdbid, season, episode]);
+    }, [imdbid, season, episode, movieUrlTemplate, seriesUrlTemplate]);
 
     const generateUrl = (template: string, { imdbid, season = '1', episode = '1' }: { imdbid: string; season?: string; episode?: string; }) => {
-        let url = template;
-        url = url.split('{IMDBID}').join(imdbid);
-        url = url.split('{SEASON}').join(season.toString());
-        url = url.split('{EPISODE}').join(episode.toString());
-        return url;
+        return template
+            .replace(/(\{IMDBID\})/gi, imdbid)
+            .replace(/(\{SEASON\})/gi, season.toString())
+            .replace(/(\{EPISODE\})/gi, episode.toString());
     };
 
     // HTML structure with iframe and popup-blocking JavaScript
@@ -74,7 +97,7 @@ const EmbedPlayer = () => {
                     style="width: 100%; height: 100%;"
                     allow="autoplay; fullscreen" 
                     referrerPolicy="no-referrer-when-downgrade"                    
-                    sandbox="allow-forms allow-scripts allow-same-origin allow-presentation"
+                    ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"' : ''}
                     allowfullscreen>
                 </iframe>
             </div>
@@ -93,7 +116,7 @@ const EmbedPlayer = () => {
                 Platform.OS === 'web' ? (
                     <>
                         {
-                            sanboxAllowed ? (
+                            sandboxAllowed ? (
                                 <iframe
                                     src={videoUrl as string}
                                     style={{ flex: 1, width: "100%", height: "100%" }}
@@ -123,7 +146,6 @@ const EmbedPlayer = () => {
                         javaScriptEnabled
                         domStorageEnabled
                         startInLoadingState
-                        javaScriptEnabledAndroid
                         allowUniversalAccessFromFileURLs
                         allowFileAccess
                     />
