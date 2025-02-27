@@ -133,7 +133,9 @@ const styles = StyleSheet.create({
     textInput: {
         borderRadius: 12,
         paddingHorizontal: 20,
-        fontSize: 16
+        fontSize: 16,
+        paddingVertical: 10,
+        minHeight: 90
     },
     lightTextInput: {
         backgroundColor: '#f0f0f0',
