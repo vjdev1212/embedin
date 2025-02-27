@@ -1,11 +1,11 @@
 version: '3.0'
 
-name: VidSrcStream
+name: EmbedIn
 services:
-  vidsrcstream:
-    container_name: vidsrcstream
-    hostname: vidsrcstream
-    image: jarvisnexus/vidsrcstream:latest
+  embedin:
+    container_name: embedin
+    hostname: embedin
+    image: jarvisnexus/embedin:latest
     ports:
       - "4444:80"
     restart: unless-stopped

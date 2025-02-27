@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "VidsrcStream",
-    "slug": "vidsrcstream",
+    "name": "EmbedIn",
+    "slug": "embedin",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "assets/images/icon.png",
-    "scheme": "vidsrcstream",
+    "scheme": "embedin",
     "platforms": [
       "ios",
       "android",
@@ -22,14 +22,14 @@
       "icon": "assets/images/icon.png",
       "supportsTablet": true,
       "backgroundColor": "#000000",
-      "bundleIdentifier": "com.vijayyuvi.vidsrcstream"
+      "bundleIdentifier": "com.vijayyuvi.embedin"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.vijayyuvi.vidsrcstream",
+      "package": "com.vijayyuvi.embedin",
       "icon": "assets/images/icon.png"
     },
     "web": {
