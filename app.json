@@ -14,7 +14,7 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "assets/images/splash-icon.png",
+      "image": "assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
