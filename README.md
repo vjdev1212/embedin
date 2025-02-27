@@ -1,4 +1,4 @@
-# VidSrcStream
+# EmbedIn
 
 A simple and sleek frontend for VidSrc and similar services that provide embedded movies and TV shows. Easily search, browse, and watch content with a user-friendly interface.
 
@@ -16,7 +16,7 @@ This app is built using the Expo React Native framework.
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/jarvisnexus/vidsrcstream.git
+   git clone https://github.com/jarvisnexus/embedin.git
    cd vidsrcstream
    ```
 2. Create a `.env` file in the project root and set the TMDB API Key
@@ -65,12 +65,12 @@ This project is available as docker container. Use the below yaml script.
 ```yaml
 version: '3.0'
 
-name: VidSrcStream
+name: EmbedIn
 services:
-  vidsrcstream:
-    container_name: vidsrcstream
-    hostname: vidsrcstream
-    image: jarvisnexus/vidsrcstream:latest
+  embedin:
+    container_name: embedin
+    hostname: embedin
+    image: jarvisnexus/embedin:latest
     ports:
       - "4444:80"
     restart: unless-stopped
