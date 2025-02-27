@@ -64,6 +64,7 @@ const EmbedSettingsScreen = () => {
                         value={movieUrlTemplate}
                         onChangeText={setMovieUrlTemplate}
                         multiline
+                        submitBehavior={'blurAndSubmit'}
                     />
                 </View>
                 <View style={styles.textInputContainer}>
@@ -131,9 +132,7 @@ const styles = StyleSheet.create({
     textInput: {
         borderRadius: 12,
         paddingHorizontal: 20,
-        fontSize: 16,
-        paddingVertical: 20,
-        minHeight: 100,
+        fontSize: 16
     },
     lightTextInput: {
         backgroundColor: '#f0f0f0',
