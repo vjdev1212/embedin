@@ -17,7 +17,7 @@ This app is built using the Expo React Native framework.
 1. Clone the repository:
    ```sh
    git clone https://github.com/jarvisnexus/embedin.git
-   cd embedin
+   cd vidsrcstream
    ```
 2. Create a `.env` file in the project root and set the TMDB API Key
    ```cmd
