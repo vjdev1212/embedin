@@ -38,7 +38,7 @@ const EmbedPlayer = () => {
         if (imdbid) {
             let url = '';
             if (type === 'movie') {
-                url = generateUrl(movieUrlTemplate, { imdbid: imdbid as string, tmdbid : tmdbid as string });
+                url = generateUrl(movieUrlTemplate, { imdbid: imdbid as string, tmdbid: tmdbid as string });
             }
             if (type === 'series' && season && episode) {
                 url = generateUrl(seriesUrlTemplate,
@@ -151,6 +151,8 @@ const EmbedPlayer = () => {
                         startInLoadingState
                         allowUniversalAccessFromFileURLs
                         allowFileAccess
+                        mediaPlaybackRequiresUserAction={false}
+                        allowsFullscreenVideo={true}
                     />
                 )
             ) : (
