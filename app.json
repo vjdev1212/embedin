@@ -16,7 +16,7 @@
     "splash": {
       "image": "assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "icon": "assets/images/icon.png",
@@ -27,7 +27,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "assets/images/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#ffffff"
       },
       "package": "com.vijayyuvi.embedin",
       "icon": "assets/images/icon.png"
