@@ -9,6 +9,7 @@ import {
     defaultSeriesUrlTemplate,
     defaultSandboxAllowed
 } from '@/constants/Embed';
+import { useColorScheme } from '@/components/useColorScheme';
 
 const EmbedPlayer = () => {
     const { imdbid, tmdbid, type, season, episode } = useLocalSearchParams();
@@ -16,6 +17,7 @@ const EmbedPlayer = () => {
     const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
     const [seriesUrlTemplate, setSeriesUrlTemplate] = useState<string>(defaultSeriesUrlTemplate);
     const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(defaultSandboxAllowed);
+    const colorScheme = useColorScheme();
 
     useEffect(() => {
         const enableOrientation = async () => {
@@ -171,7 +173,10 @@ const EmbedPlayer = () => {
                     <WebView
                         originWhitelist={['*']}
                         source={{ html: iframeHtml }}
-                        style={{ flex: 1 }}
+                        style={{
+                            flex: 1,
+                            backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
+                        }}
                         javaScriptEnabled
                         domStorageEnabled
                         startInLoadingState
@@ -191,8 +196,7 @@ const EmbedPlayer = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingBottom: 20,
-        marginTop: 30,
+        paddingBottom: 20
     },
 });
 
