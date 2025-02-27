@@ -100,7 +100,7 @@ const EmbedPlayer = () => {
                     style="width: 100%; height: 100%;"
                     allow="autoplay; fullscreen" 
                     referrerPolicy="no-referrer-when-downgrade"                    
-                    ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"' : ''}
+                    ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allowfullscreen allow-presentation"' : ''}
                     allowfullscreen>
                 </iframe>
             </div>
@@ -163,7 +163,8 @@ const EmbedPlayer = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingBottom: 20
+        paddingBottom: 20,
+        marginTop: 30,
     },
 });
 

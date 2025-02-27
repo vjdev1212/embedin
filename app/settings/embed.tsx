@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: 20,
+        marginTop: 30,
     },
     textInputContainer: {
         marginBottom: 30,
