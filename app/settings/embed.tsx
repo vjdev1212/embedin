@@ -77,6 +77,7 @@ const EmbedSettingsScreen = () => {
                         value={tvShowsUrlTemplate}
                         onChangeText={setTvShowsUrlTemplate}
                         multiline
+                        submitBehavior={'blurAndSubmit'}
                     />
                 </View>
                 <View style={styles.textInputContainer}>
