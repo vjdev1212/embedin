@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import {
     defaultMovieUrlTemplate,
     defaultSeriesUrlTemplate,
@@ -17,6 +18,12 @@ const EmbedPlayer = () => {
     const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(defaultSandboxAllowed);
 
     useEffect(() => {
+        const enableOrientation = async () => {
+            await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
+        };
+
+        enableOrientation();
+
         const loadEmbedSettings = async () => {
             try {
                 const storedSettings = await AsyncStorage.getItem('embedSettings');
@@ -32,6 +39,10 @@ const EmbedPlayer = () => {
         };
 
         loadEmbedSettings();
+
+        return () => {
+            ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+        };
     }, []);
 
     useEffect(() => {
