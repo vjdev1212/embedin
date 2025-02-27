@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -21,7 +21,9 @@ const EmbedPlayer = () => {
 
     useEffect(() => {
         const enableOrientation = async () => {
-            await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
+            if (Platform.OS !== 'web') {
+                await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
+            }
         };
 
         enableOrientation();
@@ -43,7 +45,9 @@ const EmbedPlayer = () => {
         loadEmbedSettings();
 
         return () => {
-            ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+            if (Platform.OS !== 'web') {
+                ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+            }
         };
     }, []);
 
@@ -176,6 +180,8 @@ const EmbedPlayer = () => {
                         style={{
                             flex: 1,
                             backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
+                            marginTop: 30,
+                            marginBottom: 10
                         }}
                         javaScriptEnabled
                         domStorageEnabled
