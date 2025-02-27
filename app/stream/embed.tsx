@@ -109,6 +109,21 @@ const EmbedPlayer = () => {
                 // Block popups by overriding window.open
                 window.open = function() { return null; };
             </script>
+            <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelector('iframe').addEventListener('click', function () {
+                    if (this.requestFullscreen) {
+                        this.requestFullscreen();
+                    } else if (this.mozRequestFullScreen) {
+                        this.mozRequestFullScreen();
+                    } else if (this.webkitRequestFullscreen) {
+                        this.webkitRequestFullscreen();
+                    } else if (this.msRequestFullscreen) {
+                        this.msRequestFullscreen();
+                    }
+                });
+            });
+        </script>
         </body>
         </html>
     `;
