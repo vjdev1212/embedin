@@ -42,7 +42,6 @@ const EmbedPlayer = () => {
                     setSandboxAllowedForMovie(parsedSettings.movie?.sandboxAllowed ?? defaultSandboxAllowedForMovie);
                     setSandboxAllowedForTv(parsedSettings.tv?.sandboxAllowed ?? defaultSandboxAllowedForTv);
     
-                    // Update sandboxAllowed AFTER settings are loaded
                     if (type === 'movie') {
                         setSandboxAllowed(parsedSettings.movie?.sandboxAllowed ?? defaultSandboxAllowedForMovie);
                     } else if (type === 'series') {
