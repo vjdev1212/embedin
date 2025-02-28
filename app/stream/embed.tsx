@@ -28,9 +28,9 @@ const EmbedPlayer = () => {
                 await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
             }
         };
-
+    
         enableOrientation();
-
+    
         const loadEmbedSettings = async () => {
             try {
                 const storedSettings = await AsyncStorage.getItem('embedSettings');
@@ -41,26 +41,28 @@ const EmbedPlayer = () => {
                     setSeriesUrlTemplate(parsedSettings.tv?.template ?? defaultTvShowUrlTemplate);
                     setSandboxAllowedForMovie(parsedSettings.movie?.sandboxAllowed ?? defaultSandboxAllowedForMovie);
                     setSandboxAllowedForTv(parsedSettings.tv?.sandboxAllowed ?? defaultSandboxAllowedForTv);
+    
+                    // Update sandboxAllowed AFTER settings are loaded
+                    if (type === 'movie') {
+                        setSandboxAllowed(parsedSettings.movie?.sandboxAllowed ?? defaultSandboxAllowedForMovie);
+                    } else if (type === 'series') {
+                        setSandboxAllowed(parsedSettings.tv?.sandboxAllowed ?? defaultSandboxAllowedForTv);
+                    }
                 }
             } catch (error) {
                 console.error('Failed to load embed settings:', error);
             }
         };
-
+    
         loadEmbedSettings();
-
-        if (type === 'movie') {
-            setSandboxAllowed(sandboxAllowedForMovie);
-        } else if (type === 'series') {
-            setSandboxAllowed(sandboxAllowedForTv);
-        }
-
+    
         return () => {
             if (Platform.OS !== 'web') {
                 ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
             }
         };
-    }, []);
+    }, [type]);
+    
 
     useEffect(() => {
         if (imdbid) {
