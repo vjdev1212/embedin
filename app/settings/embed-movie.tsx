@@ -71,7 +71,7 @@ const EmbedMovieSettingsScreen = () => {
                     />
                 </View>
                 <View style={styles.textInputContainer}>
-                    <Text style={styles.label}>Enable this to prevent ads and popups:</Text>
+                    <Text style={styles.label}>Disabling this may show ads and popups.</Text>
                     <View style={styles.switchContainer}>
                         <Text style={styles.switchLabel}>Allow Sandbox</Text>
                         <Switch
