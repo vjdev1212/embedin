@@ -92,10 +92,14 @@ const EmbedPlayer = () => {
             .replace(/(\{IMDBID\})/gi, imdbid)
             .replace(/(\{IMDB_ID\})/gi, imdbid)
             .replace(/(\{SEASON\})/gi, season.toString())
+            .replace(/(\{SEASONNUMBER\})/gi, season.toString())
             .replace(/(\{SEASON_NUMBER\})/gi, season.toString())
+            .replace(/(\{SEASONNO\})/gi, season.toString())
             .replace(/(\{SEASON_NO\})/gi, season.toString())
             .replace(/(\{EPISODE\})/gi, episode.toString())
+            .replace(/(\{EPISODENO\})/gi, episode.toString())
             .replace(/(\{EPISODE_NO\})/gi, episode.toString())
+            .replace(/(\{EPISODENUMBER\})/gi, episode.toString())
             .replace(/(\{EPISODE_NUMBER\})/gi, episode.toString());
     };
 
