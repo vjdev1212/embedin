@@ -18,9 +18,9 @@ const SettingsScreen = () => {
     { title: 'Support', route: '/settings/donate', icon: 'cash-outline' },
   ];
 
-  const preferencesList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
-    //{ title: 'Preferences', route: '/settings/preferences', icon: 'build-outline' },
-    { title: 'Embed Settings', route: '/settings/embed', icon: 'options-outline' },
+  const preferencesList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [    
+    { title: 'Movie', route: '/settings/embed-movie', icon: 'film-outline' },
+    { title: 'TV', route: '/settings/embed-tv', icon: 'tv-outline' },
   ];
 
   // SettingItem Component
@@ -44,7 +44,7 @@ const SettingsScreen = () => {
       <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
       <View>
-          <Text style={styles.header}>Preferences</Text>
+          <Text style={styles.header}>Embed Settings</Text>
           <View style={[styles.settingsGroup, {
             backgroundColor: colorScheme === 'dark' ? '#101010' : '#f6f6f6',
           }]}>
@@ -107,10 +107,11 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     marginHorizontal: 5,
     justifyContent: 'space-between',
+    alignItems: 'center',
   },
   settingText: {
     fontSize: 15,
-    flex: 1,
+    flex: 1,    
     width: '100%'
   },
   icon: {

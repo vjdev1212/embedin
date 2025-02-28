@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, TextInput, Text, View, TouchableOpacity } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, TextInput, Text, View, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from '@/components/Themed';
 import { useColorScheme } from '@/components/useColorScheme';
@@ -73,9 +73,9 @@ const PreferencesScreen = () => {
                     />
                 </View>
                 <View style={styles.saveButton}>
-                    <TouchableOpacity onPress={savePreferences}>
+                    <Pressable onPress={savePreferences}>
                         <Text style={styles.saveButtonText}>Save</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 </View>
             </ScrollView>
         </SafeAreaView>

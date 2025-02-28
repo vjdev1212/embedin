@@ -1,13 +1,14 @@
 import { useLocalSearchParams } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import {
     defaultMovieUrlTemplate,
-    defaultSeriesUrlTemplate,
-    defaultSandboxAllowed
+    defaultTvShowUrlTemplate,
+    defaultSandboxAllowedForMovie,
+    defaultSandboxAllowedForTv
 } from '@/constants/Embed';
 import { useColorScheme } from '@/components/useColorScheme';
 
@@ -15,8 +16,10 @@ const EmbedPlayer = () => {
     const { imdbid, tmdbid, type, season, episode } = useLocalSearchParams();
     const [videoUrl, setVideoUrl] = useState<string>('');
     const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
-    const [seriesUrlTemplate, setSeriesUrlTemplate] = useState<string>(defaultSeriesUrlTemplate);
-    const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(defaultSandboxAllowed);
+    const [seriesUrlTemplate, setSeriesUrlTemplate] = useState<string>(defaultTvShowUrlTemplate);
+    const [sandboxAllowedForMovie, setSandboxAllowedForMovie] = useState<boolean>(defaultSandboxAllowedForMovie);
+    const [sandboxAllowedForTv, setSandboxAllowedForTv] = useState<boolean>(defaultSandboxAllowedForTv);
+    const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(true);
     const colorScheme = useColorScheme();
 
     useEffect(() => {
@@ -33,9 +36,11 @@ const EmbedPlayer = () => {
                 const storedSettings = await AsyncStorage.getItem('embedSettings');
                 if (storedSettings) {
                     const parsedSettings = JSON.parse(storedSettings);
-                    setMovieUrlTemplate(parsedSettings.movieUrlTemplate ?? defaultMovieUrlTemplate);
-                    setSeriesUrlTemplate(parsedSettings.tvShowsUrlTemplate ?? defaultSeriesUrlTemplate);
-                    setSandboxAllowed(parsedSettings.sandboxAllowed ?? defaultSandboxAllowed);
+                    console.log('Parsed embed settings:', parsedSettings);
+                    setMovieUrlTemplate(parsedSettings.movie?.template ?? defaultMovieUrlTemplate);
+                    setSeriesUrlTemplate(parsedSettings.tv?.template ?? defaultTvShowUrlTemplate);
+                    setSandboxAllowedForMovie(parsedSettings.movie?.sandboxAllowed ?? defaultSandboxAllowedForMovie);
+                    setSandboxAllowedForTv(parsedSettings.tv?.sandboxAllowed ?? defaultSandboxAllowedForTv);
                 }
             } catch (error) {
                 console.error('Failed to load embed settings:', error);
@@ -43,6 +48,12 @@ const EmbedPlayer = () => {
         };
 
         loadEmbedSettings();
+
+        if (type === 'movie') {
+            setSandboxAllowed(sandboxAllowedForMovie);
+        } else if (type === 'series') {
+            setSandboxAllowed(sandboxAllowedForTv);
+        }
 
         return () => {
             if (Platform.OS !== 'web') {
@@ -112,11 +123,11 @@ const EmbedPlayer = () => {
         <body>
             <div class="iframe-container">
                 <iframe 
-                    src="${videoUrl}" 
+                    src="${videoUrl}"
                     frameborder="0" 
                     style="width: 100%; height: 100%;"
-                    allow="autoplay; fullscreen" 
-                    referrerPolicy="no-referrer-when-downgrade"                    
+                    allow="autoplay; fullscreen"
+                    referrerPolicy="no-referrer-when-downgrade"
                     ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allowfullscreen allow-presentation"' : ''}
                     allowfullscreen>
                 </iframe>
@@ -140,7 +151,7 @@ const EmbedPlayer = () => {
                     }
                 });
             });
-        </script>
+            </script>
         </body>
         </html>
     `;

@@ -1,16 +1,15 @@
-import { SafeAreaView, ScrollView, StyleSheet, TextInput, TouchableOpacity, Switch } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, TextInput, Switch, Pressable } from 'react-native';
 import { StatusBar, Text, View } from '../../components/Themed';
 import { isHapticsSupported, showAlert } from '@/utils/platform';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useState } from 'react';
 import { useColorScheme } from '@/components/useColorScheme';
-import { defaultMovieUrlTemplate, defaultSandboxAllowed, defaultSeriesUrlTemplate } from '@/constants/Embed';
+import { defaultTvShowUrlTemplate, defaultSandboxAllowedForTv } from '@/constants/Embed';
 
-const EmbedSettingsScreen = () => {
-    const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
-    const [tvShowsUrlTemplate, setTvShowsUrlTemplate] = useState<string>(defaultSeriesUrlTemplate);
-    const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(defaultSandboxAllowed);
+const EmbedTvShowsSettingsScreen = () => {
+    const [tvShowsUrlTemplate, setTvShowsUrlTemplate] = useState<string>(defaultTvShowUrlTemplate);
+    const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(defaultSandboxAllowedForTv);
     const colorScheme = useColorScheme();
 
     useEffect(() => {
@@ -19,9 +18,8 @@ const EmbedSettingsScreen = () => {
                 const storedEmbedSettings = await AsyncStorage.getItem('embedSettings');
                 if (storedEmbedSettings) {
                     const parsedSettings = JSON.parse(storedEmbedSettings);
-                    setMovieUrlTemplate(parsedSettings.movieUrlTemplate ?? defaultMovieUrlTemplate);
-                    setTvShowsUrlTemplate(parsedSettings.tvShowsUrlTemplate ?? defaultSeriesUrlTemplate);
-                    setSandboxAllowed(parsedSettings.sandboxAllowed ?? false);
+                    setTvShowsUrlTemplate(parsedSettings.tv?.template ?? defaultTvShowUrlTemplate);
+                    setSandboxAllowed(parsedSettings.tv?.sandboxAllowed ?? defaultSandboxAllowedForTv);
                 }
             } catch (error) {
                 console.error('Failed to load preferences:', error);
@@ -35,11 +33,16 @@ const EmbedSettingsScreen = () => {
             if (isHapticsSupported()) {
                 await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
             }
-            const embedSettings = {
-                movieUrlTemplate,
-                tvShowsUrlTemplate,
-                sandboxAllowed
+
+            const existingSettings = await AsyncStorage.getItem('embedSettings');
+            console.log('Existing settings:', existingSettings);
+            const embedSettings = existingSettings ? JSON.parse(existingSettings) : {};
+
+            embedSettings.tv = {
+                template: tvShowsUrlTemplate,
+                sandboxAllowed: sandboxAllowed,
             };
+
             await AsyncStorage.setItem('embedSettings', JSON.stringify(embedSettings));
             showAlert('Embed Settings Saved', 'Your embed settings have been saved.');
         } catch (error) {
@@ -54,19 +57,6 @@ const EmbedSettingsScreen = () => {
         <SafeAreaView style={styles.container}>
             <StatusBar />
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-                <View style={styles.textInputContainer}>
-                    <Text style={styles.label}>Movie Embed URL:</Text>
-                    <TextInput
-                        style={[
-                            styles.textInput,
-                            colorScheme === 'dark' ? styles.darkTextInput : styles.lightTextInput,
-                        ]}
-                        value={movieUrlTemplate}
-                        onChangeText={setMovieUrlTemplate}
-                        multiline
-                        submitBehavior={'blurAndSubmit'}
-                    />
-                </View>
                 <View style={styles.textInputContainer}>
                     <Text style={styles.label}>TV Shows Embed URL:</Text>
                     <TextInput
@@ -94,9 +84,9 @@ const EmbedSettingsScreen = () => {
                     </View>
                 </View>
                 <View style={styles.saveButton}>
-                    <TouchableOpacity onPress={saveEmbedSettings}>
+                    <Pressable onPress={saveEmbedSettings}>
                         <Text style={styles.saveButtonText}>Save</Text>
-                    </TouchableOpacity>
+                    </Pressable>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -113,7 +103,7 @@ const styles = StyleSheet.create({
     },
     content: {
         padding: 20,
-        marginTop: 30,
+        marginTop: 20,
     },
     textInputContainer: {
         marginBottom: 30,
@@ -166,4 +156,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default EmbedSettingsScreen;
+export default EmbedTvShowsSettingsScreen;
