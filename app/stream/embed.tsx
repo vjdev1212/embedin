@@ -86,10 +86,17 @@ const EmbedPlayer = () => {
 
     const generateUrl = (template: string, { imdbid, tmdbid, season = '1', episode = '1' }: { imdbid: string; tmdbid: string; season?: string; episode?: string; }) => {
         return template
+            .replace(/(\{ID\})/gi, tmdbid)
             .replace(/(\{TMDBID\})/gi, tmdbid)
+            .replace(/(\{TMDB_ID\})/gi, tmdbid)
             .replace(/(\{IMDBID\})/gi, imdbid)
+            .replace(/(\{IMDB_ID\})/gi, imdbid)
             .replace(/(\{SEASON\})/gi, season.toString())
-            .replace(/(\{EPISODE\})/gi, episode.toString());
+            .replace(/(\{SEASON_NUMBER\})/gi, season.toString())
+            .replace(/(\{SEASON_NO\})/gi, season.toString())
+            .replace(/(\{EPISODE\})/gi, episode.toString())
+            .replace(/(\{EPISODE_NO\})/gi, episode.toString())
+            .replace(/(\{EPISODE_NUMBER\})/gi, episode.toString());
     };
 
     // HTML structure with iframe and popup-blocking JavaScript
