@@ -57,6 +57,7 @@ const PreferencesScreen = () => {
                         onChangeText={(text) => setLanguage(text)}
                         maxLength={2}
                         autoCapitalize="none"
+                        submitBehavior={'blurAndSubmit'}
                     />
                 </View>
                 <View style={styles.searchInputContainer}>
@@ -70,6 +71,7 @@ const PreferencesScreen = () => {
                         onChangeText={(text) => setRegion(text.toUpperCase())}
                         maxLength={2}
                         autoCapitalize="characters"
+                        submitBehavior={'blurAndSubmit'}
                     />
                 </View>
                 <View style={styles.saveButton}>
