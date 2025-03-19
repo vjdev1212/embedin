@@ -12,6 +12,7 @@ import MediaLogo from '@/components/MediaLogo';
 import MediaCastAndCrews from '@/components/MediaCastAndCrews';
 import PosterList from '@/components/PosterList';
 import PlayButton from '@/components/PlayButton';
+import MediaContentDetailsList from '@/components/MediaContentDetailsList';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -43,7 +44,7 @@ const MovieDetails = () => {
           const castAndCrews = await getCastandCrew();
           setCast(castAndCrews);
           setImdbId(externalIds.imdb_id);
-          const logo = `https://images.metahub.space/logo/medium/${externalIds.imdb_id}/img`
+          const logo = `https://images.metahub.space/logo/medium/${externalIds.imdb_id}/img`;
           const movie = result;
           const movieData = {
             name: movie.title,
@@ -52,6 +53,9 @@ const MovieDetails = () => {
             logo: logo,
             genre: movie.genres.map((genre: any) => genre.name),
             released: movie.release_date,
+            country: movie.origin_country,
+            languages: movie.spoken_languages,
+            status: movie.status,
             runtime: movie.runtime,
             imdbRating: movie.vote_average?.toFixed(1),
             releaseInfo: movie.release_date,
@@ -75,7 +79,7 @@ const MovieDetails = () => {
     );
     const externalIdsResult = await externalIdsResponse.json();
     return externalIdsResult;
-  }
+  };
 
   const getCastandCrew = async () => {
     const castAndCrewsResponse = await fetch(
@@ -83,7 +87,7 @@ const MovieDetails = () => {
     );
     const castAndCrewResult = await castAndCrewsResponse.json();
     return castAndCrewResult.cast || [];
-  }
+  };
 
   if (loading) {
     return (
@@ -133,7 +137,7 @@ const MovieDetails = () => {
           width: isPortrait ? '100%' : '60%',
           paddingHorizontal: isPortrait ? null : 5
         }]}>
-          <MediaLogo logo={data.logo} />
+          <MediaLogo logo={data.logo} title={data.name} />
           <MediaContentHeader
             name={data.name}
             genre={data.genre || data.genres}
@@ -144,18 +148,15 @@ const MovieDetails = () => {
           />
           <PlayButton onPress={handlePlayPress} />
           <MediaContentDescription description={data.description} />
-          {/* <MediaContentDetailsList
-            released={data.released}
-            country={data.country}
-            director={data.director}
-            writer={data.writer}
-            cast={data.cast}
-            releaseInfo={data.releaseInfo}
-          /> */}
+          <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} status={data.status} />
           <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
         </View>
+        <BottomSpacing space={20} />
       </View>
-      <BottomSpacing space={20} />
+      <View>
+        <View style={{ justifyContent: 'center', marginTop: isPortrait ? 5 : '10%' }}>
+        </View>
+      </View>
       <View style={styles.recommendationsContainer}>
         <PosterList apiUrl={`https://api.themoviedb.org/3/movie/${moviedbid}/recommendations`} title='More like this' type='movie' />
         <BottomSpacing space={50} />

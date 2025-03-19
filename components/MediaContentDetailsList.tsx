@@ -4,70 +4,90 @@ import { Text, View } from './Themed';
 import { formatDate } from '@/utils/Date';
 
 const MediaContentDetailsList = ({
-  released,
-  country,
-  director,
-  writer,
-  cast,
-  releaseInfo,
+  type = "movie",
+  released = 'Unknown',
+  country = [],
+  languages = [],
+  status = 'Unknown',
 }: {
+  type: string;
   released: string;
-  country: string;
-  director: string[];
-  writer: string[];
-  cast: string[];
-  releaseInfo: string;
+  country: string[];
+  languages: any[];
+  status: string;
 }) => (
   <View style={styles.container}>
-    {(released || releaseInfo) && (
-      <View style={styles.row}>
-        <Text style={styles.label}>Released:</Text>
-        <Text style={styles.value}>{formatDate(released) || releaseInfo}</Text>
+    <View style={styles.gridContainer}>
+      <View style={styles.gridItem}>
+        <View style={styles.row}>
+          <View style={styles.labelContainer}>
+            <Text style={styles.label}>{type === 'movie' ? 'Released On:' : 'First Aired On'}</Text>
+          </View>
+          <Text style={styles.value}>{formatDate(released)}</Text>
+        </View>
       </View>
-    )}
-    {country && (
-      <View style={styles.row}>
-        <Text style={styles.label}>Country:</Text>
-        <Text style={styles.value}>{country}</Text>
+      <View style={styles.gridItem}>
+        <View style={styles.row}>
+          <View style={styles.labelContainer}>
+            <Text style={styles.label}>Status:</Text>
+          </View>
+          <Text style={styles.value}>{status}</Text>
+        </View>
       </View>
-    )}
-    {director?.length > 0 && (
-      <View style={styles.row}>
-        <Text style={styles.label}>Directors:</Text>
-        <Text style={styles.value}>{director?.join(', ')}</Text>
+      <View style={styles.gridItem}>
+        <View style={styles.row}>
+          <View style={styles.labelContainer}>
+            <Text style={styles.label}>Country:</Text>
+          </View>
+          <Text style={styles.value}>{country.length > 0 ? country.join(', ') : 'Unknown'}</Text>
+        </View>
       </View>
-    )}
-    {writer?.length > 0 && (
-      <View style={styles.row}>
-        <Text style={styles.label}>Writers:</Text>
-        <Text style={styles.value}>{writer?.join(', ')}</Text>
+      <View style={styles.gridItem}>
+        <View style={styles.row}>
+          <View style={styles.labelContainer}>
+            <Text style={styles.label}>Spoken Languages:</Text>
+          </View>
+          <Text style={styles.value}>{languages.length > 0 ? languages.map(l => l.english_name).join(', ') : 'Unknown'}</Text>
+        </View>
       </View>
-    )}
-    {cast?.length > 0 && (
-      <View style={styles.row}>
-        <Text style={styles.label}>Cast:</Text>
-        <Text style={styles.value}>{cast?.join(', ')}</Text>
-      </View>
-    )}
+    </View>
   </View>
 );
 
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
-    marginVertical: 20,
+  },
+  gridContainer: {
+    paddingVertical: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  gridItem: {
+    width: '48%',
+    minWidth: 300,
+    borderRadius: 8,
+    marginBottom: 10,
   },
   row: {
     flexDirection: 'row',
-    marginBottom: 10
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  labelContainer: {
+    minWidth: 140,
+    alignItems: 'flex-start',
   },
   label: {
-    fontSize: 14,
-    flex: 1,
+    fontSize: 13,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
   },
   value: {
-    fontSize: 14,
-    flex: 3
+    fontSize: 13,
+    flex: 1,
+    paddingHorizontal: 10
   },
 });
 

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Animated, StyleSheet, useWindowDimensions } from 'react-native';
+import { Animated, StyleSheet, useWindowDimensions, Image, Text, View } from 'react-native';
 
-const MediaLogo = ({ logo }: { logo: string }) => {
+const MediaLogo = ({ logo, title }: { logo: string, title: string }) => {
     const [titleFadeAnim] = useState(new Animated.Value(0));
-    
+    const [logoError, setLogoError] = useState(false);
+
     const { width, height } = useWindowDimensions();
     const isPortrait = height > width;
 
@@ -19,10 +20,24 @@ const MediaLogo = ({ logo }: { logo: string }) => {
         <Animated.View
             style={[styles.logoContainer, { opacity: titleFadeAnim, alignSelf: isPortrait ? 'center' : 'auto' }]}
         >
-            <Animated.Image resizeMode="contain" source={{ uri: logo }} style={[styles.logo, {
-                width: isPortrait ? 120 : null,
-                height: isPortrait ? null : 100,
-            }]} />
+            {!logoError ? (
+                <Image
+                    resizeMode="contain"
+                    source={{ uri: logo }}
+                    style={[styles.logo, {
+                        width: isPortrait ? 120 : null,
+                        height: isPortrait ? null : 100,
+                    }]}
+                    onError={() => setLogoError(true)}
+                />
+            ) : (
+                <View style={styles.titleContainer}>
+                    <Text style={[styles.titleText,
+                    {
+                        fontSize: isPortrait ? 25 : 35
+                    }]} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
+                </View>
+            )}
         </Animated.View>
     );
 };
@@ -33,7 +48,19 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     logo: {
-        aspectRatio: 16 / 9
+        aspectRatio: 16 / 9,
+    },
+    titleContainer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 5,
+        padding: 10,
+    },
+    titleText: {
+        color: '#ffffff',
+        fontWeight: 'bold',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis'
     },
 });
 
