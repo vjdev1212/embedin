@@ -158,23 +158,27 @@ const PosterList = ({
         let list = [];
 
         if (type === 'movie') {
-          list = collection.map((movie: any) => ({
-            moviedbid: movie.id,
-            name: movie.title,
-            poster: `https://image.tmdb.org/t/p/w780${movie.poster_path}`,
-            background: `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`,
-            year: getYear(movie.release_date),
-            imdbRating: movie.vote_average?.toFixed(1),
-          }));
+          list = collection
+            .filter((movie: any) => movie.poster_path && movie.backdrop_path) // Filter out null images
+            .map((movie: any) => ({
+              moviedbid: movie.id,
+              name: movie.title,
+              poster: `https://image.tmdb.org/t/p/w780${movie.poster_path}`,
+              background: `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`,
+              year: getYear(movie.release_date),
+              imdbRating: movie.vote_average?.toFixed(1),
+            }));
         } else {
-          list = collection.map((series: any) => ({
-            moviedbid: series.id,
-            name: series.name,
-            poster: `https://image.tmdb.org/t/p/w780${series.poster_path}`,
-            background: `https://image.tmdb.org/t/p/w1280${series.backdrop_path}`,
-            year: getYear(series.first_air_date),
-            imdbRating: series.vote_average?.toFixed(1),
-          }));
+          list = collection
+            .filter((series: any) => series.poster_path && series.backdrop_path) // Filter out null images
+            .map((series: any) => ({
+              moviedbid: series.id,
+              name: series.name,
+              poster: `https://image.tmdb.org/t/p/w780${series.poster_path}`,
+              background: `https://image.tmdb.org/t/p/w1280${series.backdrop_path}`,
+              year: getYear(series.first_air_date),
+              imdbRating: series.vote_average?.toFixed(1),
+            }));
         }
 
         setData(list);
