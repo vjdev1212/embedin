@@ -60,8 +60,10 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontWeight: 'bold',
         overflow: 'hidden',
-        textOverflow: 'ellipsis'
-    },
+        textAlign: 'center',
+        flexWrap: 'wrap',
+        width: '100%',
+    }
 });
 
 export default MediaLogo;
