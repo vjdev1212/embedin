@@ -116,6 +116,14 @@ const MovieDetails = () => {
     });
   };
 
+  const Divider = () => {
+    return (
+      <View>
+        <Text style={styles.divider}>...</Text>
+      </View>
+    )
+  };
+
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={styles.container} ref={ref}>
       <StatusBar />
@@ -128,7 +136,7 @@ const MovieDetails = () => {
       }]}>
         <View style={[styles.posterContainer, {
           width: isPortrait ? '100%' : '30%',
-          padding: isPortrait ? null : '3%'
+          padding: isPortrait ? null : '2%'
         }]}>
           <MediaContentPoster background={isPortrait ? data.background : data.poster} isPortrait={isPortrait} />
         </View>
@@ -138,17 +146,10 @@ const MovieDetails = () => {
           paddingHorizontal: isPortrait ? null : 5
         }]}>
           <MediaLogo logo={data.logo} title={data.name} />
-          <MediaContentHeader
-            name={data.name}
-            genre={data.genre || data.genres}
-            released={data.released}
-            runtime={data.runtime}
-            imdbRating={data.imdbRating}
-            releaseInfo={data.releaseInfo}
-          />
           <PlayButton onPress={handlePlayPress} />
           <MediaContentDescription description={data.description} />
-          <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} status={data.status} />
+          <Divider />
+          <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
           <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
         </View>
         <BottomSpacing space={20} />
@@ -195,7 +196,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   recommendationsContainer: {
-    marginHorizontal: '2%'
+  },
+  divider: {
+    textAlign: 'center',
+    fontSize: 20,
+    color: '#535aff',
+    fontWeight: 'bold',
+    paddingBottom: 10
   }
 });
 

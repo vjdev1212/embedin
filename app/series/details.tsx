@@ -115,8 +115,7 @@ const SeriesDetails = () => {
   if (loading) {
     return (
       <View style={styles.centeredContainer}>
-        <ActivityIndicator size="large" style={styles.activityIndicator} color="#535aff" />
-        <Text style={styles.centeredText}>Loading</Text>
+        <ActivityIndicator size="large" style={styles.activityIndicator} color="#ffffff" />
       </View>
     );
   }
@@ -134,6 +133,14 @@ const SeriesDetails = () => {
       pathname: '/stream/embed',
       params: { imdbid: imdbid, tmdbid: moviedbid, type: 'series', name: data.name, season: season, episode: episode },
     });
+  };
+
+  const Divider = () => {
+    return (
+      <View>
+        <Text style={styles.divider}>...</Text>
+      </View>
+    )
   };
 
   return (
@@ -156,16 +163,9 @@ const SeriesDetails = () => {
           paddingHorizontal: isPortrait ? null : 5
         }]}>
           <MediaLogo logo={data.logo} title={data.name} />
-          <MediaContentHeader
-            name={data.name}
-            genre={data.genre}
-            released={data.released}
-            runtime={data.runtime}
-            imdbRating={data.imdbRating}
-            releaseInfo={data.releaseInfo}
-          />
           <MediaContentDescription description={data.description} />
-          <MediaContentDetailsList type='series' released={data.released} country={data.country} languages={data.languages} status={data.status} />
+          <Divider />
+          <MediaContentDetailsList type='series' released={data.released} country={data.country} languages={data.languages} genre={data.genre} runtime={data.runtime} imdbRating={data.imdbRating} />
           <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
           {
             isPortrait ? (null) : (
@@ -219,6 +219,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   recommendationsContainer: {
+  },
+  divider: {
+    textAlign: 'center',
+    fontSize: 20,
+    color: '#535aff',
+    fontWeight: 'bold',
+    paddingBottom: 10
   }
 });
 
