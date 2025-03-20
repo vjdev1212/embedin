@@ -11,6 +11,7 @@ import MediaLogo from '@/components/MediaLogo';
 import MediaCastAndCrews from '@/components/MediaCastAndCrews';
 import PosterList from '@/components/PosterList';
 import MediaContentDetailsList from '@/components/MediaContentDetailsList';
+import { useColorScheme } from '@/components/useColorScheme';
 
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
@@ -24,6 +25,7 @@ const SeriesDetails = () => {
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
   const ref = useRef<ScrollView | null>(null);
+  const colorScheme = useColorScheme();
 
   useFocusEffect(() => {
     if (ref.current) {
@@ -138,7 +140,9 @@ const SeriesDetails = () => {
   const Divider = () => {
     return (
       <View>
-        <Text style={styles.divider}>...</Text>
+        <Text style={[styles.divider, {
+          color: colorScheme === 'dark' ? '#ffffff' : '#000000',
+        }]}>...</Text>
       </View>
     )
   };
@@ -223,7 +227,6 @@ const styles = StyleSheet.create({
   divider: {
     textAlign: 'center',
     fontSize: 20,
-    color: '#535aff',
     fontWeight: 'bold',
     paddingBottom: 10
   }

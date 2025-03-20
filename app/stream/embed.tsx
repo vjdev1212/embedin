@@ -138,7 +138,7 @@ const EmbedPlayer = () => {
                     src="${videoUrl}"
                     frameborder="0" 
                     style="width: 100%; height: 100%;"
-                    allow="autoplay; fullscreen"
+                    allow="encrypted-media; autoplay; fullscreen"
                     referrerPolicy="no-referrer-when-downgrade"
                     ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allowfullscreen allow-presentation"' : ''}
                     allowfullscreen>
@@ -180,7 +180,7 @@ const EmbedPlayer = () => {
                                     style={{ flex: 1, width: "100%", height: "100%" }}
                                     referrerPolicy="no-referrer-when-downgrade"
                                     sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"
-                                    allow="autoplay; fullscreen"
+                                    allow="encrypted-media; autoplay; fullscreen"
                                     frameBorder={0}
                                     allowFullScreen
                                 />
@@ -189,7 +189,7 @@ const EmbedPlayer = () => {
                                     src={videoUrl as string}
                                     style={{ flex: 1, width: "100%", height: "100%" }}
                                     referrerPolicy="no-referrer-when-downgrade"
-                                    allow="autoplay; fullscreen"
+                                    allow="encrypted-media; autoplay; fullscreen"
                                     frameBorder={0}
                                     allowFullScreen
                                 />

@@ -77,22 +77,23 @@ function RootLayoutNav() {
   };
 
   const theme = (useColorScheme() === 'dark' ? DarkTheme : LightTheme);
+  const tintColor = useColorScheme() === 'dark' ? '#ffffff' : '#000000'
 
   return (
     <ThemeProvider value={theme}>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false, title: 'Home' }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        <Stack.Screen name="movie/details" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
-        <Stack.Screen name="movie/list" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
-        <Stack.Screen name="series/details" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
-        <Stack.Screen name="series/list" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
-        <Stack.Screen name="stream/embed" options={{ headerShown: false, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
-        <Stack.Screen name="settings/embed-movie" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
-        <Stack.Screen name="settings/embed-tv" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
-        <Stack.Screen name="settings/preferences" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
-        <Stack.Screen name="settings/contact" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
-        <Stack.Screen name="settings/donate" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: '#535aff' }} />
+        <Stack.Screen name="movie/details" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
+        <Stack.Screen name="movie/list" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
+        <Stack.Screen name="series/details" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
+        <Stack.Screen name="series/list" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
+        <Stack.Screen name="stream/embed" options={{ headerShown: false, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
+        <Stack.Screen name="settings/embed-movie" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
+        <Stack.Screen name="settings/embed-tv" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
+        <Stack.Screen name="settings/preferences" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
+        <Stack.Screen name="settings/contact" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
+        <Stack.Screen name="settings/donate" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
       </Stack>
     </ThemeProvider>
   );

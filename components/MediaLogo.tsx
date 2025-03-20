@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Animated, StyleSheet, useWindowDimensions, Image, Text, View } from 'react-native';
+import { useColorScheme } from './useColorScheme';
 
 const MediaLogo = ({ logo, title }: { logo: string, title: string }) => {
     const [titleFadeAnim] = useState(new Animated.Value(0));
     const [logoError, setLogoError] = useState(false);
-
+    const colorScheme = useColorScheme();
     const { width, height } = useWindowDimensions();
     const isPortrait = height > width;
 
@@ -34,8 +35,9 @@ const MediaLogo = ({ logo, title }: { logo: string, title: string }) => {
                 <View style={styles.titleContainer}>
                     <Text style={[styles.titleText,
                     {
+                        color: colorScheme === 'dark' ? '#ffffff' : '#000000',
                         fontSize: isPortrait ? 25 : 35
-                    }]} numberOfLines={1} ellipsizeMode="tail">{title}</Text>
+                    }]} ellipsizeMode="tail">{title}</Text>
                 </View>
             )}
         </Animated.View>
@@ -57,12 +59,11 @@ const styles = StyleSheet.create({
         padding: 10,
     },
     titleText: {
-        color: '#ffffff',
         fontWeight: 'bold',
         overflow: 'hidden',
+        textOverflow: 'ellipsis',
         textAlign: 'center',
-        flexWrap: 'wrap',
-        width: '100%',
+        paddingHorizontal: 10,
     }
 });
 

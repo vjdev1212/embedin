@@ -10,7 +10,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 
 const SettingsScreen = () => {
   const router = useRouter();
-  
+
   const colorScheme = useColorScheme();
 
   const contactList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
@@ -18,7 +18,7 @@ const SettingsScreen = () => {
     { title: 'Support', route: '/settings/donate', icon: 'cash-outline' },
   ];
 
-  const preferencesList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [    
+  const preferencesList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
     { title: 'Movie', route: '/settings/embed-movie', icon: 'film-outline' },
     { title: 'TV', route: '/settings/embed-tv', icon: 'tv-outline' },
   ];
@@ -43,7 +43,7 @@ const SettingsScreen = () => {
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-      <View>
+        <View>
           <Text style={styles.header}>Embed Settings</Text>
           <View style={[styles.settingsGroup, {
             backgroundColor: colorScheme === 'dark' ? '#101010' : '#f6f6f6',
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
   },
   settingText: {
     fontSize: 15,
-    flex: 1,    
+    flex: 1,
     width: '100%'
   },
   icon: {

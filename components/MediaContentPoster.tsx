@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View as RNView, Animated } from 'react-native';
 import { View } from './Themed';
+import { useColorScheme } from './useColorScheme';
 
 const MediaContentPoster = ({ background, isPortrait }: { background: string, isPortrait: boolean }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [titleFadeAnim] = useState(new Animated.Value(0));
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
     const imageLoader = setTimeout(() => {
@@ -39,7 +41,8 @@ const MediaContentPoster = ({ background, isPortrait }: { background: string, is
             source={{ uri: background }}
             style={[styles.poster, {
               opacity: fadeAnim,
-              aspectRatio: isPortrait ? 16 / 9 : 3 / 4
+              aspectRatio: isPortrait ? 16 / 9 : 3 / 4,
+              backgroundColor: colorScheme === 'dark' ? '#111111': '#eeeeee'
             }]}
           />
         )}

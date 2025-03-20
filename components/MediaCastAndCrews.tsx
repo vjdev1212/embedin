@@ -20,46 +20,53 @@ const MediaCastAndCrews = ({ cast }: { cast: any[] }) => {
 
   const colorScheme = useColorScheme();
   return (
-    <View style={styles.container}>
-      <View style={styles.castCrewContainer}>
-        <Text style={styles.castCrew}>Cast & Crew</Text>
-      </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {cast.map((member) => {
-          const hasImage = !!member.profile_path;
-          return (
-            <View key={member.id} style={styles.castContainer}>
-              {hasImage ? (
-                <Image
-                  source={{ uri: `${IMAGE_BASE_URL}${member.profile_path}` }}
-                  style={[styles.profileImage, {
-                    backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
-                  }]}
-                />
-              ) : (
-                <View style={[styles.placeholderImage, {
-                  backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
-                }]}>
-                  <Text style={[styles.initials, {
-                    color: colorScheme === 'dark' ? '#ffffff' : '#000000'
-                  }]}>{getInitials(member.name)}</Text>
-                </View>
-              )}
-              <Text style={[styles.name, {
-                color: colorScheme === 'dark' ? '#ffffff' : '#000000'
-              }]} numberOfLines={1}>
-                {member.name}
-              </Text>
-              <Text style={[styles.character, {
-                color: colorScheme === 'dark' ? '#ffffff' : '#000000'
-              }]} numberOfLines={1}>
-                {member.character || member.name}
-              </Text>
+    <>
+      {
+        cast.length > 0 &&
+        (
+          <View style={styles.container}>
+            <View style={styles.castCrewContainer}>
+              <Text style={styles.castCrew}>Cast & Crew</Text>
             </View>
-          );
-        })}
-      </ScrollView>
-    </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {cast.map((member) => {
+                const hasImage = !!member.profile_path;
+                return (
+                  <View key={member.id} style={styles.castContainer}>
+                    {hasImage ? (
+                      <Image
+                        source={{ uri: `${IMAGE_BASE_URL}${member.profile_path}` }}
+                        style={[styles.profileImage, {
+                          backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
+                        }]}
+                      />
+                    ) : (
+                      <View style={[styles.placeholderImage, {
+                        backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
+                      }]}>
+                        <Text style={[styles.initials, {
+                          color: colorScheme === 'dark' ? '#ffffff' : '#000000'
+                        }]}>{getInitials(member.name)}</Text>
+                      </View>
+                    )}
+                    <Text style={[styles.name, {
+                      color: colorScheme === 'dark' ? '#ffffff' : '#000000'
+                    }]} numberOfLines={1}>
+                      {member.name}
+                    </Text>
+                    <Text style={[styles.character, {
+                      color: colorScheme === 'dark' ? '#ffffff' : '#000000'
+                    }]} numberOfLines={1}>
+                      {member.character || member.name}
+                    </Text>
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </View>
+        )
+      }
+    </>
   );
 };
 
@@ -75,13 +82,13 @@ const styles = StyleSheet.create({
     marginTop: 30
   },
   profileImage: {
-    width: 60,
-    height: 60,
+    width: 70,
+    height: 70,
     borderRadius: 40,
   },
   placeholderImage: {
-    width: 60,
-    height: 60,
+    width: 70,
+    height: 70,
     borderRadius: 40,
     justifyContent: "center",
     alignItems: "center",
