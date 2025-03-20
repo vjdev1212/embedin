@@ -77,7 +77,7 @@ const SeriesList = () => {
 
     return (
       <RNView>
-        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+        <Animated.View>
           <Pressable
             style={styles.posterContainer}
             onPress={() => handlePress(item)}
