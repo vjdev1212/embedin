@@ -151,10 +151,26 @@ const MovieDetails = () => {
           paddingHorizontal: isPortrait ? null : 5
         }]}>
           <MediaLogo logo={data.logo} title={data.name} />
+          {
+            isPortrait && (
+              <MediaContentHeader
+                name={data.name}
+                genre={data.genre || data.genres}
+                released={data.released}
+                runtime={data.runtime}
+                imdbRating={data.imdbRating}
+                releaseInfo={data.releaseInfo}
+              />
+            )
+          }
           <PlayButton onPress={handlePlayPress} />
           <MediaContentDescription description={data.description} />
           <Divider />
-          <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
+          {
+            !isPortrait && (
+              <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
+            )
+          }
           <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
         </View>
         <BottomSpacing space={20} />

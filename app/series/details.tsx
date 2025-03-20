@@ -168,9 +168,25 @@ const SeriesDetails = () => {
           paddingHorizontal: isPortrait ? null : 5
         }]}>
           <MediaLogo logo={data.logo} title={data.name} />
+          {
+            isPortrait && (
+              <MediaContentHeader
+                name={data.name}
+                genre={data.genre}
+                released={data.released}
+                runtime={data.runtime}
+                imdbRating={data.imdbRating}
+                releaseInfo={data.releaseInfo}
+              />
+            )
+          }
           <MediaContentDescription description={data.description} />
           <Divider />
-          <MediaContentDetailsList type='series' released={data.released} country={data.country} languages={data.languages} genre={data.genre} runtime={data.runtime} imdbRating={data.imdbRating} />
+          {
+            !isPortrait && (
+              <MediaContentDetailsList type='series' released={data.released} country={data.country} languages={data.languages} genre={data.genre} runtime={data.runtime} imdbRating={data.imdbRating} />
+            )
+          }
           <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
           {
             isPortrait ? (null) : (
