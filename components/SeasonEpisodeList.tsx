@@ -59,6 +59,12 @@ const EpisodeItem = ({ item, onEpisodeSelect }: { item: any, onEpisodeSelect: an
 
   const thumbnailBackgroundColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
 
+  const episodeAiredColor = {
+    color: colorScheme === 'dark' ? '#afafaf' : '#101010',
+  };
+  const episodeDescriptionColor = {
+    color: colorScheme === 'dark' ? '#dfdfdf' : '#101010',
+  };
   return (
     <View style={[
       styles.episodeContainer,
@@ -111,18 +117,13 @@ const EpisodeItem = ({ item, onEpisodeSelect }: { item: any, onEpisodeSelect: an
               <Text style={[styles.episodeTitle]} numberOfLines={3}>
                 {item.episode || item.number}. {item.name || item.title}
               </Text>
-              <Text style={[styles.episodeAired, {
-                color: colorScheme === 'dark' ? '#afafaf' : '#101010',
-              }]}>{
-                  formatDate(item.firstAired) || formatDate(item.released)}
+              <Text style={[styles.episodeAired, episodeAiredColor]}>{
+                formatDate(item.firstAired) || formatDate(item.released)}
               </Text>
             </View>
           </View>
           <View style={{ justifyContent: 'center', width: '100%', marginRight: 5 }}>
-            <Text style={[styles.episodeDescription,
-            {
-              color: colorScheme === 'dark' ? '#dfdfdf' : '#101010',
-            }]} numberOfLines={5}>
+            <Text style={[styles.episodeDescription, episodeDescriptionColor]} numberOfLines={5}>
               {item.description || item.overview}
             </Text>
           </View>

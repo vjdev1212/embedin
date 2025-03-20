@@ -17,6 +17,7 @@ const MediaLogo = ({ logo, title }: { logo: string, title: string }) => {
         }).start();
     }, [titleFadeAnim]);
 
+    const logoTextColor = colorScheme === 'dark' ? '#ffffff' : '#000000';
     return (
         <Animated.View
             style={[styles.logoContainer, { opacity: titleFadeAnim, alignSelf: isPortrait ? 'center' : 'auto' }]}
@@ -35,7 +36,7 @@ const MediaLogo = ({ logo, title }: { logo: string, title: string }) => {
                 <View style={styles.titleContainer}>
                     <Text style={[styles.titleText,
                     {
-                        color: colorScheme === 'dark' ? '#ffffff' : '#000000',
+                        color: logoTextColor,
                         fontSize: isPortrait ? 25 : 35
                     }]} ellipsizeMode="tail">{title}</Text>
                 </View>

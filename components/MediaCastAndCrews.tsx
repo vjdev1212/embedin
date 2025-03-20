@@ -19,6 +19,9 @@ const getInitials = (name: string) => {
 const MediaCastAndCrews = ({ cast }: { cast: any[] }) => {
 
   const colorScheme = useColorScheme();
+  const castImageBgColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
+  const castTextColor = colorScheme === 'dark' ? '#ffffff' : '#000000';
+
   return (
     <>
       {
@@ -37,25 +40,25 @@ const MediaCastAndCrews = ({ cast }: { cast: any[] }) => {
                       <Image
                         source={{ uri: `${IMAGE_BASE_URL}${member.profile_path}` }}
                         style={[styles.profileImage, {
-                          backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
+                          backgroundColor: castImageBgColor,
                         }]}
                       />
                     ) : (
                       <View style={[styles.placeholderImage, {
-                        backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
+                        backgroundColor: castImageBgColor,
                       }]}>
                         <Text style={[styles.initials, {
-                          color: colorScheme === 'dark' ? '#ffffff' : '#000000'
+                          color: castTextColor
                         }]}>{getInitials(member.name)}</Text>
                       </View>
                     )}
                     <Text style={[styles.name, {
-                      color: colorScheme === 'dark' ? '#ffffff' : '#000000'
+                      color: castTextColor
                     }]} numberOfLines={1}>
                       {member.name}
                     </Text>
                     <Text style={[styles.character, {
-                      color: colorScheme === 'dark' ? '#ffffff' : '#000000'
+                      color: castTextColor
                     }]} numberOfLines={1}>
                       {member.character || member.name}
                     </Text>

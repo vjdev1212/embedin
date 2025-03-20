@@ -119,11 +119,12 @@ const MovieDetails = () => {
   };
 
   const Divider = () => {
+    const dividerColor = {
+      color: colorScheme === 'dark' ? '#ffffff' : '#000000',
+    };
     return (
       <View>
-        <Text style={[styles.divider, {
-          color: colorScheme === 'dark' ? '#ffffff' : '#000000',
-        }]}>...</Text>
+        <Text style={[styles.divider, dividerColor]}>...</Text>
       </View>
     )
   };

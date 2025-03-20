@@ -39,15 +39,17 @@ const SettingsScreen = () => {
     router.push({ pathname: item.route });
   }
 
+  const settingsBgColor = {
+    backgroundColor: colorScheme === 'dark' ? '#101010' : '#f6f6f6',
+  };
+  
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View>
           <Text style={styles.header}>Embed Settings</Text>
-          <View style={[styles.settingsGroup, {
-            backgroundColor: colorScheme === 'dark' ? '#101010' : '#f6f6f6',
-          }]}>
+          <View style={[styles.settingsGroup, settingsBgColor]}>
             {preferencesList.map((item, index) => (
               <SettingItem
                 key={index}
@@ -60,9 +62,7 @@ const SettingsScreen = () => {
         </View>
         <View>
           <Text style={styles.header}>Contact</Text>
-          <View style={[styles.settingsGroup, {
-            backgroundColor: colorScheme === 'dark' ? '#101010' : '#f6f6f6',
-          }]}>
+          <View style={[styles.settingsGroup, settingsBgColor]}>
             {contactList.map((item, index) => (
               <SettingItem
                 key={index}

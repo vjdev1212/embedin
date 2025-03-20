@@ -23,13 +23,14 @@ const SkeletonLoader = () => {
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
 
+  const skeletonBgColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
   return (
     <RNView style={styles.skeletonContainer}>
       <RNView
         style={[
           styles.skeletonImage,
           {
-            backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
+            backgroundColor: skeletonBgColor,
             width: isPortrait ? 100 : 140,
             height: isPortrait ? 150 : 200,
           },
@@ -88,6 +89,10 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
     }).start();
   };
 
+  const posterImageBgColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
+  const posterYearColor = {
+    color: colorScheme === 'dark' ? '#afafaf' : '#303030',
+  };
   return (
     <Pressable
       style={[styles.posterContainer, layout === 'vertical' && styles.verticalContainer]}
@@ -106,7 +111,7 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
               layout === 'vertical' ? styles.verticalImage : styles.horizontalImage,
               {
                 opacity: fadeAnim,
-                backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
+                backgroundColor: posterImageBgColor,
                 width: isPortrait ? 100 : 200,
                 height: isPortrait ? 150 : 110,
               },
@@ -118,7 +123,7 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
               styles.posterImagePlaceHolder,
               layout === 'vertical' ? styles.verticalImage : styles.horizontalImage,
               {
-                backgroundColor: colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0',
+                backgroundColor: posterImageBgColor,
                 width: isPortrait ? 100 : 200,
                 height: isPortrait ? 150 : 110,
               },
@@ -144,9 +149,7 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
       <Text
         style={[
           styles.posterYear,
-          {
-            color: colorScheme === 'dark' ? '#afafaf' : '#303030',
-          },
+          posterYearColor,
         ]}
       >
         {`★ ${item.imdbRating}   ${year}`}

@@ -41,6 +41,8 @@ const PreferencesScreen = () => {
         }
         showAlert('Preferences Saved', 'Your preferences have been saved.'); // Moved outside the try-catch
     };
+    const textInputStyle = colorScheme === 'dark' ? styles.darkSearchInput : styles.lightSearchInput;
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -51,7 +53,7 @@ const PreferencesScreen = () => {
                     <TextInput
                         style={[
                             styles.searchInput,
-                            colorScheme === 'dark' ? styles.darkSearchInput : styles.lightSearchInput,
+                            textInputStyle
                         ]}
                         value={language}
                         onChangeText={(text) => setLanguage(text)}
@@ -65,7 +67,7 @@ const PreferencesScreen = () => {
                     <TextInput
                         style={[
                             styles.searchInput,
-                            colorScheme === 'dark' ? styles.darkSearchInput : styles.lightSearchInput,
+                            textInputStyle
                         ]}
                         value={region}
                         onChangeText={(text) => setRegion(text.toUpperCase())}

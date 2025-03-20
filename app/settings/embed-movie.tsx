@@ -52,6 +52,7 @@ const EmbedMovieSettingsScreen = () => {
     };
 
     const toggleSandBoxAllowed = useCallback(() => setSandboxAllowed(prev => !prev), [setSandboxAllowed]);
+    const textInputStyle =colorScheme === 'dark' ? styles.darkTextInput : styles.lightTextInput;
 
     return (
         <SafeAreaView style={styles.container}>
@@ -62,7 +63,7 @@ const EmbedMovieSettingsScreen = () => {
                     <TextInput
                         style={[
                             styles.textInput,
-                            colorScheme === 'dark' ? styles.darkTextInput : styles.lightTextInput,
+                            textInputStyle
                         ]}
                         value={movieUrlTemplate}
                         onChangeText={setMovieUrlTemplate}

@@ -161,6 +161,8 @@ const SearchScreen = () => {
 
 
   const colorScheme = useColorScheme();
+  const searchInputColor = colorScheme === 'dark' ? styles.darkSearchInput : styles.lightSearchInput;
+  const noResultsColor = { color: colorScheme === 'dark' ? '#a0a0a0' : '#303030' }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -169,7 +171,7 @@ const SearchScreen = () => {
         <TextInput
           style={[
             styles.searchInput,
-            colorScheme === 'dark' ? styles.darkSearchInput : styles.lightSearchInput,
+            searchInputColor
           ]}
           placeholder="Search movies or series..."
           placeholderTextColor={'#888888'}
@@ -193,15 +195,11 @@ const SearchScreen = () => {
               <Ionicons style={styles.noResults} name='search-outline' color="#535aff" size={70} />
               {
                 query.length > 0 ? (
-                  <Text style={[styles.noResultsText, {
-                    color: colorScheme === 'dark' ? '#a0a0a0' : '#303030'
-                  }]}>
+                  <Text style={[styles.noResultsText, noResultsColor]}>
                     No results found.
                   </Text>
                 ) : (
-                  <Text style={[styles.noResultsText, {
-                    color: colorScheme === 'dark' ? '#a0a0a0' : '#303030',
-                  }]}>
+                  <Text style={[styles.noResultsText, noResultsColor]}>
                     What would you like to watch today?
                   </Text>
                 )

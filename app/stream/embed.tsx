@@ -168,6 +168,8 @@ const EmbedPlayer = () => {
         </html>
     `;
 
+    const webViewBgColor = colorScheme === 'dark' ? '#000' : '#fff';
+    
     return (
         <View style={styles.container}>
             {videoUrl ? (
@@ -202,7 +204,7 @@ const EmbedPlayer = () => {
                         source={{ html: iframeHtml }}
                         style={{
                             flex: 1,
-                            backgroundColor: colorScheme === 'dark' ? '#000' : '#fff',
+                            backgroundColor: webViewBgColor,
                             marginTop: 30,
                             marginBottom: 10
                         }}
