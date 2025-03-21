@@ -25,7 +25,7 @@ const SettingsScreen = () => {
 
   // SettingItem Component
   const SettingItem = ({ title, icon, onPress }: { title: string, icon: keyof typeof Ionicons.glyphMap, onPress: () => void }) => {
-    const iconColor = colorScheme === 'dark' ? '#f0f0f0': '#0f0f0f'
+    const iconColor = '#535aff'
     return (
       <Pressable style={styles.settingItem} onPress={onPress}>
         <Ionicons name={icon} size={24} color={iconColor} style={styles.icon} />
