@@ -182,11 +182,7 @@ const SeriesDetails = () => {
           }
           <MediaContentDescription description={data.description} />
           <Divider />
-          {
-            !isPortrait && (
-              <MediaContentDetailsList type='series' released={data.released} country={data.country} languages={data.languages} genre={data.genre} runtime={data.runtime} imdbRating={data.imdbRating} />
-            )
-          }
+          <MediaContentDetailsList type='series' released={data.released} country={data.country} languages={data.languages} genre={data.genre} runtime={data.runtime} imdbRating={data.imdbRating} />
           <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
           {
             isPortrait ? (null) : (

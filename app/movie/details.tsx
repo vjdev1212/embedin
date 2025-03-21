@@ -166,11 +166,7 @@ const MovieDetails = () => {
           <PlayButton onPress={handlePlayPress} />
           <MediaContentDescription description={data.description} />
           <Divider />
-          {
-            !isPortrait && (
-              <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
-            )
-          }
+          <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
           <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
         </View>
         <BottomSpacing space={20} />

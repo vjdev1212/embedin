@@ -85,13 +85,13 @@ const styles = StyleSheet.create({
     marginTop: 30
   },
   profileImage: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: 40,
   },
   placeholderImage: {
-    width: 70,
-    height: 70,
+    width: 60,
+    height: 60,
     borderRadius: 40,
     justifyContent: "center",
     alignItems: "center",
