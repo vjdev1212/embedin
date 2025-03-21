@@ -24,13 +24,16 @@ const SettingsScreen = () => {
   ];
 
   // SettingItem Component
-  const SettingItem = ({ title, icon, onPress }: { title: string, icon: keyof typeof Ionicons.glyphMap, onPress: () => void }) => (
-    <Pressable style={styles.settingItem} onPress={onPress}>
-      <Ionicons name={icon} size={24} color="#535aff" style={styles.icon} />
-      <Text style={styles.settingText}>{title}</Text>
-      <MaterialIcons name="chevron-right" size={24} color="#535aff" style={styles.chevron} />
-    </Pressable>
-  );
+  const SettingItem = ({ title, icon, onPress }: { title: string, icon: keyof typeof Ionicons.glyphMap, onPress: () => void }) => {
+    const iconColor = colorScheme === 'dark' ? '#f0f0f0': '#0f0f0f'
+    return (
+      <Pressable style={styles.settingItem} onPress={onPress}>
+        <Ionicons name={icon} size={24} color={iconColor} style={styles.icon} />
+        <Text style={styles.settingText}>{title}</Text>
+        <MaterialIcons name="chevron-right" size={24} color={iconColor} style={styles.chevron} />
+      </Pressable>
+    )
+  };
 
   const onSettingsItemPress = async (item: any) => {
     if (isHapticsSupported()) {
@@ -39,17 +42,14 @@ const SettingsScreen = () => {
     router.push({ pathname: item.route });
   }
 
-  const settingsBgColor = {
-    backgroundColor: colorScheme === 'dark' ? '#101010' : '#f6f6f6',
-  };
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         <View>
           <Text style={styles.header}>Embed Settings</Text>
-          <View style={[styles.settingsGroup, settingsBgColor]}>
+          <View style={[styles.settingsGroup]}>
             {preferencesList.map((item, index) => (
               <SettingItem
                 key={index}
@@ -62,7 +62,7 @@ const SettingsScreen = () => {
         </View>
         <View>
           <Text style={styles.header}>Contact</Text>
-          <View style={[styles.settingsGroup, settingsBgColor]}>
+          <View style={[styles.settingsGroup]}>
             {contactList.map((item, index) => (
               <SettingItem
                 key={index}
