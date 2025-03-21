@@ -13,12 +13,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 10,
+    minHeight: 10,
   },
   description: {
     fontSize: 14,
     lineHeight: 22,
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
+    marginVertical: 10
   },
 });
 

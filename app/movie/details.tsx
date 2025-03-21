@@ -221,7 +221,6 @@ const styles = StyleSheet.create({
   divider: {
     textAlign: 'center',
     fontSize: 20,
-    fontWeight: 'bold',
     paddingBottom: 10
   }
 });
