@@ -119,7 +119,7 @@ const EmbedPlayer = () => {
                 }
 
                 .iframe-container {
-                    height: 100vh;
+                    aspect-ratio: 16/9;
                     width: 100%;
                     margin: auto;
                     border: none;
@@ -127,7 +127,7 @@ const EmbedPlayer = () => {
 
                 @media (orientation: portrait) {
                     .iframe-container {
-                        height: 100vh;
+                        aspect-ratio: 16/9;
                     }
                 }
             </style>
