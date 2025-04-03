@@ -88,7 +88,7 @@ function RootLayoutNav() {
         <Stack.Screen name="movie/list" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
         <Stack.Screen name="series/details" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
         <Stack.Screen name="series/list" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
-        <Stack.Screen name="stream/embed" options={{ headerShown: false, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
+        <Stack.Screen name="stream/embed" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
         <Stack.Screen name="settings/embed-movie" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
         <Stack.Screen name="settings/embed-tv" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
         <Stack.Screen name="settings/preferences" options={{ headerShown: true, headerTransparent: true, headerTitle: '', headerTintColor: tintColor }} />
