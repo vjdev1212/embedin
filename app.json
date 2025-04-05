@@ -3,7 +3,7 @@
     "name": "EmbedIn",
     "slug": "embedin",
     "version": "1.0.2",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "assets/images/icon.png",
     "scheme": "embedin",
     "platforms": [
