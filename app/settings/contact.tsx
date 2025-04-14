@@ -6,7 +6,7 @@ import { View, Text, StatusBar } from '@/components/Themed';
 import { isHapticsSupported } from '@/utils/platform';
 
 const ContactScreen = () => {
-    const feedbackUrl = 'https://form.jotform.com/250372743622454'
+    const feedbackUrl = 'https://form.jotform.com/251033310144438'
     const contactInfo = [
         {
             type: 'Feedback',
