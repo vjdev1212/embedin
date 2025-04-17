@@ -77,7 +77,6 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    margin: 10
   },
   castContainer: {
     alignItems: "center",
