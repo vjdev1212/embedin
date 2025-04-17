@@ -39,7 +39,7 @@ const MediaContentPoster = ({ background, isPortrait }: { background: string, is
             source={{ uri: background }}
             style={[styles.poster, {
               opacity: fadeAnim,
-              aspectRatio: 16 / 9,
+              aspectRatio: 4 / 3,
               borderRadius: isPortrait ? 0 : 10,
             }]}
           />
