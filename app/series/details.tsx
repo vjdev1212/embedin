@@ -12,6 +12,9 @@ import MediaCastAndCrews from '@/components/MediaCastAndCrews';
 import PosterList from '@/components/PosterList';
 import MediaContentDetailsList from '@/components/MediaContentDetailsList';
 import { useColorScheme } from '@/components/useColorScheme';
+import PlayButton from '@/components/PlayButton';
+import { isHapticsSupported } from '@/utils/platform';
+import * as Haptics from 'expo-haptics';
 
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
@@ -64,7 +67,7 @@ const SeriesDetails = () => {
 
           const seriesData = {
             name: result.name,
-            background: `https://image.tmdb.org/t/p/w1280${result.backdrop_path}`,
+            background: `https://image.tmdb.org/t/p/original${result.backdrop_path}`,
             poster: `https://image.tmdb.org/t/p/w780${result.poster_path}`,
             logo: logo,
             genre: result.genres.map((genre: any) => genre.name),
@@ -137,6 +140,16 @@ const SeriesDetails = () => {
     });
   };
 
+  const handlePlayPress = async () => {
+    if (isHapticsSupported()) {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+    }
+    router.push({
+      pathname: '/stream/embed',
+      params: { imdbid: imdbid, tmdbid: moviedbid, type: 'series', name: data.name, season: 1, episode: 1 },
+    });
+  };
+
   const Divider = () => {
     const dividerColor = {
       color: colorScheme === 'dark' ? '#ffffff' : '#000000',
@@ -151,39 +164,38 @@ const SeriesDetails = () => {
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={styles.container} ref={ref}>
       <StatusBar />
-      <View style={[{
-        flex: 1,
-        flexDirection: isPortrait ? 'column' : 'row',
+      <View style={[styles.rootContainer, {
+        flexDirection: isPortrait ? 'column' : 'row-reverse',
         marginTop: isPortrait ? 0 : '5%',
         justifyContent: 'center',
       }]}>
         <View style={[styles.posterContainer, {
-          width: isPortrait ? '100%' : '30%',
-          padding: isPortrait ? null : '3%'
+          width: isPortrait ? '100%' : '50%',
+          padding: isPortrait ? null : '2%'
         }]}>
-          <MediaContentPoster background={isPortrait ? data.background : data.poster} isPortrait={isPortrait} />
+          <MediaContentPoster background={data.background} isPortrait={isPortrait} />
         </View>
         <View style={[styles.detailsContainer, {
-          width: isPortrait ? '100%' : '60%',
-          paddingHorizontal: isPortrait ? null : 5
+          width: isPortrait ? '100%' : '50%',
+          paddingHorizontal: isPortrait ? null : 5,
+          zIndex: 10
         }]}>
           <MediaLogo logo={data.logo} title={data.name} />
+          <MediaContentHeader
+            name={data.name}
+            genre={data.genre}
+            released={data.released}
+            runtime={data.runtime}
+            imdbRating={data.imdbRating}
+            releaseInfo={data.releaseInfo}
+          />
+          <PlayButton onPress={handlePlayPress} />
+          <MediaContentDescription description={data.description} />
           {
             isPortrait && (
-              <MediaContentHeader
-                name={data.name}
-                genre={data.genre}
-                released={data.released}
-                runtime={data.runtime}
-                imdbRating={data.imdbRating}
-                releaseInfo={data.releaseInfo}
-              />
+              <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
             )
           }
-          <MediaContentDescription description={data.description} />
-          <Divider />
-          <MediaContentDetailsList type='series' released={data.released} country={data.country} languages={data.languages} genre={data.genre} runtime={data.runtime} imdbRating={data.imdbRating} />
-          <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
           {
             isPortrait ? (null) : (
               <>
@@ -193,8 +205,14 @@ const SeriesDetails = () => {
           }
         </View>
       </View>
+      {
+        isPortrait && (<Divider />)
+      }
+      <View style={styles.castContainer}>
+        <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
+      </View>
       <View>
-        <View style={{ justifyContent: 'center', marginTop: isPortrait ? 5 : '10%' }}>
+        <View style={{ justifyContent: 'center', marginTop: 5 }}>
           <SeasonEpisodeList videos={data.videos} onEpisodeSelect={handleEpisodeSelect} />
         </View>
       </View>
@@ -209,6 +227,10 @@ const SeriesDetails = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  rootContainer: {
+    flex: 1,
+    flexDirection: 'column',
   },
   posterContainer: {
     flexDirection: 'column',
@@ -234,6 +256,9 @@ const styles = StyleSheet.create({
   centeredText: {
     fontSize: 18,
     textAlign: 'center',
+  },
+  castContainer: {
+    marginHorizontal: '1%'
   },
   recommendationsContainer: {
   },

@@ -50,7 +50,7 @@ const MovieDetails = () => {
           const movie = result;
           const movieData = {
             name: movie.title,
-            background: `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`,
+            background: `https://image.tmdb.org/t/p/original${movie.backdrop_path}`,
             poster: `https://image.tmdb.org/t/p/w780${movie.poster_path}`,
             logo: logo,
             genre: movie.genres.map((genre: any) => genre.name),
@@ -132,48 +132,47 @@ const MovieDetails = () => {
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={styles.container} ref={ref}>
       <StatusBar />
-
-      <View style={[{
-        flex: 1,
-        flexDirection: isPortrait ? 'column' : 'row',
+      <View style={[styles.rootContainer, {
+        flexDirection: isPortrait ? 'column' : 'row-reverse',
         marginTop: isPortrait ? 0 : '5%',
         justifyContent: 'center',
       }]}>
         <View style={[styles.posterContainer, {
-          width: isPortrait ? '100%' : '30%',
-          padding: isPortrait ? null : '2%'
+          width: isPortrait ? '100%' : '50%',
+          padding: isPortrait ? null : '2%',
+          alignItems: isPortrait ? 'center' : 'flex-end',
         }]}>
-          <MediaContentPoster background={isPortrait ? data.background : data.poster} isPortrait={isPortrait} />
+          <MediaContentPoster background={data.background} isPortrait={isPortrait} />
         </View>
 
         <View style={[styles.detailsContainer, {
-          width: isPortrait ? '100%' : '60%',
-          paddingHorizontal: isPortrait ? null : 5
+          width: isPortrait ? '100%' : '50%',
+          paddingHorizontal: isPortrait ? null : 5,
+          zIndex: 10
         }]}>
           <MediaLogo logo={data.logo} title={data.name} />
+          <MediaContentHeader
+            name={data.name}
+            genre={data.genre || data.genres}
+            released={data.released}
+            runtime={data.runtime}
+            imdbRating={data.imdbRating}
+            releaseInfo={data.releaseInfo}
+          />
+          <PlayButton onPress={handlePlayPress}/>
+          <MediaContentDescription description={data.description} />
           {
             isPortrait && (
-              <MediaContentHeader
-                name={data.name}
-                genre={data.genre || data.genres}
-                released={data.released}
-                runtime={data.runtime}
-                imdbRating={data.imdbRating}
-                releaseInfo={data.releaseInfo}
-              />
+              <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
             )
           }
-          <PlayButton onPress={handlePlayPress} />
-          <MediaContentDescription description={data.description} />
-          <Divider />
-          <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
-          <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
         </View>
-        <BottomSpacing space={20} />
       </View>
-      <View>
-        <View style={{ justifyContent: 'center', marginTop: isPortrait ? 5 : '10%' }}>
-        </View>
+      {
+        isPortrait && (<Divider />)
+      }
+      <View style={styles.castContainer}>
+        <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
       </View>
       <View style={styles.recommendationsContainer}>
         <PosterList apiUrl={`https://api.themoviedb.org/3/movie/${moviedbid}/recommendations`} title='More like this' type='movie' />
@@ -186,6 +185,10 @@ const MovieDetails = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  rootContainer: {
+    flex: 1,
+    flexDirection: 'column',
   },
   posterContainer: {
     flexDirection: 'column',
@@ -211,6 +214,9 @@ const styles = StyleSheet.create({
   centeredText: {
     fontSize: 18,
     textAlign: 'center',
+  },
+  castContainer: {
+    marginHorizontal: '1%'
   },
   recommendationsContainer: {
   },

@@ -5,7 +5,7 @@ import { Pressable, Text, StyleSheet } from 'react-native';
 const PlayButton = ({ onPress }: { onPress: () => void }) => (
   <Pressable style={styles.button} onPress={onPress}>
     <Ionicons name="play" size={16} color="#fff" style={styles.icon} />
-    <Text style={styles.text}>Play Movie</Text>
+    <Text style={styles.text}>Watch Now</Text>
   </Pressable>
 );
 

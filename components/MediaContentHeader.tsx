@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, StyleSheet } from 'react-native';
+import { Platform, ScrollView, StyleSheet } from 'react-native';
 import { Text, View } from './Themed';
 import { getYear } from '@/utils/Date';
 import { MaterialIcons, FontAwesome, Feather } from '@expo/vector-icons';
@@ -27,7 +27,13 @@ const MediaContentHeader = ({
 
   return (
     <View style={styles.container}>
-      {genre?.length > 0 && <Text numberOfLines={1} style={styles.genre}>{genre.join(', ')}</Text>}
+      {genre?.length > 0 && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <Text numberOfLines={1} style={styles.genre}>
+            {genre.map((g, i) => i === genre.length - 1 ? g : `${g}\u00A0\u00A0\u00A0|\u00A0\u00A0\u00A0`).join('')}
+          </Text>
+        </ScrollView>
+      )}
       {(released || releaseInfo || imdbRating || runtime) && (
         <View style={styles.infoContainer}>
           {released && (
@@ -60,7 +66,7 @@ const MediaContentHeader = ({
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    padding: 10,
+    padding: 10
   },
   title: {
     fontSize: 24,

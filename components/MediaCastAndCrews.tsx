@@ -77,6 +77,7 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingVertical: 10,
+    margin: 10
   },
   castContainer: {
     alignItems: "center",
@@ -119,7 +120,8 @@ const styles = StyleSheet.create({
   castCrew: {
     fontWeight: 'bold',
     marginVertical: 10,
-    fontSize: 15
+    fontSize: 15,
+    paddingHorizontal: 10,
   }
 });
 
