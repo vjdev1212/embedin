@@ -52,7 +52,10 @@ const EmbedMovieSettingsScreen = () => {
     };
 
     const toggleSandBoxAllowed = useCallback(() => setSandboxAllowed(prev => !prev), [setSandboxAllowed]);
-    const textInputStyle =colorScheme === 'dark' ? styles.darkTextInput : styles.lightTextInput;
+    const textInputStyle = colorScheme === 'dark' ? styles.darkTextInput : styles.lightTextInput;
+
+    const tmdbHint = "Example (TMDB): https://player.videasy.net/movie/{TMDBID}";
+    const imdbHint = "Example (IMDB): https://player.videasy.net/movie/{IMDBID}";
 
     return (
         <SafeAreaView style={styles.container}>
@@ -70,6 +73,10 @@ const EmbedMovieSettingsScreen = () => {
                         multiline
                         submitBehavior={'blurAndSubmit'}
                     />
+                    <View style={styles.hintContainer}>
+                        <Text style={styles.hint}>{tmdbHint}</Text>
+                        <Text style={styles.hint}>{imdbHint}</Text>
+                    </View>
                 </View>
                 <View style={styles.textInputContainer}>
                     <Text style={styles.label}>Disabling this may show ads and popups.</Text>
@@ -106,12 +113,19 @@ const styles = StyleSheet.create({
         padding: 20,
         marginTop: 20,
     },
+    hintContainer: {
+        marginVertical: 10,
+    },
     textInputContainer: {
         marginBottom: 30,
         paddingHorizontal: 10,
         width: '100%',
     },
     label: {
+        color: '#888',
+        marginBottom: 10,
+    },
+    hint: {
         color: '#888',
         marginBottom: 10,
     },
