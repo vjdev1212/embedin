@@ -63,7 +63,7 @@ const EpisodeItem = ({ item, onEpisodeSelect }: { item: any, onEpisodeSelect: an
     color: colorScheme === 'dark' ? '#afafaf' : '#101010',
   };
   const episodeDescriptionColor = {
-    color: colorScheme === 'dark' ? '#dfdfdf' : '#101010',
+    color: colorScheme === 'dark' ? '#efefef' : '#101010',
   };
   return (
     <View style={[
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   selectedSeasonText: {
-    color: '#fff',
+    color: '#fff'
   },
   episodeList: {
     paddingHorizontal: 10,
@@ -270,7 +270,8 @@ const styles = StyleSheet.create({
     marginVertical: 20
   },
   episodeTitle: {
-    fontSize: 14
+    fontSize: 14,
+    fontWeight: '500',
   },
   episodeAired: {
     marginTop: 5,
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
   },
   episodeDescription: {
     marginTop: 5,
-    fontSize: 14,
+    fontSize: 13,
     marginRight: 10
   },
   skeletonBackground: {
