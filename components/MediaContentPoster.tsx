@@ -30,12 +30,14 @@ const MediaContentPoster = ({ background, isPortrait }: { background: string, is
 
   return (
     <>
-      <View style={[styles.posterContainer]}>
+      <View style={[styles.posterContainer, {
+        aspectRatio: isPortrait ? 4 / 3 : 16 / 9,
+      }]}>
         {isLoading ? (
           <RNView style={styles.skeletonBackground} />
         ) : (
           <Animated.Image
-            resizeMode={'contain'}
+            resizeMode={isPortrait ? 'cover' : 'contain'}
             source={{ uri: background }}
             style={[styles.poster, {
               opacity: fadeAnim,
@@ -53,7 +55,6 @@ const styles = StyleSheet.create({
   posterContainer: {
     position: 'relative',
     width: '100%',
-    aspectRatio: 16 / 9,
     overflow: 'hidden',
     alignItems: 'center',
   },
