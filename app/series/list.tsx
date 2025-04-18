@@ -58,37 +58,52 @@ const SeriesList = () => {
   };
 
   const renderItem = ({ item }: any) => {
-    const scaleAnim = new Animated.Value(1);
+    const scaleAnim = new Animated.Value(1);  // Initialize scale animation
     const year = item.year?.split('–')[0] || item.year;
+
+    const handlePress = async () => {
+      if (isHapticsSupported()) {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+      }
+      router.push({
+        pathname: '/series/details',
+        params: { moviedbid: item.moviedbid || item.id },
+      });
+    };
 
     const handleHoverIn = () => {
       Animated.spring(scaleAnim, {
-        toValue: 1.1,
+        toValue: 1.1,  // Zoom in effect
         useNativeDriver: true,
       }).start();
     };
 
     const handleHoverOut = () => {
       Animated.spring(scaleAnim, {
-        toValue: 1,
+        toValue: 1,  // Reset to normal size
         useNativeDriver: true,
       }).start();
     };
 
     return (
       <RNView>
-        <Animated.View>
+        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
           <Pressable
             style={styles.posterContainer}
-            onPress={() => handlePress(item)}
+            onPress={handlePress}
             onHoverIn={handleHoverIn}
             onHoverOut={handleHoverOut}
           >
-            <Image source={{ uri: isPortrait ? item.poster : item.background }}
-              style={[styles.posterImage, {
-                width: isPortrait ? 100 : 200,
-                height: isPortrait ? 150 : 110,
-              }]} />
+            <Image
+              source={{ uri: isPortrait ? item.poster : item.background }}
+              style={[
+                styles.posterImage,
+                {
+                  width: isPortrait ? 100 : 200,
+                  height: isPortrait ? 150 : 110,
+                },
+              ]}
+            />
             <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
               {item.name}
             </Text>
@@ -98,6 +113,7 @@ const SeriesList = () => {
       </RNView>
     );
   };
+
 
   return (
     <RNView style={styles.container}>
