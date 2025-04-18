@@ -28,11 +28,9 @@ const MediaContentHeader = ({
   return (
     <View style={styles.container}>
       {genre?.length > 0 && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <Text numberOfLines={1} style={styles.genre}>
-            {genre.map((g, i) => i === genre.length - 1 ? g : `${g}\u00A0\u00A0\u00A0|\u00A0\u00A0\u00A0`).join('')}
-          </Text>
-        </ScrollView>
+        <Text style={styles.genre}>
+          {genre.map((g, i) => i === genre.length - 1 ? g : `${g}\u00A0\u00A0\u00A0|\u00A0\u00A0\u00A0`).join('')}
+        </Text>
       )}
       {(released || releaseInfo || imdbRating || runtime) && (
         <View style={styles.infoContainer}>
@@ -76,7 +74,9 @@ const styles = StyleSheet.create({
   genre: {
     fontSize: 14,
     marginBottom: 10,
-    paddingBottom: 10
+    paddingBottom: 10,
+    textAlign: 'center',
+    marginHorizontal: 5
   },
   infoContainer: {
     flexDirection: 'row',
