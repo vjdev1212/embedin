@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, StyleSheet, Pressable, View as RNView, useWindowDimensions, Animated } from 'react-native';
+import { FlatList, Image, StyleSheet, Pressable, View as RNView, useWindowDimensions } from 'react-native';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -25,16 +25,16 @@ const MoviesList = () => {
           let list = [];
           if (result.results) {
             list = result.results
-              .filter((item: any) => item.poster_path && item.backdrop_path)
-              .map((item: any) => ({
-                moviedbid: item.id,
-                name: item.title || item.name,
-                year: getYear(item.release_date || item.first_air_date),
-                poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
-                background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
-                imdbRating: item.vote_average?.toFixed(1),
-                imdbid: item.imdb_id,
-              }));
+            .filter((item: any) => item.poster_path && item.backdrop_path)
+            .map((item: any) => ({
+              moviedbid: item.id,
+              name: item.title || item.name,
+              year: getYear(item.release_date || item.first_air_date),
+              poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
+              background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
+              imdbRating: item.vote_average?.toFixed(1),
+              imdbid: item.imdb_id,
+            }));
           }
           setData(list);
         }
@@ -49,62 +49,35 @@ const MoviesList = () => {
   }, [apiUrl]);
 
   const renderItem = ({ item }: any) => {
-    const scaleAnim = new Animated.Value(1);  // Initialize scale animation
     const year = item.year?.split('–')[0] || item.year;
 
     const handlePress = async () => {
       if (isHapticsSupported()) {
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-      }
-      router.push({
+      } router.push({
         pathname: '/movie/details',
         params: { moviedbid: item.moviedbid || item.id },
-      });
-    };
-
-    const handleHoverIn = () => {
-      Animated.spring(scaleAnim, {
-        toValue: 1.1,  // Zoom in effect
-        useNativeDriver: true,
-      }).start();
-    };
-
-    const handleHoverOut = () => {
-      Animated.spring(scaleAnim, {
-        toValue: 1,  // Reset to normal size
-        useNativeDriver: true,
-      }).start();
+      })
     };
 
     return (
       <RNView>
-        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-          <Pressable
-            style={styles.posterContainer}
-            onPress={handlePress}
-            onHoverIn={handleHoverIn}
-            onHoverOut={handleHoverOut}
-          >
-            <Image
-              source={{ uri: isPortrait ? item.poster : item.background }}
-              style={[
-                styles.posterImage,
-                {
-                  width: isPortrait ? 100 : 200,
-                  height: isPortrait ? 150 : 110,
-                },
-              ]}
-            />
-            <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
-              {item.name}
-            </Text>
-            <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
-          </Pressable>
-        </Animated.View>
+        <Pressable
+          style={styles.posterContainer}
+          onPress={handlePress}
+        >
+          <Image source={{ uri: isPortrait ? item.poster : item.background }} style={[styles.posterImage, {
+            width: isPortrait ? 100 : 200,
+            height: isPortrait ? 150 : 110,
+          }]} />
+          <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
+            {item.name}
+          </Text>
+          <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
+        </Pressable>
       </RNView>
     );
   };
-
 
   return (
     <RNView style={styles.container}>

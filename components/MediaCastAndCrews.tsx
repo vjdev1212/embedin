@@ -1,11 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   StyleSheet,
   ScrollView,
   Image,
-  Platform,
-  Pressable,
-  Animated,
 } from "react-native";
 import { View, Text } from "./Themed";
 import { useColorScheme } from "./useColorScheme";
@@ -20,97 +17,58 @@ const getInitials = (name: string) => {
 };
 
 const MediaCastAndCrews = ({ cast }: { cast: any[] }) => {
+
   const colorScheme = useColorScheme();
-  const castImageBgColor = colorScheme === "dark" ? "#0f0f0f" : "#f0f0f0";
-  const castTextColor = colorScheme === "dark" ? "#ffffff" : "#000000";
+  const castImageBgColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
+  const castTextColor = colorScheme === 'dark' ? '#ffffff' : '#000000';
 
   return (
     <>
-      {cast.length > 0 && (
-        <View style={styles.container}>
-          <View style={styles.castCrewContainer}>
-            <Text style={styles.castCrew}>Cast & Crew</Text>
-          </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {cast.map((member) => {
-              const hasImage = !!member.profile_path;
-              const scaleAnim = useState(() => new Animated.Value(1))[0];
-
-              const handleHoverIn = () => {
-                if (Platform.OS === "web") {
-                  Animated.spring(scaleAnim, {
-                    toValue: 1.2,
-                    useNativeDriver: true,
-                  }).start();
-                }
-              };
-
-              const handleHoverOut = () => {
-                if (Platform.OS === "web") {
-                  Animated.spring(scaleAnim, {
-                    toValue: 1,
-                    useNativeDriver: true,
-                  }).start();
-                }
-              };
-
-              const Wrapper = Platform.OS === "web" ? Pressable : View;
-
-              return (
-                <Wrapper
-                  key={member.id}
-                  onHoverIn={handleHoverIn}
-                  onHoverOut={handleHoverOut}
-                  style={{ marginRight: 15 }}
-                >
-                  <Animated.View
-                    style={[
-                      styles.castContainer,
-                      {
-                        transform: [{ scale: scaleAnim }],
-                      },
-                    ]}
-                  >
+      {
+        cast.length > 0 &&
+        (
+          <View style={styles.container}>
+            <View style={styles.castCrewContainer}>
+              <Text style={styles.castCrew}>Cast & Crew</Text>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {cast.map((member) => {
+                const hasImage = !!member.profile_path;
+                return (
+                  <View key={member.id} style={styles.castContainer}>
                     {hasImage ? (
                       <Image
                         source={{ uri: `${IMAGE_BASE_URL}${member.profile_path}` }}
-                        style={[
-                          styles.profileImage,
-                          {
-                            backgroundColor: castImageBgColor,
-                          },
-                        ]}
+                        style={[styles.profileImage, {
+                          backgroundColor: castImageBgColor,
+                        }]}
                       />
                     ) : (
-                      <View
-                        style={[
-                          styles.placeholderImage,
-                          {
-                            backgroundColor: castImageBgColor,
-                          },
-                        ]}
-                      >
-                        <Text style={[styles.initials, { color: castTextColor }]}>
-                          {getInitials(member.name)}
-                        </Text>
+                      <View style={[styles.placeholderImage, {
+                        backgroundColor: castImageBgColor,
+                      }]}>
+                        <Text style={[styles.initials, {
+                          color: castTextColor
+                        }]}>{getInitials(member.name)}</Text>
                       </View>
                     )}
-                    <Text style={[styles.name, { color: castTextColor }]} numberOfLines={1}>
+                    <Text style={[styles.name, {
+                      color: castTextColor
+                    }]} numberOfLines={1}>
                       {member.name}
                     </Text>
-                    <Text
-                      style={[styles.character, { color: castTextColor }]}
-                      numberOfLines={1}
-                    >
+                    <Text style={[styles.character, {
+                      color: castTextColor
+                    }]} numberOfLines={1}>
                       {member.character || member.name}
                     </Text>
-                  </Animated.View>
-                </Wrapper>
-              );
-            })}
-          </ScrollView>
-        </View>
-      )}
+                  </View>
+                );
+              })}
+            </ScrollView>
+          </View>
+        )
+      }
     </>
   );
 };
@@ -122,22 +80,22 @@ const styles = StyleSheet.create({
   },
   castContainer: {
     alignItems: "center",
+    marginRight: 15,
     width: 110,
-    marginTop: 30,
+    marginTop: 30
   },
   profileImage: {
     width: 60,
     height: 60,
-    borderRadius: 30,
-    marginBottom: 5,
+    borderRadius: 40,
   },
   placeholderImage: {
     width: 60,
     height: 60,
-    borderRadius: 30,
+    borderRadius: 40,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 5,
+    backgroundColor: '#111111'
   },
   initials: {
     fontSize: 25,
@@ -159,10 +117,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   castCrew: {
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginVertical: 10,
     fontSize: 15,
-  },
+  }
 });
 
 export default MediaCastAndCrews;
