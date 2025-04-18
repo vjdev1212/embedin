@@ -100,7 +100,13 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
       onHoverIn={handleHoverIn}
       onHoverOut={handleHoverOut}
     >
-      <Animated.View>
+      <Animated.View style={{
+        transform: [{ scale: scaleAnim }],
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 4 },
+        elevation: 4,
+      }}>
         {!imgError ? (
           <Animated.Image
             source={{ uri: posterUri }}
@@ -132,28 +138,28 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
             <SvgXml xml={DefaultPosterImgXml} />
           </View>
         )}
-      </Animated.View>
 
-      <Text
-        numberOfLines={1}
-        ellipsizeMode="tail"
-        style={[
-          styles.posterTitle,
-          {
-            maxWidth: isPortrait ? 100 : 200,
-          },
-        ]}
-      >
-        {item.name}
-      </Text>
-      <Text
-        style={[
-          styles.posterYear,
-          posterYearColor,
-        ]}
-      >
-        {`★ ${item.imdbRating}   ${year}`}
-      </Text>
+        <Text
+          numberOfLines={1}
+          ellipsizeMode="tail"
+          style={[
+            styles.posterTitle,
+            {
+              maxWidth: isPortrait ? 100 : 200,
+            },
+          ]}
+        >
+          {item.name}
+        </Text>
+        <Text
+          style={[
+            styles.posterYear,
+            posterYearColor,
+          ]}
+        >
+          {`★ ${item.imdbRating}   ${year}`}
+        </Text>
+      </Animated.View>
     </Pressable>
   );
 };
