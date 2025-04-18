@@ -35,13 +35,14 @@ const EpisodeItem = ({ item, onEpisodeSelect }: { item: any, onEpisodeSelect: an
   const [imgError, setImgError] = useState(false);
   const isPortrait = height > width;
 
+  // Initialize scale animation for the zoom effect
+  const [scaleAnim] = useState(new Animated.Value(1));
 
   useEffect(() => {
     const imageLoader = setTimeout(() => {
       setIsLoading(false);
-      Animated.timing(fadeAnim, {
+      Animated.spring(fadeAnim, {
         toValue: 1,
-        duration: 500,
         useNativeDriver: true,
       }).start();
     }, 100);
@@ -65,51 +66,57 @@ const EpisodeItem = ({ item, onEpisodeSelect }: { item: any, onEpisodeSelect: an
   const episodeDescriptionColor = {
     color: colorScheme === 'dark' ? '#efefef' : '#101010',
   };
+
+  // Handle zoom-in effect when touch starts
+  const handleHoverIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1.15,  // Zoom in effect
+      useNativeDriver: true,
+    }).start();
+  };
+
+  // Reset zoom-out effect when touch ends
+  const handleHoverOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,  // Reset to normal size
+      useNativeDriver: true,
+    }).start();
+  };
+
   return (
-    <View style={[
-      styles.episodeContainer,
-      {
-        marginHorizontal: 'auto',
-        marginVertical: 10,
-        width: '99%',
-        maxWidth: 350,
-      },
-    ]}>
-      <Pressable
-        key={`${item.season}-${item.number}`}
+    <View style={[styles.episodeContainer, { marginHorizontal: 'auto', marginVertical: 10, width: '99%', maxWidth: 350 }]}>
+      <Pressable key={`${item.season}-${item.number}`}
         onPress={() => handleEpisodeSelect(item.season, item.number)}
-      >
-        <View>
+        onHoverIn={handleHoverIn}
+        onHoverOut={handleHoverOut}>
+        <Animated.View>
           <View style={{ flexDirection: 'row', marginRight: 5 }}>
             <View style={{ width: '50%' }}>
               {isLoading ? (
                 <View style={styles.skeletonBackground} />
               ) : (
                 <>
-                  {
-                    !imgError ? (
+                  {!imgError ? (
+                    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
                       <Animated.Image
                         source={{ uri: item.thumbnail }}
                         onError={() => setImgError(true)}
-                        style={[styles.thumbnail, {
-                          backgroundColor: thumbnailBackgroundColor,
-                          height: isPortrait ? 80 : null,
-                          width: isPortrait ? null : 160,
-                          aspectRatio: 16 / 9,
-                        }]}
+                        style={[
+                          styles.thumbnail,
+                          {
+                            backgroundColor: thumbnailBackgroundColor,
+                            height: isPortrait ? 80 : null,
+                            width: isPortrait ? null : 160,
+                            aspectRatio: 16 / 9,
+                          },
+                        ]}
                       />
-                    ) : (
-                      <View style={[styles.thumbnailPlaceHolder,
-                      {
-                        backgroundColor: thumbnailBackgroundColor,
-                        height: isPortrait ? 80 : null,
-                        width: isPortrait ? null : 160,
-                        aspectRatio: 16 / 9,
-                      }]}>
-                        <SvgXml xml={DefaultEpisodeThumbnailImgXml} />
-                      </View>
-                    )
-                  }
+                    </Animated.View>
+                  ) : (
+                    <View style={[styles.thumbnailPlaceHolder, { backgroundColor: thumbnailBackgroundColor, height: isPortrait ? 80 : null, width: isPortrait ? null : 160, aspectRatio: 16 / 9 }]}>
+                      <SvgXml xml={DefaultEpisodeThumbnailImgXml} />
+                    </View>
+                  )}
                 </>
               )}
             </View>
@@ -117,8 +124,8 @@ const EpisodeItem = ({ item, onEpisodeSelect }: { item: any, onEpisodeSelect: an
               <Text style={[styles.episodeTitle]} numberOfLines={3}>
                 {item.episode || item.number}. {item.name || item.title}
               </Text>
-              <Text style={[styles.episodeAired, episodeAiredColor]}>{
-                formatDate(item.firstAired) || formatDate(item.released)}
+              <Text style={[styles.episodeAired, episodeAiredColor]}>
+                {formatDate(item.firstAired) || formatDate(item.released)}
               </Text>
             </View>
           </View>
@@ -127,11 +134,13 @@ const EpisodeItem = ({ item, onEpisodeSelect }: { item: any, onEpisodeSelect: an
               {item.description || item.overview}
             </Text>
           </View>
-        </View>
+        </Animated.View>
       </Pressable>
     </View>
-  )
-}
+  );
+};
+
+
 
 const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisodeSelect }) => {
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
