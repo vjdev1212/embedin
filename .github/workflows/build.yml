@@ -3,38 +3,35 @@ name: Build Expo iOS
 on:
   push:
     branches:
-      - main  # Trigger build on pushing to the main branch
-  pull_request:
-    branches:
-      - main  # Trigger build on pull requests to the main branch
+      - main
 
 jobs:
   build:
-    runs-on: macos-latest  # Run on macOS (necessary for iOS builds)
+    runs-on: macos-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: '14'  # Specify the Node.js version (adjust as necessary)
+          node-version: '18'
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: npm install
 
       - name: Install Expo CLI
-        run: |
-          npm install -g expo-cli
+        run: npm install -g expo-cli
 
-      - name: Build the app for iOS
-        run: |
-          expo build:ios --non-interactive --no-publish
-          
-      - name: Upload IPA as artifact
-        uses: actions/upload-artifact@v2
+      - name: Login to Expo (using token)
+        run: expo login --username ${{ secrets.EXPO_USERNAME }} --password ${{ secrets.EXPO_PASSWORD }}
+
+      - name: Build iOS app
+        run: expo build:ios --non-interactive --no-publish
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v3
         with:
           name: expo-ipa
-          path: ./build/ios/*.ipa  # Path to the built .ipa file
+          path: ./build/*.ipa
