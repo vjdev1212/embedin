@@ -6,7 +6,6 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { Platform } from 'react-native';
 import { isHapticsSupported } from '@/utils/platform';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
