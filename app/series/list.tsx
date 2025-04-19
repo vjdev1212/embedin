@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: 40,
-    padding: 10,
+    padding: 5,
   },
   title: {
     fontSize: 20,
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   posterContainer: {
-    padding: 5,
+    padding: 10,
     marginBottom: 10,
   },
   posterImage: {
