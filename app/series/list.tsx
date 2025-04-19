@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, Pressable, View as RNView, useWindowDimensions, ScrollView } from 'react-native';
+import { FlatList, Image, StyleSheet, Pressable, View as RNView, useWindowDimensions } from 'react-native';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -25,16 +25,16 @@ const SeriesList = () => {
           let list = [];
           if (result.results) {
             list = result.results
-              .filter((item: any) => item.poster_path && item.backdrop_path)
-              .map((item: any) => ({
-                moviedbid: item.id,
-                name: item.title || item.name,
-                year: getYear(item.release_date || item.first_air_date),
-                poster: `https://image.tmdb.org/t/p/w1280${item.poster_path}`,
-                background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
-                imdbRating: item.vote_average?.toFixed(1),
-                imdbid: item.imdb_id,
-              }));
+            .filter((item: any) => item.poster_path && item.backdrop_path)
+            .map((item: any) => ({
+              moviedbid: item.id,
+              name: item.title || item.name,
+              year: getYear(item.release_date || item.first_air_date),
+              poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
+              background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
+              imdbRating: item.vote_average?.toFixed(1),
+              imdbid: item.imdb_id,
+            }));
           }
           setData(list);
         }
@@ -48,33 +48,30 @@ const SeriesList = () => {
     fetchData();
   }, [apiUrl]);
 
+  const handlePress = async (item: any) => {
+    if (isHapticsSupported()) {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+    } router.push({
+      pathname: '/series/details',
+      params: { moviedbid: item.moviedbid || item.id },
+    });
+  };
 
-
-  const renderItem = (item: any) => {
+  const renderItem = ({ item }: any) => {
     const year = item.year?.split('–')[0] || item.year;
 
-    const handlePress = async () => {
-      if (isHapticsSupported()) {
-        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-      } router.push({
-        pathname: '/series/details',
-        params: { moviedbid: item.moviedbid || item.id },
-      });
-    };
-
     return (
-      <RNView key={item.moviedbid || item.id} style={styles.posterContainer}>
-        <Pressable style={styles.posterInnerContainer} onPress={handlePress}>
-          <Image
-            source={{ uri: isPortrait ? item.poster : item.poster }}
+      <RNView>
+        <Pressable
+          style={styles.posterContainer}
+          onPress={() => handlePress(item)}
+        >
+          <Image source={{ uri: isPortrait ? item.poster : item.background }}
             style={[styles.posterImage, {
-              width: isPortrait ? 100 : 150,
-              height: isPortrait ? 150 : 225,
-            }]}
-          />
-          <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.posterTitle, {
-            width: isPortrait ? 100 : 150,
-          }]}>
+              width: isPortrait ? 100 : 200,
+              height: isPortrait ? 150 : 110,
+            }]} />
+          <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
             {item.name}
           </Text>
           <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
@@ -91,11 +88,14 @@ const SeriesList = () => {
           <ActivityIndicator size="large" style={styles.activityIndicator} color="#535aff" />
           <Text style={styles.centeredText}>Loading</Text>
         </View>) : (
-        <ScrollView contentContainerStyle={styles.posterList} showsVerticalScrollIndicator={false}>
-          <RNView style={styles.row}>
-            {data.map(renderItem)}
-          </RNView>
-        </ScrollView>
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          numColumns={isPortrait ? 3 : 6}
+          contentContainerStyle={styles.posterList}
+          showsVerticalScrollIndicator={false}
+        />
       )}
     </RNView>
   );
@@ -119,14 +119,6 @@ const styles = StyleSheet.create({
   posterContainer: {
     padding: 10,
     marginBottom: 10,
-    alignItems: 'center'
-  },
-  posterInnerContainer: {
-  },
-  row: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
   },
   posterImage: {
     borderRadius: 8,
