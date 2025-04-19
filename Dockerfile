@@ -1,28 +1,5 @@
-# Use Node base image (ARM-compatible for Pi)
-FROM node:18-bullseye
+# Use a lightweight base image
+FROM nginx:alpine
 
-# Install required packages
-RUN apt-get update && apt-get install -y \
-    git \
-    python3 \
-    make \
-    g++ \
-    && rm -rf /var/lib/apt/lists/*
-
-# Set working directory
-WORKDIR /app
-
-# Copy project files
-COPY . .
-
-# Install Expo CLI globally
-RUN npm install -g expo-cli
-
-# Install project dependencies
-RUN npm install
-
-# Expose port used by Expo
-EXPOSE 19000 19001 19002
-
-# Start Expo with tunnel on container boot
-CMD ["npx", "expo", "start", "--tunnel", "--no-interactive"]
+# Copy the static website files to the Nginx document root
+COPY ./dist /usr/share/nginx/html
