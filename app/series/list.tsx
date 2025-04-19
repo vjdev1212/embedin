@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   posterContainer: {
-    padding: 10,
+    padding: 5,
     marginBottom: 10,
   },
   posterImage: {
