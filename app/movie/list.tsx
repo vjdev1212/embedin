@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, StyleSheet, Pressable, View as RNView, useWindowDimensions } from 'react-native';
+import { ScrollView, Image, StyleSheet, Pressable, View as RNView, useWindowDimensions } from 'react-native';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -15,6 +15,9 @@ const MoviesList = () => {
   const [loading, setLoading] = useState(true);
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
+  
+  const posterWidth = isPortrait ? 100 : 150;
+  const posterHeight = isPortrait ? 150 : 225;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,34 +51,36 @@ const MoviesList = () => {
     fetchData();
   }, [apiUrl]);
 
-  const renderItem = ({ item }: any) => {
+  const MovieItem = ({ item }: { item: any }) => {
     const year = item.year?.split('–')[0] || item.year;
 
     const handlePress = async () => {
       if (isHapticsSupported()) {
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-      } router.push({
+      }
+      router.push({
         pathname: '/movie/details',
         params: { moviedbid: item.moviedbid || item.id },
-      })
+      });
     };
 
     return (
-      <RNView>
-        <Pressable
-          style={styles.posterContainer}
-          onPress={handlePress}
-        >
-          <Image source={{ uri: isPortrait ? item.poster : item.background }} style={[styles.posterImage, {
-            width: isPortrait ? 100 : 200,
-            height: isPortrait ? 150 : 110,
-          }]} />
-          <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
-            {item.name}
-          </Text>
-          <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
-        </Pressable>
-      </RNView>
+      <Pressable
+        style={styles.posterContainer}
+        onPress={handlePress}
+      >
+        <Image 
+          source={{ uri: isPortrait ? item.poster : item.poster }} 
+          style={[styles.posterImage, {
+            width: posterWidth,
+            height: posterHeight,
+          }]} 
+        />
+        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
+          {item.name}
+        </Text>
+        <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
+      </Pressable>
     );
   };
 
@@ -88,14 +93,16 @@ const MoviesList = () => {
           <Text style={styles.centeredText}>Loading</Text>
         </View>
       ) : (
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={isPortrait ? 3 : 6}
+        <ScrollView
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.posterList}
-        />
+          contentContainerStyle={styles.scrollViewContent}
+        >
+          <RNView style={styles.moviesGrid}>
+            {data.map((item, index) => (
+              <MovieItem key={index.toString()} item={item} />
+            ))}
+          </RNView>
+        </ScrollView>
       )}
     </RNView>
   );
@@ -113,8 +120,15 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
-  posterList: {
-    paddingVertical: 20
+  scrollViewContent: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  moviesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
   },
   posterContainer: {
     padding: 10,

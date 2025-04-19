@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, StyleSheet, Pressable, View as RNView, useWindowDimensions } from 'react-native';
+import { ScrollView, Image, StyleSheet, Pressable, View as RNView, useWindowDimensions } from 'react-native';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -15,6 +15,9 @@ const SeriesList = () => {
   const [loading, setLoading] = useState(true);
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
+  
+  const posterWidth = isPortrait ? 100 : 150;
+  const posterHeight = isPortrait ? 150 : 225;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -48,35 +51,36 @@ const SeriesList = () => {
     fetchData();
   }, [apiUrl]);
 
-  const handlePress = async (item: any) => {
-    if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-    } router.push({
-      pathname: '/series/details',
-      params: { moviedbid: item.moviedbid || item.id },
-    });
-  };
-
-  const renderItem = ({ item }: any) => {
+  const SeriesItem = ({ item }: { item: any }) => {
     const year = item.year?.split('–')[0] || item.year;
 
+    const handlePress = async () => {
+      if (isHapticsSupported()) {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+      }
+      router.push({
+        pathname: '/series/details',
+        params: { moviedbid: item.moviedbid || item.id },
+      });
+    };
+
     return (
-      <RNView>
-        <Pressable
-          style={styles.posterContainer}
-          onPress={() => handlePress(item)}
-        >
-          <Image source={{ uri: isPortrait ? item.poster : item.background }}
-            style={[styles.posterImage, {
-              width: isPortrait ? 100 : 200,
-              height: isPortrait ? 150 : 110,
-            }]} />
-          <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
-            {item.name}
-          </Text>
-          <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
-        </Pressable>
-      </RNView>
+      <Pressable
+        style={styles.posterContainer}
+        onPress={handlePress}
+      >
+        <Image 
+          source={{ uri: isPortrait ? item.poster : item.poster }} 
+          style={[styles.posterImage, {
+            width: posterWidth,
+            height: posterHeight,
+          }]} 
+        />
+        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
+          {item.name}
+        </Text>
+        <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
+      </Pressable>
     );
   };
 
@@ -87,15 +91,18 @@ const SeriesList = () => {
         <View style={styles.centeredContainer}>
           <ActivityIndicator size="large" style={styles.activityIndicator} color="#535aff" />
           <Text style={styles.centeredText}>Loading</Text>
-        </View>) : (
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={isPortrait ? 3 : 6}
-          contentContainerStyle={styles.posterList}
+        </View>
+      ) : (
+        <ScrollView
           showsVerticalScrollIndicator={false}
-        />
+          contentContainerStyle={styles.scrollViewContent}
+        >
+          <RNView style={styles.seriesGrid}>
+            {data.map((item, index) => (
+              <SeriesItem key={index.toString()} item={item} />
+            ))}
+          </RNView>
+        </ScrollView>
       )}
     </RNView>
   );
@@ -113,8 +120,15 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     textAlign: 'center',
   },
-  posterList: {
-    paddingVertical: 20
+  scrollViewContent: {
+    paddingVertical: 20,
+    alignItems: 'center',
+  },
+  seriesGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
   },
   posterContainer: {
     padding: 10,
