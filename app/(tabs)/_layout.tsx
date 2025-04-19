@@ -6,6 +6,7 @@ import { useColorScheme } from '@/components/useColorScheme';
 import { Platform } from 'react-native';
 import { isHapticsSupported } from '@/utils/platform';
 import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
@@ -40,7 +41,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: '#535aff',
         headerShown: false,
-        tabBarStyle: { height: getTabBarHeight() },
+        tabBarStyle: { height: getTabBarHeight(), backgroundColor: 'transparent', borderColor: '#1f1f1f' },
       }}
     >
       <Tabs.Screen
@@ -72,7 +73,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
           tabBarIconStyle: { marginVertical: 5 },
         }}
-      />      
+      />
       <Tabs.Screen
         name="settings"
         listeners={{
