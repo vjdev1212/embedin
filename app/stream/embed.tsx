@@ -28,9 +28,9 @@ const EmbedPlayer = () => {
                 await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
             }
         };
-    
+
         enableOrientation();
-    
+
         const loadEmbedSettings = async () => {
             try {
                 const storedSettings = await AsyncStorage.getItem('embedSettings');
@@ -41,7 +41,7 @@ const EmbedPlayer = () => {
                     setSeriesUrlTemplate(parsedSettings.tv?.template ?? defaultTvShowUrlTemplate);
                     setSandboxAllowedForMovie(parsedSettings.movie?.sandboxAllowed ?? defaultSandboxAllowedForMovie);
                     setSandboxAllowedForTv(parsedSettings.tv?.sandboxAllowed ?? defaultSandboxAllowedForTv);
-    
+
                     if (type === 'movie') {
                         setSandboxAllowed(parsedSettings.movie?.sandboxAllowed ?? defaultSandboxAllowedForMovie);
                     } else if (type === 'series') {
@@ -52,16 +52,16 @@ const EmbedPlayer = () => {
                 console.error('Failed to load embed settings:', error);
             }
         };
-    
+
         loadEmbedSettings();
-    
+
         return () => {
             if (Platform.OS !== 'web') {
                 ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
             }
         };
     }, [type]);
-    
+
 
     useEffect(() => {
         if (imdbid) {
@@ -105,71 +105,73 @@ const EmbedPlayer = () => {
 
     // HTML structure with iframe and popup-blocking JavaScript
     const iframeHtml = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Embed Video Player</title>
-            <style>
-                body {
-                    padding: 0 !important;
-                    margin: 0 !important;
-                    background-color: #000;
-                }
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>EmbedIn</title>
+      <style>
+        html, body {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          overflow: hidden;
+          background-color: #000;
+        }
+        iframe {
+          position: absolute;
+          top: 0;
+          left: 0;
+          border: none;
+          width: 100%;
+          height: 100%;
+        }
+        @media (orientation: portrait) {
+          .iframe-container {
+            aspect-ratio: 16/9;
+          }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="iframe-container">
+        <iframe
+          src="${videoUrl}"
+          frameborder="0"
+          style="width: 100%; height: 100%;"
+          allow="encrypted-media; autoplay; fullscreen"
+          referrerPolicy="no-referrer-when-downgrade"
+          ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allowfullscreen allow-presentation"' : ''}
+          allowfullscreen>
+        </iframe>
+      </div>
 
-                .iframe-container {
-                    aspect-ratio: 16/9;
-                    width: 100%;
-                    margin: auto;
-                    border: none;
-                }
+      <script>
+        window.open = function() { return null; };
+      </script>
 
-                @media (orientation: portrait) {
-                    .iframe-container {
-                        aspect-ratio: 16/9;
-                    }
-                }
-            </style>
-        </head>
-        <body>
-            <div class="iframe-container">
-                <iframe 
-                    src="${videoUrl}"
-                    frameborder="0" 
-                    style="width: 100%; height: 100%;"
-                    allow="encrypted-media; autoplay; fullscreen"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allowfullscreen allow-presentation"' : ''}
-                    allowfullscreen>
-                </iframe>
-            </div>
-
-            <script>
-                // Block popups by overriding window.open
-                window.open = function() { return null; };
-            </script>
-            <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                document.querySelector('iframe').addEventListener('click', function () {
-                    if (this.requestFullscreen) {
-                        this.requestFullscreen();
-                    } else if (this.mozRequestFullScreen) {
-                        this.mozRequestFullScreen();
-                    } else if (this.webkitRequestFullscreen) {
-                        this.webkitRequestFullscreen();
-                    } else if (this.msRequestFullscreen) {
-                        this.msRequestFullscreen();
-                    }
-                });
-            });
-            </script>
-        </body>
-        </html>
-    `;
+      <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          document.querySelector('iframe').addEventListener('click', function () {
+            if (this.requestFullscreen) {
+              this.requestFullscreen();
+            } else if (this.mozRequestFullScreen) {
+              this.mozRequestFullScreen();
+            } else if (this.webkitRequestFullscreen) {
+              this.webkitRequestFullscreen();
+            } else if (this.msRequestFullscreen) {
+              this.msRequestFullscreen();
+            }
+          });
+        });
+      </script>
+    </body>
+  </html>
+`;
 
     const webViewBgColor = colorScheme === 'dark' ? '#000' : '#fff';
-    
+
     return (
         <View style={styles.container}>
             {videoUrl ? (
