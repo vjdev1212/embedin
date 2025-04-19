@@ -11,8 +11,8 @@
     "build:web": "npx expo export -p web",
     "build:ios": "eas build -p ios --profile preview",
     "build:android": "eas build -p android --profile preview",
-    "docker-push:latest": "npx expo export -p web && docker buildx build --tag=jarvisnexus/embedin:latest --platform=linux/arm64,linux/amd64,linux/arm/v7 --push .",
-    "docker-push-tunnel:latest": "npx expo export -p web && docker buildx build --tag=jarvisnexus/embedin-tunnel:latest --platform=linux/arm64,linux/amd64,linux/arm/v7 --push ."
+    "docker-push:latest": "npx expo export -p web && docker buildx build --tag=jarvisnexus/embedin:latest --platform=linux/arm64 --push .",
+    "docker-push-tunnel:latest": "npx expo export -p web && docker buildx build --tag=jarvisnexus/embedin-tunnel:latest --platform=linux/arm64 --push ."
   },
   "jest": {
     "preset": "jest-expo"
