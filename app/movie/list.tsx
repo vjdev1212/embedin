@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Image, StyleSheet, Pressable, View as RNView, useWindowDimensions } from 'react-native';
+import { Image, StyleSheet, Pressable, View as RNView, useWindowDimensions, ScrollView } from 'react-native';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -25,16 +25,16 @@ const MoviesList = () => {
           let list = [];
           if (result.results) {
             list = result.results
-            .filter((item: any) => item.poster_path && item.backdrop_path)
-            .map((item: any) => ({
-              moviedbid: item.id,
-              name: item.title || item.name,
-              year: getYear(item.release_date || item.first_air_date),
-              poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
-              background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
-              imdbRating: item.vote_average?.toFixed(1),
-              imdbid: item.imdb_id,
-            }));
+              .filter((item: any) => item.poster_path && item.backdrop_path)
+              .map((item: any) => ({
+                moviedbid: item.id,
+                name: item.title || item.name,
+                year: getYear(item.release_date || item.first_air_date),
+                poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
+                background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
+                imdbRating: item.vote_average?.toFixed(1),
+                imdbid: item.imdb_id,
+              }));
           }
           setData(list);
         }
@@ -48,29 +48,32 @@ const MoviesList = () => {
     fetchData();
   }, [apiUrl]);
 
-  const renderItem = ({ item }: any) => {
+  const renderItem = (item: any) => {
     const year = item.year?.split('–')[0] || item.year;
 
     const handlePress = async () => {
       if (isHapticsSupported()) {
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-      } router.push({
+      }
+      router.push({
         pathname: '/movie/details',
         params: { moviedbid: item.moviedbid || item.id },
-      })
+      });
     };
 
     return (
-      <RNView>
-        <Pressable
-          style={styles.posterContainer}
-          onPress={handlePress}
-        >
-          <Image source={{ uri: isPortrait ? item.poster : item.background }} style={[styles.posterImage, {
-            width: isPortrait ? 100 : 200,
-            height: isPortrait ? 150 : 110,
-          }]} />
-          <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
+      <RNView key={item.moviedbid || item.id} style={styles.posterContainer}>
+        <Pressable style={styles.posterInnerContainer} onPress={handlePress}>
+          <Image
+            source={{ uri: isPortrait ? item.poster : item.poster }}
+            style={[styles.posterImage, {
+              width: isPortrait ? 100 : 150,
+              height: isPortrait ? 150 : 225,
+            }]}
+          />
+          <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.posterTitle, {
+            width: isPortrait ? 100 : 150,
+          }]}>
             {item.name}
           </Text>
           <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
@@ -88,14 +91,11 @@ const MoviesList = () => {
           <Text style={styles.centeredText}>Loading</Text>
         </View>
       ) : (
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          numColumns={isPortrait ? 3 : 6}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.posterList}
-        />
+        <ScrollView contentContainerStyle={styles.posterList} showsVerticalScrollIndicator={false}>
+          <RNView style={styles.row}>
+            {data.map(renderItem)}
+          </RNView>
+        </ScrollView>
       )}
     </RNView>
   );
@@ -114,19 +114,30 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   posterList: {
-    paddingVertical: 20
+    paddingVertical: 20,
+  },
+  row: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
   posterContainer: {
-    padding: 10,
     marginBottom: 10,
+    padding: 10,
+    alignItems: 'center'
+  },
+  posterInnerContainer: {
   },
   posterImage: {
     borderRadius: 8,
+    marginBottom: 8,
+    width: '100%', // Make the image fill its container
+    aspectRatio: 9 / 16, // Keep the aspect ratio of the image
   },
   posterTitle: {
     marginTop: 8,
     fontSize: 14,
-    maxWidth: 100,
+    maxWidth: '100%', // Allow text to take up available space
   },
   posterYear: {
     marginTop: 4,

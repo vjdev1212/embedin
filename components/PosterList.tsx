@@ -24,6 +24,7 @@ const SkeletonLoader = () => {
   const isPortrait = height > width;
 
   const skeletonBgColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
+
   return (
     <RNView style={styles.skeletonContainer}>
       <RNView
@@ -31,8 +32,9 @@ const SkeletonLoader = () => {
           styles.skeletonImage,
           {
             backgroundColor: skeletonBgColor,
-            width: isPortrait ? 100 : 140,
-            height: isPortrait ? 150 : 200,
+            width: isPortrait ? 100 : 150,
+            height: isPortrait ? 150 : 220,
+            aspectRatio: 9 / 16
           },
         ]}
       />
@@ -40,10 +42,11 @@ const SkeletonLoader = () => {
   );
 };
 
+
 const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' | 'vertical', type: string }) => {
   const [imgError, setImgError] = useState(false);
   const fadeAnim = useState(new Animated.Value(0))[0];
-  const scaleAnim = useState(new Animated.Value(1))[0]; // Scale animation
+  const scaleAnim = useState(new Animated.Value(1))[0];
   const colorScheme = useColorScheme();
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
@@ -55,7 +58,7 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
     return item.year;
   }, [item.year]);
 
-  const posterUri = useMemo(() => (isPortrait ? item.poster : item.background), [isPortrait, item]);
+  const posterUri = item.poster; // Always use poster
 
   const handleImageLoad = () => {
     Animated.timing(fadeAnim, {
@@ -93,6 +96,7 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
   const posterYearColor = {
     color: colorScheme === 'dark' ? '#afafaf' : '#303030',
   };
+
   return (
     <Pressable
       style={[styles.posterContainer, layout === 'vertical' && styles.verticalContainer]}
@@ -112,8 +116,9 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
               {
                 opacity: fadeAnim,
                 backgroundColor: posterImageBgColor,
-                width: isPortrait ? 100 : 200,
-                height: isPortrait ? 150 : 110,
+                width: isPortrait ? 100 : 150,
+                height: isPortrait ? 150 : 220,
+                aspectRatio: 9 / 16
               },
             ]}
           />
@@ -124,8 +129,8 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
               layout === 'vertical' ? styles.verticalImage : styles.horizontalImage,
               {
                 backgroundColor: posterImageBgColor,
-                width: isPortrait ? 100 : 200,
-                height: isPortrait ? 150 : 110,
+                width: 100,
+                height: 150,
               },
             ]}
           >
@@ -137,26 +142,17 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
       <Text
         numberOfLines={1}
         ellipsizeMode="tail"
-        style={[
-          styles.posterTitle,
-          {
-            maxWidth: isPortrait ? 100 : 200,
-          },
-        ]}
+        style={[styles.posterTitle, { maxWidth: 100 }]}
       >
         {item.name}
       </Text>
-      <Text
-        style={[
-          styles.posterYear,
-          posterYearColor,
-        ]}
-      >
+      <Text style={[styles.posterYear, posterYearColor]}>
         {`★ ${item.imdbRating}   ${year}`}
       </Text>
     </Pressable>
   );
 };
+
 
 const PosterList = ({
   apiUrl,
