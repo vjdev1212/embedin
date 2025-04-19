@@ -1,5 +1,5 @@
-# Use Node base image (ARM-compatible for Pi)
-FROM node:18-bullseye
+# Use compatible Node.js version
+FROM node:16-bullseye
 
 # Install required packages
 RUN apt-get update && apt-get install -y \
@@ -15,8 +15,9 @@ WORKDIR /app
 # Copy project files
 COPY . .
 
-# Install Expo CLI globally
-RUN npm install -g expo-cli
+# Uninstall old expo-cli and install new expo
+RUN npm uninstall -g expo-cli
+RUN npm install -g expo
 
 # Install project dependencies
 RUN npm install
@@ -24,5 +25,5 @@ RUN npm install
 # Expose port used by Expo
 EXPOSE 19000 19001 19002
 
-# Start Expo with tunnel on container boot
-CMD ["npx", "expo", "start", "--tunnel", "--no-interactive"]
+# Start Expo with tunnel on container boot (without --no-interactive)
+CMD ["npx", "expo", "start", "--tunnel"]
