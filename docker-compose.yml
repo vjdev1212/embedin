@@ -1,21 +1,11 @@
-version: '3.8'
+version: '3.0'
 
+name: EmbedIn
 services:
-  embedin-tunnel:
-    container_name: embedin-tunnel  # Container name
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: jarvisnexus/embedin-tunnel:latest  # Image name (for local build)
+  embedin:
+    container_name: embedin
+    hostname: embedin
+    image: jarvisnexus/embedin:latest
     ports:
-      - "19000:19000"   # Metro bundler (JS)
-      - "19001:19001"   # React DevTools
-      - "19002:19002"   # Expo web UI
-    environment:
-      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
-      - EXPO_USE_DEV_SERVER=true
-      - NODE_ENV=development
-    volumes:
-      - .:/app
-      - /app/node_modules
+      - "4444:80"
     restart: unless-stopped
