@@ -25,8 +25,6 @@ export default function MoviesScreen() {
           <PosterList apiUrl={MovieGneres.fantasy} title="Fantasy" type="movie" />
           <PosterList apiUrl={MovieGneres.drama} title="Drama" type="movie" />
           <PosterList apiUrl={MovieGneres.romance} title="Romance" type="movie" />
-          <PosterList apiUrl={MovieGneres.documentary} title="Documentary" type="movie" />
-          <PosterList apiUrl={MovieGneres.history} title="History" type="movie" />
         </View>
       </ScrollView>
     </SafeAreaView>
