@@ -12,18 +12,16 @@ import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { getYear } from '@/utils/Date';
-import { useColorScheme } from './useColorScheme';
 import { SvgXml } from 'react-native-svg';
 import { DefaultPosterImgXml } from '@/utils/Svg';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
 const SkeletonLoader = memo(() => {
-  const colorScheme = useColorScheme();
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
 
-  const skeletonBgColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
+  const skeletonBgColor = '#0f0f0f';
   const skeletonWidth = isPortrait ? 100 : 150;
   const skeletonHeight = isPortrait ? 150 : 220;
 
@@ -56,7 +54,6 @@ const PosterItem = memo(({ item, layout, type }: { item: PosterItemData, layout?
   const [imgError, setImgError] = useState(false);
   const fadeAnim = useMemo(() => new Animated.Value(0), []);
   const scaleAnim = useMemo(() => new Animated.Value(1), []);
-  const colorScheme = useColorScheme();
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
 
@@ -101,14 +98,11 @@ const PosterItem = memo(({ item, layout, type }: { item: PosterItemData, layout?
     }).start();
   }, [scaleAnim]);
 
-  const posterImageBgColor = useMemo(() => 
-    colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0', 
-    [colorScheme]
-  );
+  const posterImageBgColor = '#0f0f0f';
   
   const posterYearColor = useMemo(() => ({
-    color: colorScheme === 'dark' ? '#afafaf' : '#303030',
-  }), [colorScheme]);
+    color: '#afafaf',
+  }), []);
 
   const imageDimensions = useMemo(() => ({
     width: isPortrait ? 100 : 150,

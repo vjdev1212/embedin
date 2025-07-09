@@ -4,7 +4,6 @@ import { Text, View } from './Themed';
 import * as Haptics from 'expo-haptics';  // Importing Haptics for haptic feedback
 import { formatDate } from '@/utils/Date';
 import { isHapticsSupported } from '@/utils/platform';
-import { useColorScheme } from './useColorScheme';
 import { SvgXml } from 'react-native-svg';
 import { DefaultEpisodeThumbnailImgXml } from '@/utils/Svg';
 
@@ -27,7 +26,6 @@ interface SeasonEpisodeListProps {
 }
 
 const EpisodeItem = ({ item, onEpisodeSelect }: { item: any, onEpisodeSelect: any }) => {
-  const colorScheme = useColorScheme();
   const [selectedEpisode, setSelectedEpisode] = useState<number>(1);
   const [isLoading, setIsLoading] = useState(true);
   const [fadeAnim] = useState(new Animated.Value(0));
@@ -57,13 +55,13 @@ const EpisodeItem = ({ item, onEpisodeSelect }: { item: any, onEpisodeSelect: an
     onEpisodeSelect(season, episode);
   };
 
-  const thumbnailBackgroundColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
+  const thumbnailBackgroundColor = '#0f0f0f';
 
   const episodeAiredColor = {
-    color: colorScheme === 'dark' ? '#afafaf' : '#101010',
+    color: '#afafaf',
   };
   const episodeDescriptionColor = {
-    color: colorScheme === 'dark' ? '#efefef' : '#101010',
+    color: '#efefef',
   };
   return (
     <View style={[
@@ -135,7 +133,6 @@ const EpisodeItem = ({ item, onEpisodeSelect }: { item: any, onEpisodeSelect: an
 
 const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisodeSelect }) => {
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
-  const colorScheme = useColorScheme();
 
   // Group episodes by season
   const groupedEpisodes = videos.reduce((acc, video) => {
@@ -185,7 +182,7 @@ const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisode
               style={[
                 styles.seasonButton,
                 {
-                  backgroundColor: item !== selectedSeason && colorScheme === 'dark' ? '#101010' : '#f0f0f0',
+                  backgroundColor: item !== selectedSeason ? '#101010' : '#101010',
                 },
                 item === selectedSeason && styles.selectedSeasonButton,
               ]}

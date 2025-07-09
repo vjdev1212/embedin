@@ -13,7 +13,6 @@ import MediaCastAndCrews from '@/components/MediaCastAndCrews';
 import PosterList from '@/components/PosterList';
 import PlayButton from '@/components/PlayButton';
 import MediaContentDetailsList from '@/components/MediaContentDetailsList';
-import { useColorScheme } from '@/components/useColorScheme';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -26,7 +25,6 @@ const MovieDetails = () => {
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
   const ref = useRef<ScrollView | null>(null);
-  const colorScheme = useColorScheme();
 
   useFocusEffect(() => {
     if (ref.current) {
@@ -120,7 +118,7 @@ const MovieDetails = () => {
 
   const Divider = () => {
     const dividerColor = {
-      color: colorScheme === 'dark' ? '#ffffff' : '#000000',
+      color: '#ffffff',
     };
     return (
       <View>
@@ -159,7 +157,7 @@ const MovieDetails = () => {
             imdbRating={data.imdbRating}
             releaseInfo={data.releaseInfo}
           />
-          <PlayButton onPress={handlePlayPress}/>
+          <PlayButton onPress={handlePlayPress} />
           <MediaContentDescription description={data.description} />
           {
             isPortrait && (

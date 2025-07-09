@@ -3,7 +3,6 @@ import { Platform, ScrollView, StyleSheet } from 'react-native';
 import { Text, View } from './Themed';
 import { getYear } from '@/utils/Date';
 import { MaterialIcons, FontAwesome, Feather } from '@expo/vector-icons';
-import { useColorScheme } from './useColorScheme';
 
 const MediaContentHeader = ({
   name,
@@ -21,9 +20,7 @@ const MediaContentHeader = ({
   imdbRating: string;
 }) => {
 
-
-  const colorScheme = useColorScheme();
-  const headerTextColor = colorScheme === 'dark' ? '#ffffff' : '#000000';
+  const headerTextColor = '#ffffff';
 
   return (
     <View style={styles.container}>

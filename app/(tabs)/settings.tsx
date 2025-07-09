@@ -6,13 +6,9 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics'
 import { isHapticsSupported } from '@/utils/platform';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useColorScheme } from '@/components/useColorScheme';
 
 const SettingsScreen = () => {
   const router = useRouter();
-
-  const colorScheme = useColorScheme();
-
   const contactList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
     { title: 'Contact', route: '/settings/contact', icon: 'mail-outline' },
     { title: 'Support', route: '/settings/donate', icon: 'cash-outline' },

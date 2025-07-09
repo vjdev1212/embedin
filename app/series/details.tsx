@@ -11,7 +11,6 @@ import MediaLogo from '@/components/MediaLogo';
 import MediaCastAndCrews from '@/components/MediaCastAndCrews';
 import PosterList from '@/components/PosterList';
 import MediaContentDetailsList from '@/components/MediaContentDetailsList';
-import { useColorScheme } from '@/components/useColorScheme';
 import PlayButton from '@/components/PlayButton';
 import { isHapticsSupported } from '@/utils/platform';
 import * as Haptics from 'expo-haptics';
@@ -28,7 +27,6 @@ const SeriesDetails = () => {
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
   const ref = useRef<ScrollView | null>(null);
-  const colorScheme = useColorScheme();
 
   useFocusEffect(() => {
     if (ref.current) {
@@ -152,7 +150,7 @@ const SeriesDetails = () => {
 
   const Divider = () => {
     const dividerColor = {
-      color: colorScheme === 'dark' ? '#ffffff' : '#000000',
+      color: '#ffffff',
     };
     return (
       <View>

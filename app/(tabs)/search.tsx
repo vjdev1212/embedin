@@ -7,7 +7,6 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { getYear } from '@/utils/Date';
-import { useColorScheme } from '@/components/useColorScheme';
 
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -20,7 +19,7 @@ const SearchScreen = () => {
   const [debounceTimeout, setDebounceTimeout] = useState<any>(null);
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
-  
+
   const posterWidth = isPortrait ? 100 : 150;
   const posterHeight = isPortrait ? 150 : 225;
 
@@ -119,7 +118,7 @@ const SearchScreen = () => {
         onPress={handlePress}
         onHoverIn={handleHoverIn}
         onHoverOut={handleHoverOut}>
-        <Image source={{ uri: isPortrait ? item.poster : item.poster }} 
+        <Image source={{ uri: isPortrait ? item.poster : item.poster }}
           style={[styles.posterImage, {
             width: posterWidth,
             height: posterHeight,
@@ -141,9 +140,8 @@ const SearchScreen = () => {
     setSeries([]);
   };
 
-  const colorScheme = useColorScheme();
-  const searchInputColor = colorScheme === 'dark' ? styles.darkSearchInput : styles.lightSearchInput;
-  const noResultsColor = { color: colorScheme === 'dark' ? '#a0a0a0' : '#303030' }
+  const searchInputColor = styles.darkSearchInput;
+  const noResultsColor = { color: '#a0a0a0' }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -168,7 +166,7 @@ const SearchScreen = () => {
       </View>
 
       {loading && <ActivityIndicator size="large" color="#535aff" style={styles.loader} />}
-      
+
       <ScrollView showsVerticalScrollIndicator={false} style={styles.searchResultsContainer}>
         {
           !loading && movies.length === 0 && series.length === 0 &&
@@ -189,7 +187,7 @@ const SearchScreen = () => {
             </View>
           )
         }
-        
+
         {!loading && movies.length > 0 && (
           <View>
             <Text style={styles.sectionTitle}>Movies</Text>

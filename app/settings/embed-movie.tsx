@@ -4,13 +4,11 @@ import { isHapticsSupported, showAlert } from '@/utils/platform';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useState } from 'react';
-import { useColorScheme } from '@/components/useColorScheme';
 import { defaultMovieUrlTemplate, defaultSandboxAllowedForMovie } from '@/constants/Embed';
 
 const EmbedMovieSettingsScreen = () => {
     const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
     const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(defaultSandboxAllowedForMovie);
-    const colorScheme = useColorScheme();
 
     useEffect(() => {
         const loadEmbedSettings = async () => {
@@ -52,7 +50,7 @@ const EmbedMovieSettingsScreen = () => {
     };
 
     const toggleSandBoxAllowed = useCallback(() => setSandboxAllowed(prev => !prev), [setSandboxAllowed]);
-    const textInputStyle = colorScheme === 'dark' ? styles.darkTextInput : styles.lightTextInput;
+    const textInputStyle = styles.darkTextInput;
 
     const tmdbHint = "Example (TMDB): https://player.videasy.net/movie/{TMDBID}";
     const imdbHint = "Example (IMDB): https://player.videasy.net/movie/{IMDBID}";

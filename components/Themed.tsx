@@ -12,7 +12,6 @@ import {
 } from 'react-native';
 import { StatusBar as DefaultStatusBar } from 'expo-status-bar';
 import Colors from '@/constants/Colors';
-import { useColorScheme } from './useColorScheme';
 
 type ThemeProps = {
   lightColor?: string;
@@ -29,7 +28,7 @@ export function useThemeColor(
   props: { light?: string; dark?: string },
   colorName: keyof typeof Colors.light & keyof typeof Colors.dark
 ) {
-  const theme = useColorScheme() ?? 'dark';
+  const theme = 'dark';
   const colorFromProps = props[theme];
 
   if (colorFromProps) {
@@ -77,10 +76,9 @@ export function Card(props: ViewProps) {
 
   // Dynamically adjust border and shadow based on the color scheme
 
-  const colorScheme = useColorScheme();
-  const backgroundColor = colorScheme === 'dark' ? '#101010' : '#FAFAFA';
-  const borderColor = colorScheme === 'dark' ? '#101010' : '#DDDDDD';
-  const shadowColor = colorScheme === 'dark' ? '#101010' : '#EFEFEF';
+  const backgroundColor = '#101010';
+  const borderColor = '#101010';
+  const shadowColor = '#101010';
 
   return (
     <DefaultView

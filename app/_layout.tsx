@@ -5,7 +5,6 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import { useColorScheme } from '@/components/useColorScheme';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -76,8 +75,8 @@ function RootLayoutNav() {
     }
   };
 
-  const theme = (useColorScheme() === 'dark' ? DarkTheme : LightTheme);
-  const tintColor = useColorScheme() === 'dark' ? '#ffffff' : '#000000'
+  const theme = DarkTheme;
+  const tintColor ='#ffffff';
 
   return (
     <ThemeProvider value={theme}>

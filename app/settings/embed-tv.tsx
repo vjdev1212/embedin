@@ -4,13 +4,11 @@ import { isHapticsSupported, showAlert } from '@/utils/platform';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useState } from 'react';
-import { useColorScheme } from '@/components/useColorScheme';
 import { defaultTvShowUrlTemplate, defaultSandboxAllowedForTv } from '@/constants/Embed';
 
 const EmbedTvShowsSettingsScreen = () => {
     const [tvShowsUrlTemplate, setTvShowsUrlTemplate] = useState<string>(defaultTvShowUrlTemplate);
     const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(defaultSandboxAllowedForTv);
-    const colorScheme = useColorScheme();
 
     useEffect(() => {
         const loadEmbedSettings = async () => {
@@ -52,7 +50,7 @@ const EmbedTvShowsSettingsScreen = () => {
     };
 
     const toggleSandBoxAllowed = useCallback(() => setSandboxAllowed(prev => !prev), [setSandboxAllowed]);
-    const textInputStyle = colorScheme === 'dark' ? styles.darkTextInput : styles.lightTextInput;
+    const textInputStyle = styles.darkTextInput;
 
     const tmdbHint = "Example (TMDB): https://player.videasy.net/tv/{TMDBID}/{SEASON}/{EPISODE}"
     const imdbHint = "Example (IMDB): https://player.videasy.net/tv/{IMDBID}/{SEASON}/{EPISODE}"

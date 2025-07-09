@@ -5,7 +5,6 @@ import {
   Image,
 } from "react-native";
 import { View, Text } from "./Themed";
-import { useColorScheme } from "./useColorScheme";
 
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w200";
 
@@ -18,9 +17,8 @@ const getInitials = (name: string) => {
 
 const MediaCastAndCrews = ({ cast }: { cast: any[] }) => {
 
-  const colorScheme = useColorScheme();
-  const castImageBgColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
-  const castTextColor = colorScheme === 'dark' ? '#ffffff' : '#000000';
+  const castImageBgColor = '#0f0f0f';
+  const castTextColor = '#ffffff';
 
   return (
     <>

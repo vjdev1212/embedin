@@ -2,14 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { SafeAreaView, ScrollView, StyleSheet, TextInput, Text, View, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from '@/components/Themed';
-import { useColorScheme } from '@/components/useColorScheme';
 import { isHapticsSupported, showAlert } from '@/utils/platform';
 import * as Haptics from 'expo-haptics';
 
 const PreferencesScreen = () => {
     const [language, setLanguage] = useState('en');
     const [region, setRegion] = useState('US');
-    const colorScheme = useColorScheme();
 
     useEffect(() => {
         const loadPreferences = async () => {
@@ -41,7 +39,7 @@ const PreferencesScreen = () => {
         }
         showAlert('Preferences Saved', 'Your preferences have been saved.'); // Moved outside the try-catch
     };
-    const textInputStyle = colorScheme === 'dark' ? styles.darkSearchInput : styles.lightSearchInput;
+    const textInputStyle = styles.darkSearchInput;
 
 
     return (
