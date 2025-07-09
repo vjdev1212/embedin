@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback, memo } from 'react';
 import {
   FlatList,
   StyleSheet,
@@ -18,12 +18,14 @@ import { DefaultPosterImgXml } from '@/utils/Svg';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
-const SkeletonLoader = () => {
+const SkeletonLoader = memo(() => {
   const colorScheme = useColorScheme();
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
 
   const skeletonBgColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
+  const skeletonWidth = isPortrait ? 100 : 150;
+  const skeletonHeight = isPortrait ? 150 : 220;
 
   return (
     <RNView style={styles.skeletonContainer}>
@@ -32,20 +34,28 @@ const SkeletonLoader = () => {
           styles.skeletonImage,
           {
             backgroundColor: skeletonBgColor,
-            width: isPortrait ? 100 : 150,
-            height: isPortrait ? 150 : 220,
+            width: skeletonWidth,
+            height: skeletonHeight,
           },
         ]}
       />
     </RNView>
   );
-};
+});
 
+interface PosterItemData {
+  moviedbid: number;
+  name: string;
+  poster: string;
+  background: string;
+  year: string;
+  imdbRating: string;
+}
 
-const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' | 'vertical', type: string }) => {
+const PosterItem = memo(({ item, layout, type }: { item: PosterItemData, layout?: 'horizontal' | 'vertical', type: string }) => {
   const [imgError, setImgError] = useState(false);
-  const fadeAnim = useState(new Animated.Value(0))[0];
-  const scaleAnim = useState(new Animated.Value(1))[0];
+  const fadeAnim = useMemo(() => new Animated.Value(0), []);
+  const scaleAnim = useMemo(() => new Animated.Value(1), []);
   const colorScheme = useColorScheme();
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
@@ -59,15 +69,15 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
 
   const posterUri = item.poster; // Always use poster
 
-  const handleImageLoad = () => {
+  const handleImageLoad = useCallback(() => {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 500,
       useNativeDriver: true,
     }).start();
-  };
+  }, [fadeAnim]);
 
-  const handlePress = async () => {
+  const handlePress = useCallback(async () => {
     if (isHapticsSupported()) {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
     }
@@ -75,26 +85,37 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
       pathname: type === 'movie' ? '/movie/details' : '/series/details',
       params: { moviedbid: item.moviedbid },
     });
-  };
+  }, [item.moviedbid, type]);
 
-  const handleHoverIn = () => {
+  const handleHoverIn = useCallback(() => {
     Animated.spring(scaleAnim, {
       toValue: 1.1,
       useNativeDriver: true,
     }).start();
-  };
+  }, [scaleAnim]);
 
-  const handleHoverOut = () => {
+  const handleHoverOut = useCallback(() => {
     Animated.spring(scaleAnim, {
       toValue: 1,
       useNativeDriver: true,
     }).start();
-  };
+  }, [scaleAnim]);
 
-  const posterImageBgColor = colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0';
-  const posterYearColor = {
+  const posterImageBgColor = useMemo(() => 
+    colorScheme === 'dark' ? '#0f0f0f' : '#f0f0f0', 
+    [colorScheme]
+  );
+  
+  const posterYearColor = useMemo(() => ({
     color: colorScheme === 'dark' ? '#afafaf' : '#303030',
-  };
+  }), [colorScheme]);
+
+  const imageDimensions = useMemo(() => ({
+    width: isPortrait ? 100 : 150,
+    height: isPortrait ? 150 : 220,
+  }), [isPortrait]);
+
+  const handleImageError = useCallback(() => setImgError(true), []);
 
   return (
     <Pressable
@@ -107,7 +128,7 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
         {!imgError ? (
           <Animated.Image
             source={{ uri: posterUri }}
-            onError={() => setImgError(true)}
+            onError={handleImageError}
             onLoad={handleImageLoad}
             style={[
               styles.posterImage,
@@ -115,8 +136,7 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
               {
                 opacity: fadeAnim,
                 backgroundColor: posterImageBgColor,
-                width: isPortrait ? 100 : 150,
-                height: isPortrait ? 150 : 220,
+                ...imageDimensions,
               },
             ]}
           />
@@ -149,8 +169,7 @@ const PosterItem = ({ item, layout, type }: { item: any, layout?: 'horizontal' |
       </Text>
     </Pressable>
   );
-};
-
+});
 
 const PosterList = ({
   apiUrl,
@@ -163,8 +182,36 @@ const PosterList = ({
   type: 'movie' | 'series';
   layout?: 'horizontal' | 'vertical';
 }) => {
-  const [data, setData] = useState<any[]>([]);
+  const [data, setData] = useState<PosterItemData[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const skeletonData = useMemo(() => new Array(10).fill(null), []);
+
+  const processMovieData = useCallback((collection: any[]): PosterItemData[] => {
+    return collection
+      .filter((movie: any) => movie.poster_path && movie.backdrop_path)
+      .map((movie: any) => ({
+        moviedbid: movie.id,
+        name: movie.title,
+        poster: `https://image.tmdb.org/t/p/w780${movie.poster_path}`,
+        background: `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`,
+        year: getYear(movie.release_date),
+        imdbRating: movie.vote_average?.toFixed(1),
+      }));
+  }, []);
+
+  const processSeriesData = useCallback((collection: any[]): PosterItemData[] => {
+    return collection
+      .filter((series: any) => series.poster_path && series.backdrop_path)
+      .map((series: any) => ({
+        moviedbid: series.id,
+        name: series.name,
+        poster: `https://image.tmdb.org/t/p/w780${series.poster_path}`,
+        background: `https://image.tmdb.org/t/p/w1280${series.backdrop_path}`,
+        year: getYear(series.first_air_date),
+        imdbRating: series.vote_average?.toFixed(1),
+      }));
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -173,31 +220,10 @@ const PosterList = ({
         const response = await fetch(`${apiUrl}${separator}api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
         const result = await response.json();
         const collection = result.results;
-        let list = [];
 
-        if (type === 'movie') {
-          list = collection
-            .filter((movie: any) => movie.poster_path && movie.backdrop_path) // Filter out null images
-            .map((movie: any) => ({
-              moviedbid: movie.id,
-              name: movie.title,
-              poster: `https://image.tmdb.org/t/p/w780${movie.poster_path}`,
-              background: `https://image.tmdb.org/t/p/w1280${movie.backdrop_path}`,
-              year: getYear(movie.release_date),
-              imdbRating: movie.vote_average?.toFixed(1),
-            }));
-        } else {
-          list = collection
-            .filter((series: any) => series.poster_path && series.backdrop_path) // Filter out null images
-            .map((series: any) => ({
-              moviedbid: series.id,
-              name: series.name,
-              poster: `https://image.tmdb.org/t/p/w780${series.poster_path}`,
-              background: `https://image.tmdb.org/t/p/w1280${series.backdrop_path}`,
-              year: getYear(series.first_air_date),
-              imdbRating: series.vote_average?.toFixed(1),
-            }));
-        }
+        const list = type === 'movie' 
+          ? processMovieData(collection)
+          : processSeriesData(collection);
 
         setData(list);
       } catch (error) {
@@ -208,9 +234,9 @@ const PosterList = ({
     };
 
     fetchData();
-  }, [apiUrl]);
+  }, [apiUrl, type, processMovieData, processSeriesData]);
 
-  const handleSeeAllPress = async () => {
+  const handleSeeAllPress = useCallback(async () => {
     if (isHapticsSupported()) {
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
     }
@@ -218,42 +244,65 @@ const PosterList = ({
       pathname: `/${type}/list`,
       params: { apiUrl, title, type },
     });
-  };
+  }, [apiUrl, title, type]);
+
+  const renderPosterItem = useCallback(({ item }: { item: PosterItemData }) => (
+    <PosterItem item={item} layout={layout} type={type} />
+  ), [layout, type]);
+
+  const renderSkeletonItem = useCallback(() => <SkeletonLoader />, []);
+
+  const keyExtractor = useCallback((item: PosterItemData, index: number) => 
+    item ? `${item.moviedbid}-${index}` : index.toString(), 
+    []
+  );
+
+  const skeletonKeyExtractor = useCallback((_: null, index: number) => index.toString(), []);
+
+  if (!data || data.length === 0) {
+    return null;
+  }
 
   return (
-    <>
-      {
-        data && data.length > 0 &&
-        <RNView style={styles.container}>
-          <RNView style={styles.header}>
-            <Text style={styles.title}>{title}</Text>
-            <Pressable onPress={handleSeeAllPress}>
-              <Text style={styles.seeAllText}>See All</Text>
-            </Pressable>
-          </RNView>
+    <RNView style={styles.container}>
+      <RNView style={styles.header}>
+        <Text style={styles.title}>{title}</Text>
+        <Pressable onPress={handleSeeAllPress}>
+          <Text style={styles.seeAllText}>See All</Text>
+        </Pressable>
+      </RNView>
 
-          {loading ? (
-            <FlatList
-              data={new Array(10).fill(null)}
-              renderItem={() => <SkeletonLoader />}
-              keyExtractor={(_, index) => index.toString()}
-              horizontal={layout === 'horizontal'}
-              showsHorizontalScrollIndicator={false}
-              numColumns={layout === 'vertical' ? 2 : 1}
-            />
-          ) : (
-            <FlatList
-              data={data}
-              renderItem={({ item }) => <PosterItem item={item} layout={layout} type={type} />}
-              keyExtractor={(item, index) => index.toString()}
-              horizontal={layout === 'horizontal'}
-              showsHorizontalScrollIndicator={false}
-              numColumns={layout === 'vertical' ? 2 : 1}
-            />
-          )}
-        </RNView>
-      }
-    </>
+      {loading ? (
+        <FlatList
+          data={skeletonData}
+          renderItem={renderSkeletonItem}
+          keyExtractor={skeletonKeyExtractor}
+          horizontal={layout === 'horizontal'}
+          showsHorizontalScrollIndicator={false}
+          numColumns={layout === 'vertical' ? 2 : 1}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          initialNumToRender={10}
+        />
+      ) : (
+        <FlatList
+          data={data}
+          renderItem={renderPosterItem}
+          keyExtractor={keyExtractor}
+          horizontal={layout === 'horizontal'}
+          showsHorizontalScrollIndicator={false}
+          numColumns={layout === 'vertical' ? 2 : 1}
+          removeClippedSubviews={true}
+          maxToRenderPerBatch={10}
+          initialNumToRender={10}
+          getItemLayout={layout === 'horizontal' ? (data: ArrayLike<PosterItemData> | null | undefined, index: number) => ({
+            length: 120,
+            offset: 120 * index,
+            index,
+          }) : undefined}
+        />
+      )}
+    </RNView>
   );
 };
 
