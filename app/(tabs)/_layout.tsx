@@ -75,6 +75,36 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="movies"
+        listeners={{
+          tabPress: () => {
+            if (isHapticsSupported()) {
+              Haptics.selectionAsync();
+            }
+          },
+        }}
+        options={{
+          title: 'Movies',
+          tabBarIcon: ({ color }) => <TabBarIcon name="film" color={color} />,
+          tabBarIconStyle: { marginVertical: 5 }
+        }}
+      />
+      <Tabs.Screen
+        name="series"
+        listeners={{
+          tabPress: () => {
+            if (isHapticsSupported()) {
+              Haptics.selectionAsync();
+            }
+          },
+        }}
+        options={{
+          title: 'TV',
+          tabBarIcon: ({ color }) => <TabBarIcon name="tv" color={color} />,
+          tabBarIconStyle: { marginVertical: 5 }
+        }}
+      />
+      <Tabs.Screen
         name="search"
         listeners={{
           tabPress: () => {

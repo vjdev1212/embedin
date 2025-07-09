@@ -169,7 +169,8 @@ const PosterList = ({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiUrl}?api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
+        const separator = apiUrl.includes('?') ? '&' : '?';
+        const response = await fetch(`${apiUrl}${separator}api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
         const result = await response.json();
         const collection = result.results;
         let list = [];
