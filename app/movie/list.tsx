@@ -15,29 +15,30 @@ const MoviesList = () => {
   const [loading, setLoading] = useState(true);
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
-  
+
   const posterWidth = isPortrait ? 100 : 150;
   const posterHeight = isPortrait ? 150 : 225;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${apiUrl}?api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
+        const separator = apiUrl.includes('?') ? '&' : '?';
+        const response = await fetch(`${apiUrl}${separator}api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
         const result = await response.json();
         if (result) {
           let list = [];
           if (result.results) {
             list = result.results
-            .filter((item: any) => item.poster_path && item.backdrop_path)
-            .map((item: any) => ({
-              moviedbid: item.id,
-              name: item.title || item.name,
-              year: getYear(item.release_date || item.first_air_date),
-              poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
-              background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
-              imdbRating: item.vote_average?.toFixed(1),
-              imdbid: item.imdb_id,
-            }));
+              .filter((item: any) => item.poster_path && item.backdrop_path)
+              .map((item: any) => ({
+                moviedbid: item.id,
+                name: item.title || item.name,
+                year: getYear(item.release_date || item.first_air_date),
+                poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
+                background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
+                imdbRating: item.vote_average?.toFixed(1),
+                imdbid: item.imdb_id,
+              }));
           }
           setData(list);
         }
@@ -69,12 +70,12 @@ const MoviesList = () => {
         style={styles.posterContainer}
         onPress={handlePress}
       >
-        <Image 
-          source={{ uri: isPortrait ? item.poster : item.poster }} 
+        <Image
+          source={{ uri: isPortrait ? item.poster : item.poster }}
           style={[styles.posterImage, {
             width: posterWidth,
             height: posterHeight,
-          }]} 
+          }]}
         />
         <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
           {item.name}

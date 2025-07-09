@@ -122,7 +122,6 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     label: {
-        color: '#888',
         marginBottom: 10,
     },
     hint: {
@@ -160,7 +159,7 @@ const styles = StyleSheet.create({
         width: 150,
     },
     switchLabel: {
-        fontSize: 16,
+        fontSize: 14,
     },
     switch: {
         marginVertical: 5,

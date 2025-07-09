@@ -21,8 +21,9 @@ const SeriesList = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const response = await fetch(`${apiUrl}?api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
+      try {        
+        const separator = apiUrl.includes('?') ? '&' : '?';
+        const response = await fetch(`${apiUrl}${separator}api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
         const result = await response.json();
         if (result) {
           let list = [];

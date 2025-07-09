@@ -120,7 +120,7 @@ const SeriesDetails = () => {
   if (loading) {
     return (
       <View style={styles.centeredContainer}>
-        <ActivityIndicator size="large" style={styles.activityIndicator} color="#ffffff" />
+        <ActivityIndicator size="large" style={styles.activityIndicator} color="#535aff" />
       </View>
     );
   }
