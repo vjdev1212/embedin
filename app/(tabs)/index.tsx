@@ -10,6 +10,8 @@ export default function HomeScreen() {
       <StatusBar />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.contentContainer}>
+          <PosterList apiUrl={CatalogUrl.trendingMovies} title='Movies - Trending' type='movie' />
+          <PosterList apiUrl={CatalogUrl.trendingSeries} title='Series - Trending' type='series' />
           <PosterList apiUrl={CatalogUrl.popularMovies} title='Movies - Popular' type='movie' />
           <PosterList apiUrl={CatalogUrl.popularSeries} title='Series - Popular' type='series' />
           <PosterList apiUrl={CatalogUrl.topMovies} title='Movies - Top Rated' type='movie' />

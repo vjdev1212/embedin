@@ -1,4 +1,6 @@
 export const CatalogUrl = {
+    trendingMovies: 'https://api.themoviedb.org/3/trending/movie/week',
+    trendingSeries: 'https://api.themoviedb.org/3/trending/tv/week',
     nowPlayingMovies: 'https://api.themoviedb.org/3/movie/now_playing',
     popularMovies: 'https://api.themoviedb.org/3/movie/popular',
     topMovies: 'https://api.themoviedb.org/3/movie/top_rated',    

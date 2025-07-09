@@ -9,17 +9,20 @@ export default function SeriesScreen() {
     <SafeAreaView style={styles.container}>
       <StatusBar />
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.contentContainer}>          
+        <View style={styles.contentContainer}>
+          <PosterList apiUrl={CatalogUrl.trendingSeries} title='Trending' type='series' />
           <PosterList apiUrl={TvGneres.actionAdventure} title="Action & Adventure" type="series" />
           <PosterList apiUrl={TvGneres.drama} title="Drama" type="series" />
           <PosterList apiUrl={TvGneres.crime} title="Crime" type="series" />
-          <PosterList apiUrl={TvGneres.comedy} title="Comedy" type="series" />                    
+          <PosterList apiUrl={TvGneres.comedy} title="Comedy" type="series" />       
+          <PosterList apiUrl={CatalogUrl.airingTodayTv} title='Airing Today' type='series' />
+          <PosterList apiUrl={CatalogUrl.onTheAirTv} title='On the Air' type='series' />
           <PosterList apiUrl={TvGneres.mystery} title="Mystery" type="series" />
           <PosterList apiUrl={TvGneres.scifiFantsy} title="Sci-Fi & Fantasy" type="series" />
           <PosterList apiUrl={TvGneres.animation} title="Animation" type="series" />
           <PosterList apiUrl={TvGneres.family} title="Family" type="series" />
           <PosterList apiUrl={TvGneres.kids} title="Kids" type="series" />
-          <PosterList apiUrl={TvGneres.reality} title="Reality" type="series" />
+          <PosterList apiUrl={TvGneres.reality} title="Reality" type="series" />   
           <PosterList apiUrl={TvGneres.documentary} title="Documentary" type="series" />
           <PosterList apiUrl={TvGneres.soap} title="Soap" type="series" />
           <PosterList apiUrl={TvGneres.warPolitics} title="War & Politics" type="series" />

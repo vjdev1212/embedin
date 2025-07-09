@@ -17,7 +17,7 @@ const SearchScreen = () => {
   const [loading, setLoading] = useState(false);
   const [movies, setMovies] = useState<any[]>([]);
   const [series, setSeries] = useState<any[]>([]);
-  const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [debounceTimeout, setDebounceTimeout] = useState<any>(null);
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
   

@@ -10,6 +10,8 @@ export default function MoviesScreen() {
       <StatusBar />
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.contentContainer}>
+          <PosterList apiUrl={CatalogUrl.trendingMovies} title='Trending' type='movie' />
+          <PosterList apiUrl={CatalogUrl.nowPlayingMovies} title='Now Playing' type='movie' />
           <PosterList apiUrl={MovieGneres.action} title="Action" type="movie" />
           <PosterList apiUrl={MovieGneres.adventure} title="Adventure" type="movie" />
           <PosterList apiUrl={MovieGneres.scifi} title="Sci-Fi" type="movie" />

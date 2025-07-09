@@ -42,3 +42,4 @@ android
 .env
 .firebaserc
 .firebase
+pglite-debug.log
