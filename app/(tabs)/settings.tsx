@@ -8,6 +8,7 @@ import { isHapticsSupported } from '@/utils/platform';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const SettingsScreen = () => {
+  const showContactList = process.env.EXPO_PUBLIC_SHOW_CONTACT === 'true';
   const router = useRouter();
   const contactList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
     { title: 'Contact', route: '/settings/contact', icon: 'mail-outline' },
@@ -56,19 +57,21 @@ const SettingsScreen = () => {
             ))}
           </View>
         </View>
-        <View>
-          <Text style={styles.header}>Contact</Text>
-          <View style={[styles.settingsGroup]}>
-            {contactList.map((item, index) => (
-              <SettingItem
-                key={index}
-                title={item.title}
-                icon={item.icon}
-                onPress={() => onSettingsItemPress(item)}
-              />
-            ))}
+        {showContactList && (
+          <View>
+            <Text style={styles.header}>Contact</Text>
+            <View style={[styles.settingsGroup]}>
+              {contactList.map((item, index) => (
+                <SettingItem
+                  key={index}
+                  title={item.title}
+                  icon={item.icon}
+                  onPress={() => onSettingsItemPress(item)}
+                />
+              ))}
+            </View>
           </View>
-        </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
