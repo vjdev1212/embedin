@@ -2,7 +2,7 @@
   "expo": {
     "name": "EmbedIn",
     "slug": "embedin",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "orientation": "default",
     "icon": "assets/images/icon.png",
     "scheme": "embedin",
@@ -16,7 +16,7 @@
     "splash": {
       "image": "assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "icon": "assets/images/icon.png",
@@ -27,7 +27,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#000000"
       },
       "package": "com.vijayyuvi.embedin",
       "icon": "assets/images/icon.png"
