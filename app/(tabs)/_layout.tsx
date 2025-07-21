@@ -19,7 +19,7 @@ export default function TabLayout() {
   const getTabBarHeight = () => {
     switch (Platform.OS) {
       case 'web':
-        return 70;
+        return 85;
       case 'ios':
         return 85;
       default:
