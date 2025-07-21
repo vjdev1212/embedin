@@ -13,6 +13,7 @@ const DonateScreen = () => {
         }
         const profileUsername = process.env.EXPO_PUBLIC_BUY_ME_COFFEE || '';
         const buyMeACoffeeUrl = `https://www.buymeacoffee.com/${profileUsername}`;
+        console.log('BuyMeACofffee', buyMeACoffeeUrl);
         Linking.openURL(buyMeACoffeeUrl).catch((err) =>
             console.error('Failed to open URL:', err)
         );
