@@ -17,30 +17,6 @@ import { DefaultPosterImgXml } from '@/utils/Svg';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
-const SkeletonLoader = memo(() => {
-  const { width, height } = useWindowDimensions();
-  const isPortrait = height > width;
-
-  const skeletonBgColor = '#0f0f0f';
-  const skeletonWidth = isPortrait ? 100 : 150;
-  const skeletonHeight = isPortrait ? 150 : 220;
-
-  return (
-    <RNView style={styles.skeletonContainer}>
-      <RNView
-        style={[
-          styles.skeletonImage,
-          {
-            backgroundColor: skeletonBgColor,
-            width: skeletonWidth,
-            height: skeletonHeight,
-          },
-        ]}
-      />
-    </RNView>
-  );
-});
-
 interface PosterItemData {
   moviedbid: number;
   name: string;
@@ -99,9 +75,9 @@ const PosterItem = memo(({ item, layout, type }: { item: PosterItemData, layout?
   }, [scaleAnim]);
 
   const posterImageBgColor = '#0f0f0f';
-  
+
   const posterYearColor = useMemo(() => ({
-    color: '#afafaf',
+    color: '#ccc',
   }), []);
 
   const imageDimensions = useMemo(() => ({
@@ -215,7 +191,7 @@ const PosterList = ({
         const result = await response.json();
         const collection = result.results;
 
-        const list = type === 'movie' 
+        const list = type === 'movie'
           ? processMovieData(collection)
           : processSeriesData(collection);
 
@@ -244,10 +220,8 @@ const PosterList = ({
     <PosterItem item={item} layout={layout} type={type} />
   ), [layout, type]);
 
-  const renderSkeletonItem = useCallback(() => <SkeletonLoader />, []);
-
-  const keyExtractor = useCallback((item: PosterItemData, index: number) => 
-    item ? `${item.moviedbid}-${index}` : index.toString(), 
+  const keyExtractor = useCallback((item: PosterItemData, index: number) =>
+    item ? `${item.moviedbid}-${index}` : index.toString(),
     []
   );
 
@@ -266,36 +240,22 @@ const PosterList = ({
         </Pressable>
       </RNView>
 
-      {loading ? (
-        <FlatList
-          data={skeletonData}
-          renderItem={renderSkeletonItem}
-          keyExtractor={skeletonKeyExtractor}
-          horizontal={layout === 'horizontal'}
-          showsHorizontalScrollIndicator={false}
-          numColumns={layout === 'vertical' ? 2 : 1}
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={10}
-          initialNumToRender={10}
-        />
-      ) : (
-        <FlatList
-          data={data}
-          renderItem={renderPosterItem}
-          keyExtractor={keyExtractor}
-          horizontal={layout === 'horizontal'}
-          showsHorizontalScrollIndicator={false}
-          numColumns={layout === 'vertical' ? 2 : 1}
-          removeClippedSubviews={true}
-          maxToRenderPerBatch={10}
-          initialNumToRender={10}
-          getItemLayout={layout === 'horizontal' ? (data: ArrayLike<PosterItemData> | null | undefined, index: number) => ({
-            length: 120,
-            offset: 120 * index,
-            index,
-          }) : undefined}
-        />
-      )}
+      <FlatList
+        data={data}
+        renderItem={renderPosterItem}
+        keyExtractor={keyExtractor}
+        horizontal={layout === 'horizontal'}
+        showsHorizontalScrollIndicator={false}
+        numColumns={layout === 'vertical' ? 2 : 1}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        initialNumToRender={10}
+        getItemLayout={layout === 'horizontal' ? (data: ArrayLike<PosterItemData> | null | undefined, index: number) => ({
+          length: 120,
+          offset: 120 * index,
+          index,
+        }) : undefined}
+      />
     </RNView>
   );
 };
