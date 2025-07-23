@@ -25,8 +25,8 @@ const SeriesList = () => {
   const isPortrait = height >= width;
   const shortSide = Math.min(width, height);
 
-  const isMobile = shortSide < 600;
-  const isTablet = shortSide >= 600 && shortSide < 1024;
+  const isMobile = shortSide < 580;
+  const isTablet = shortSide >= 580 && shortSide < 1024;
   const isLaptop = shortSide >= 1024 && shortSide < 1440;
   const isDesktop = shortSide >= 1440;
 
