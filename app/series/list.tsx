@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  ScrollView,
+  FlatList,
   Image,
   StyleSheet,
   Pressable,
@@ -20,24 +20,26 @@ const SeriesList = () => {
   const { apiUrl } = useLocalSearchParams();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
   const { width, height } = useWindowDimensions();
   const isPortrait = height >= width;
+  const shortSide = Math.min(width, height);
 
-  // ✅ Correct layout based on width & orientation
+  const isMobile = shortSide < 600;
+  const isTablet = shortSide >= 600 && shortSide < 1024;
+  const isLaptop = shortSide >= 1024 && shortSide < 1440;
+  const isDesktop = shortSide >= 1440;
+
   const getNumColumns = () => {
-    const isMobile = width < 600;
-    const isTablet = width >= 600 && width < 1024;
-
     if (isMobile) return isPortrait ? 3 : 5;
     if (isTablet) return isPortrait ? 5 : 7;
-    return isPortrait ? 5 : 7; // Desktop
+    if (isLaptop) return isPortrait ? 6 : 8;
+    if (isDesktop) return isPortrait ? 7 : 10;
+    return 5;
   };
 
   const numColumns = getNumColumns();
   const spacing = 16;
-  const totalSpacing = spacing * (numColumns + 1);
-  const posterWidth = (width - totalSpacing) / numColumns;
-  const posterHeight = posterWidth * 1.5;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,7 +71,7 @@ const SeriesList = () => {
     fetchData();
   }, [apiUrl]);
 
-  const SeriesItem = ({ item }: { item: any }) => {
+  const renderItem = ({ item }: { item: any }) => {
     const year = item.year?.split('–')[0] || item.year;
 
     const handlePress = async () => {
@@ -84,15 +86,21 @@ const SeriesList = () => {
 
     return (
       <Pressable
-        style={[styles.posterContainer, { width: posterWidth, marginHorizontal: spacing / 2 }]}
+        style={[
+          styles.posterContainer,
+          {
+            flexBasis: `${100 / numColumns}%`,
+            paddingHorizontal: spacing / 2,
+          },
+        ]}
         onPress={handlePress}
       >
         <Image
           source={{ uri: item.poster }}
-          style={[styles.posterImage, { width: posterWidth, height: posterHeight }]}
+          style={[styles.posterImage, { aspectRatio: 2 / 3, width: '100%' }]}
           resizeMode="cover"
         />
-        <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.posterTitle, { width: posterWidth }]}>
+        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
           {item.name}
         </Text>
         <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
@@ -105,20 +113,19 @@ const SeriesList = () => {
       <StatusBar />
       {loading ? (
         <View style={styles.centeredContainer}>
-          <ActivityIndicator size="large" style={styles.activityIndicator} color="#535aff" />
+          <ActivityIndicator size="large" color="#535aff" />
           <Text style={styles.centeredText}>Loading</Text>
         </View>
       ) : (
-        <ScrollView
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(_, index) => index.toString()}
+          numColumns={numColumns}
+          columnWrapperStyle={{ justifyContent: 'flex-start' }}
+          contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
-        >
-          <RNView style={styles.seriesGrid}>
-            {data.map((item, index) => (
-              <SeriesItem key={index.toString()} item={item} />
-            ))}
-          </RNView>
-        </ScrollView>
+        />
       )}
     </RNView>
   );
@@ -130,15 +137,8 @@ const styles = StyleSheet.create({
     marginTop: 40,
     padding: 5,
   },
-  scrollViewContent: {
+  listContent: {
     paddingVertical: 20,
-    alignItems: 'center',
-  },
-  seriesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
   },
   posterContainer: {
     marginVertical: 10,
@@ -155,9 +155,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 12,
     color: '#ccc',
-  },
-  activityIndicator: {
-    marginBottom: 10,
   },
   centeredContainer: {
     flex: 1,
