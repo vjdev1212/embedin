@@ -20,18 +20,24 @@ const MoviesList = () => {
   const { apiUrl } = useLocalSearchParams();
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+
   const { width, height } = useWindowDimensions();
   const isPortrait = height >= width;
+  const shortSide = Math.min(width, height);
+
+  // 4-category responsive logic
+  const isMobile = shortSide < 600;
+  const isTablet = shortSide >= 600 && shortSide < 1024;
+  const isLaptop = shortSide >= 1024 && shortSide < 1440;
+  const isDesktop = shortSide >= 1440;
 
   const getNumColumns = () => {
-    const isMobile = width < 600;
-    const isTablet = width >= 600 && width < 1024;
-
     if (isMobile) return isPortrait ? 3 : 5;
     if (isTablet) return isPortrait ? 5 : 7;
-    return isPortrait ? 5 : 7; // Desktop
+    if (isLaptop) return isPortrait ? 6 : 8;
+    if (isDesktop) return isPortrait ? 7 : 10;
+    return 5;
   };
-
 
   const numColumns = getNumColumns();
   const spacing = 16;
