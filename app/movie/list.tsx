@@ -12,6 +12,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { getYear } from '@/utils/Date';
+import BottomSpacing from '@/components/BottomSpacing';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -128,6 +129,7 @@ const MoviesList = () => {
           showsVerticalScrollIndicator={false}
         />
       )}
+      <BottomSpacing space={50} />
     </RNView>
   );
 };

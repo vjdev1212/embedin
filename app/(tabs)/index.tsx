@@ -2,6 +2,7 @@ import { SafeAreaView, ScrollView, StyleSheet } from 'react-native';
 import PosterList from '@/components/PosterList';
 import { CatalogUrl } from '@/constants/Tmdb';
 import { StatusBar, View } from '@/components/Themed';
+import BottomSpacing from '@/components/BottomSpacing';
 
 export default function HomeScreen() {
 
@@ -21,6 +22,7 @@ export default function HomeScreen() {
           <PosterList apiUrl={CatalogUrl.upcomingMovies} title='Movies - Upcoming' type='movie' />
           <PosterList apiUrl={CatalogUrl.airingTodayTv} title='Series - Airing Today' type='series' />
         </View>
+        <BottomSpacing space={50} />
       </ScrollView>
     </SafeAreaView>
   );

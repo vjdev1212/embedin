@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { getYear } from '@/utils/Date';
+import BottomSpacing from '@/components/BottomSpacing';
 
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -214,6 +215,7 @@ const SearchScreen = () => {
           </View>
         )}
       </ScrollView>
+      <BottomSpacing space={50} />
     </SafeAreaView>
   );
 };
