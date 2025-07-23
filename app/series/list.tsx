@@ -23,11 +23,15 @@ const SeriesList = () => {
   const { width, height } = useWindowDimensions();
   const isPortrait = height >= width;
 
-  // Responsive column count logic
+  // ✅ Correct device & orientation-aware column logic
   const getNumColumns = () => {
-    if (width < 600) return isPortrait ? 3 : 5;     // Mobile
-    if (width < 1024) return isPortrait ? 5 : 8;    // Tablet
-    return isPortrait ? 5 : 8;                      // Laptop/Desktop
+    const shortSide = Math.min(width, height);
+    const isMobile = shortSide < 600;
+    const isTablet = shortSide >= 600 && shortSide < 1024;
+
+    if (isMobile) return isPortrait ? 3 : 5;
+    if (isTablet) return isPortrait ? 5 : 7;
+    return isPortrait ? 5 : 7; // Laptop/Desktop
   };
 
   const numColumns = getNumColumns();
@@ -42,21 +46,18 @@ const SeriesList = () => {
         const separator = apiUrl.includes('?') ? '&' : '?';
         const response = await fetch(`${apiUrl}${separator}api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
         const result = await response.json();
-        if (result) {
-          let list = [];
-          if (result.results) {
-            list = result.results
-              .filter((item: any) => item.poster_path && item.backdrop_path)
-              .map((item: any) => ({
-                moviedbid: item.id,
-                name: item.title || item.name,
-                year: getYear(item.release_date || item.first_air_date),
-                poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
-                background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
-                imdbRating: item.vote_average?.toFixed(1),
-                imdbid: item.imdb_id,
-              }));
-          }
+        if (result?.results) {
+          const list = result.results
+            .filter((item: any) => item.poster_path && item.backdrop_path)
+            .map((item: any) => ({
+              moviedbid: item.id,
+              name: item.title || item.name,
+              year: getYear(item.release_date || item.first_air_date),
+              poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
+              background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
+              imdbRating: item.vote_average?.toFixed(1),
+              imdbid: item.imdb_id,
+            }));
           setData(list);
         }
       } catch (error) {
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   posterContainer: {
-    marginVertical: 10
+    marginVertical: 10,
   },
   posterImage: {
     borderRadius: 8,
