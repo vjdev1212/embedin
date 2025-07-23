@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, Image, StyleSheet, Pressable, View as RNView, useWindowDimensions } from 'react-native';
+import {
+  ScrollView,
+  Image,
+  StyleSheet,
+  Pressable,
+  useWindowDimensions,
+  View as RNView,
+} from 'react-native';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
@@ -14,14 +21,24 @@ const SeriesList = () => {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { width, height } = useWindowDimensions();
-  const isPortrait = height > width;
-  
-  const posterWidth = isPortrait ? 100 : 150;
-  const posterHeight = isPortrait ? 150 : 225;
+  const isPortrait = height >= width;
+
+  // Responsive column count logic
+  const getNumColumns = () => {
+    if (width < 600) return isPortrait ? 3 : 5;     // Mobile
+    if (width < 1024) return isPortrait ? 5 : 8;    // Tablet
+    return isPortrait ? 5 : 8;                      // Laptop/Desktop
+  };
+
+  const numColumns = getNumColumns();
+  const spacing = 16;
+  const totalSpacing = spacing * (numColumns + 1);
+  const posterWidth = (width - totalSpacing) / numColumns;
+  const posterHeight = posterWidth * 1.5;
 
   useEffect(() => {
     const fetchData = async () => {
-      try {        
+      try {
         const separator = apiUrl.includes('?') ? '&' : '?';
         const response = await fetch(`${apiUrl}${separator}api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
         const result = await response.json();
@@ -29,16 +46,16 @@ const SeriesList = () => {
           let list = [];
           if (result.results) {
             list = result.results
-            .filter((item: any) => item.poster_path && item.backdrop_path)
-            .map((item: any) => ({
-              moviedbid: item.id,
-              name: item.title || item.name,
-              year: getYear(item.release_date || item.first_air_date),
-              poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
-              background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
-              imdbRating: item.vote_average?.toFixed(1),
-              imdbid: item.imdb_id,
-            }));
+              .filter((item: any) => item.poster_path && item.backdrop_path)
+              .map((item: any) => ({
+                moviedbid: item.id,
+                name: item.title || item.name,
+                year: getYear(item.release_date || item.first_air_date),
+                poster: `https://image.tmdb.org/t/p/w780${item.poster_path}`,
+                background: `https://image.tmdb.org/t/p/w1280${item.backdrop_path}`,
+                imdbRating: item.vote_average?.toFixed(1),
+                imdbid: item.imdb_id,
+              }));
           }
           setData(list);
         }
@@ -67,17 +84,15 @@ const SeriesList = () => {
 
     return (
       <Pressable
-        style={styles.posterContainer}
+        style={[styles.posterContainer, { width: posterWidth, marginHorizontal: spacing / 2 }]}
         onPress={handlePress}
       >
-        <Image 
-          source={{ uri: isPortrait ? item.poster : item.poster }} 
-          style={[styles.posterImage, {
-            width: posterWidth,
-            height: posterHeight,
-          }]} 
+        <Image
+          source={{ uri: item.poster }}
+          style={[styles.posterImage, { width: posterWidth, height: posterHeight }]}
+          resizeMode="cover"
         />
-        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
+        <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.posterTitle, { width: posterWidth }]}>
           {item.name}
         </Text>
         <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
@@ -115,12 +130,6 @@ const styles = StyleSheet.create({
     marginTop: 40,
     padding: 5,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
   scrollViewContent: {
     paddingVertical: 20,
     alignItems: 'center',
@@ -128,29 +137,27 @@ const styles = StyleSheet.create({
   seriesGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'flex-start',
   },
   posterContainer: {
-    padding: 10,
-    marginBottom: 10,
+    marginVertical: 10
   },
   posterImage: {
     borderRadius: 8,
+    backgroundColor: '#101010',
   },
   posterTitle: {
     marginTop: 8,
-    fontSize: 14,
-    maxWidth: 100,
+    fontSize: 14
   },
   posterYear: {
     marginTop: 4,
     fontSize: 12,
-    color: '#888',
+    color: '#ccc',
   },
   activityIndicator: {
     marginBottom: 10,
-    color: '#535aff',
   },
   centeredContainer: {
     flex: 1,
