@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
-  ScrollView,
+  FlatList,
   Image,
   StyleSheet,
   Pressable,
@@ -23,22 +23,18 @@ const MoviesList = () => {
   const { width, height } = useWindowDimensions();
   const isPortrait = height >= width;
 
-  // Determine number of columns based on device type and orientation
   const getNumColumns = () => {
-    const shortSide = Math.min(width, height);
-    const isMobile = shortSide < 600;
-    const isTablet = shortSide >= 600 && shortSide < 1024;
+    const isMobile = width < 600;
+    const isTablet = width >= 600 && width < 1024;
 
     if (isMobile) return isPortrait ? 3 : 5;
     if (isTablet) return isPortrait ? 5 : 7;
-    return isPortrait ? 5 : 7;
+    return isPortrait ? 5 : 7; // Desktop
   };
+
 
   const numColumns = getNumColumns();
   const spacing = 16;
-  const totalSpacing = spacing * (numColumns + 1);
-  const posterWidth = (width - totalSpacing) / numColumns;
-  const posterHeight = posterWidth * 1.5;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +42,7 @@ const MoviesList = () => {
         const separator = apiUrl.includes('?') ? '&' : '?';
         const response = await fetch(`${apiUrl}${separator}api_key=${EXPO_PUBLIC_TMDB_API_KEY}`);
         const result = await response.json();
-        if (result && result.results) {
+        if (result?.results) {
           const list = result.results
             .filter((item: any) => item.poster_path && item.backdrop_path)
             .map((item: any) => ({
@@ -70,7 +66,7 @@ const MoviesList = () => {
     fetchData();
   }, [apiUrl]);
 
-  const MovieItem = ({ item }: { item: any }) => {
+  const renderItem = ({ item }: { item: any }) => {
     const year = item.year?.split('–')[0] || item.year;
 
     const handlePress = async () => {
@@ -85,15 +81,21 @@ const MoviesList = () => {
 
     return (
       <Pressable
-        style={[styles.posterContainer, { width: posterWidth, marginHorizontal: spacing / 2 }]}
+        style={[
+          styles.posterContainer,
+          {
+            flexBasis: `${100 / numColumns}%`,
+            paddingHorizontal: spacing / 2,
+          },
+        ]}
         onPress={handlePress}
       >
         <Image
           source={{ uri: item.poster }}
-          style={[styles.posterImage, { width: posterWidth, height: posterHeight }]}
+          style={[styles.posterImage, { aspectRatio: 2 / 3, width: '100%' }]}
           resizeMode="cover"
         />
-        <Text numberOfLines={1} ellipsizeMode="tail" style={[styles.posterTitle, { width: posterWidth }]}>
+        <Text numberOfLines={1} ellipsizeMode="tail" style={styles.posterTitle}>
           {item.name}
         </Text>
         <Text style={styles.posterYear}>{`★ ${item.imdbRating}   ${year}`}</Text>
@@ -106,20 +108,19 @@ const MoviesList = () => {
       <StatusBar />
       {loading ? (
         <View style={styles.centeredContainer}>
-          <ActivityIndicator size="large" style={styles.activityIndicator} color="#535aff" />
+          <ActivityIndicator size="large" color="#535aff" />
           <Text style={styles.centeredText}>Loading</Text>
         </View>
       ) : (
-        <ScrollView
+        <FlatList
+          data={data}
+          renderItem={renderItem}
+          keyExtractor={(_, index) => index.toString()}
+          numColumns={numColumns}
+          columnWrapperStyle={{ justifyContent: 'flex-start' }}
+          contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollViewContent}
-        >
-          <RNView style={styles.moviesGrid}>
-            {data.map((item, index) => (
-              <MovieItem key={index.toString()} item={item} />
-            ))}
-          </RNView>
-        </ScrollView>
+        />
       )}
     </RNView>
   );
@@ -131,15 +132,8 @@ const styles = StyleSheet.create({
     marginTop: 40,
     padding: 5,
   },
-  scrollViewContent: {
+  listContent: {
     paddingVertical: 20,
-    alignItems: 'center',
-  },
-  moviesGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
   },
   posterContainer: {
     marginVertical: 10,
@@ -156,9 +150,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 12,
     color: '#ccc',
-  },
-  activityIndicator: {
-    marginBottom: 10,
   },
   centeredContainer: {
     flex: 1,

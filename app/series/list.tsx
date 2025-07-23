@@ -23,15 +23,14 @@ const SeriesList = () => {
   const { width, height } = useWindowDimensions();
   const isPortrait = height >= width;
 
-  // ✅ Correct device & orientation-aware column logic
+  // ✅ Correct layout based on width & orientation
   const getNumColumns = () => {
-    const shortSide = Math.min(width, height);
-    const isMobile = shortSide < 600;
-    const isTablet = shortSide >= 600 && shortSide < 1024;
+    const isMobile = width < 600;
+    const isTablet = width >= 600 && width < 1024;
 
     if (isMobile) return isPortrait ? 3 : 5;
     if (isTablet) return isPortrait ? 5 : 7;
-    return isPortrait ? 5 : 7; // Laptop/Desktop
+    return isPortrait ? 5 : 7; // Desktop
   };
 
   const numColumns = getNumColumns();
@@ -150,7 +149,7 @@ const styles = StyleSheet.create({
   },
   posterTitle: {
     marginTop: 8,
-    fontSize: 14
+    fontSize: 14,
   },
   posterYear: {
     marginTop: 4,
