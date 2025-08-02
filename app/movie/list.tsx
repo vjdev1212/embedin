@@ -5,6 +5,7 @@ import {
   StyleSheet,
   Pressable,
   useWindowDimensions,
+  SafeAreaView,
   View as RNView,
 } from 'react-native';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
@@ -26,7 +27,6 @@ const MoviesList = () => {
   const isPortrait = height >= width;
   const shortSide = Math.min(width, height);
 
-  // 4-category responsive logic
   const isMobile = shortSide < 580;
   const isTablet = shortSide >= 580 && shortSide < 1024;
   const isLaptop = shortSide >= 1024 && shortSide < 1440;
@@ -34,8 +34,8 @@ const MoviesList = () => {
 
   const getNumColumns = () => {
     if (isMobile) return isPortrait ? 3 : 5;
-    if (isTablet) return isPortrait ? 5 : 7;
-    if (isLaptop) return isPortrait ? 6 : 8;
+    if (isTablet) return isPortrait ? 5 : 8;
+    if (isLaptop) return isPortrait ? 6 : 9;
     if (isDesktop) return isPortrait ? 7 : 10;
     return 5;
   };
@@ -111,37 +111,36 @@ const MoviesList = () => {
   };
 
   return (
-    <RNView style={styles.container}>
-      <StatusBar />
-      {loading ? (
-        <View style={styles.centeredContainer}>
-          <ActivityIndicator size="large" color="#535aff" />
-          <Text style={styles.centeredText}>Loading</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={data}
-          renderItem={renderItem}
-          keyExtractor={(_, index) => index.toString()}
-          numColumns={numColumns}
-          columnWrapperStyle={{ justifyContent: 'flex-start' }}
-          contentContainerStyle={styles.listContent}
-          showsVerticalScrollIndicator={false}
-        />
-      )}
-      <BottomSpacing space={50} />
-    </RNView>
+    <SafeAreaView style={{ flex: 1 }}>
+      <RNView style={styles.container}>
+        <StatusBar />
+        {loading ? (
+          <View style={styles.centeredContainer}>
+            <ActivityIndicator size="large" color="#535aff" />
+            <Text style={styles.centeredText}>Loading</Text>
+          </View>
+        ) : (
+          <FlatList
+            data={data}
+            renderItem={renderItem}
+            keyExtractor={(_, index) => index.toString()}
+            numColumns={numColumns}
+            columnWrapperStyle={{ justifyContent: 'flex-start' }}
+            contentContainerStyle={styles.listContent}
+            showsVerticalScrollIndicator={false}
+          />
+        )}
+      </RNView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 40,
     padding: 5,
   },
   listContent: {
-    paddingVertical: 20,
   },
   posterContainer: {
     marginVertical: 10,

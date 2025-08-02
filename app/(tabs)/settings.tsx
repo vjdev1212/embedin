@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   header: {
-    fontWeight: 'bold',
+    fontWeight: '500',
     fontSize: 17,
     paddingVertical: 5,
     paddingHorizontal: 5,

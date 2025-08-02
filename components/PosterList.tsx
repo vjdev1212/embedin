@@ -209,11 +209,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   seeAllText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '500',
   },
   posterContainer: {
     marginBottom: 10,

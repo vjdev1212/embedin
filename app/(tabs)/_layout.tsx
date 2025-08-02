@@ -58,15 +58,13 @@ export default function TabLayout() {
           height: getTabBarHeight(),
           backgroundColor: 'transparent',
           borderTopWidth: 0,
-          elevation: 0,
+          elevation: 0          
         },
         tabBarBackground: () => tabBarBackground,
       }}
     >
       {[
         { name: 'index', title: 'Home', icon: 'home' },
-        { name: 'movies', title: 'Movies', icon: 'film' },
-        { name: 'series', title: 'TV', icon: 'tv' },
         { name: 'search', title: 'Search', icon: 'search' },
         { name: 'settings', title: 'Settings', icon: 'gear' },
       ].map(({ name, title, icon }) => (

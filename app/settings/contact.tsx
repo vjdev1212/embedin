@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     },
     header: {
         fontSize: 20,
-        fontWeight: 'bold',
+        fontWeight: '500',
         marginBottom: 20,
         textAlign: 'center',
     },
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     },
     type: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontWeight: '500',
     },
     value: {
         fontSize: 14,
