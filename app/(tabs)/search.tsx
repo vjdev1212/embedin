@@ -198,9 +198,12 @@ const SearchScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, marginTop: 20 },
+  container: {
+    flex: 1,
+    marginTop: 30
+  },
   searchInputContainer: {
-    marginTop: 30,
+    marginTop: 20,
     paddingHorizontal: 20,
     width: '100%',
     maxWidth: 780,

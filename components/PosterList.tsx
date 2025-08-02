@@ -106,17 +106,19 @@ const PosterList = ({
   // Device category based on shortSide
   const getPostersPerScreen = () => {
     if (shortSide < 580) return isPortrait ? 3 : 5;       // mobile
-    if (shortSide < 1024) return isPortrait ? 5 : 7;      // tablet
-    if (shortSide < 1440) return isPortrait ? 6 : 8;      // laptop
+    if (shortSide < 1024) return isPortrait ? 6 : 8;      // tablet
+    if (shortSide < 1440) return isPortrait ? 7 : 9;      // laptop
     return isPortrait ? 7 : 10;                           // desktop
   };
 
   const postersPerScreen = getPostersPerScreen();
   const spacing = 12;
 
+  const containerMargin = 10;
   const posterWidth = useMemo(() => {
     const totalSpacing = spacing * (postersPerScreen - 1);
-    return (width - totalSpacing - 20) / postersPerScreen;
+    const totalMargins = containerMargin * 2; // left + right
+    return (width - totalSpacing - totalMargins) / postersPerScreen;
   }, [width, postersPerScreen]);
 
   const posterHeight = posterWidth * 1.5;
@@ -186,7 +188,7 @@ const PosterList = ({
         )}
         keyExtractor={(item, index) => `${item.moviedbid}-${index}`}
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 10 }}
+        contentContainerStyle={{ paddingRight: 4 }}
       />
     </RNView>
   );
@@ -196,20 +198,21 @@ const styles = StyleSheet.create({
   container: {
     paddingTop: 10,
     marginBottom: 20,
+    marginHorizontal: 10
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
   },
   seeAllText: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
   },
   posterContainer: {
