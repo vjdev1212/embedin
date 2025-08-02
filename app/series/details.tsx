@@ -215,7 +215,10 @@ const SeriesDetails = () => {
         </View>
       </View>
       <View style={styles.recommendationsContainer}>
-        <PosterList apiUrl={`https://api.themoviedb.org/3/tv/${moviedbid}/recommendations`} title='More like this' type='series' />
+        <PosterList apiUrl={`https://api.themoviedb.org/3/tv/${moviedbid}/recommendations`} title='Recommended' type='series' />
+      </View>
+      <View style={styles.recommendationsContainer}>
+        <PosterList apiUrl={`https://api.themoviedb.org/3/tv/${moviedbid}/similar`} title='Similar to this' type='series' />
       </View>
       <BottomSpacing space={50} />
     </ScrollView>

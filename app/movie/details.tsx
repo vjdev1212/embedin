@@ -173,9 +173,12 @@ const MovieDetails = () => {
         <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
       </View>
       <View style={styles.recommendationsContainer}>
-        <PosterList apiUrl={`https://api.themoviedb.org/3/movie/${moviedbid}/recommendations`} title='More like this' type='movie' />
-        <BottomSpacing space={50} />
+        <PosterList apiUrl={`https://api.themoviedb.org/3/movie/${moviedbid}/recommendations`} title='Recommended' type='movie' />
       </View>
+      <View style={styles.recommendationsContainer}>
+        <PosterList apiUrl={`https://api.themoviedb.org/3/movie/${moviedbid}/similar`} title='Similar to this' type='movie' />
+      </View>
+      <BottomSpacing space={50} />
     </ScrollView>
   );
 };
