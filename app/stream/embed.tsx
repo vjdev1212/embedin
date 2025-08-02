@@ -137,14 +137,13 @@ const EmbedPlayer = () => {
         <iframe
           src="${videoUrl}"
           frameborder="0"
-          style="width: 100%; height: 100%;"
-          allow="encrypted-media; autoplay; fullscreen"
-          referrerPolicy="no-referrer-when-downgrade"
-          ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allowfullscreen allow-presentation"' : ''}
+          style="width: 100%; height: 100%; border: 0; background-color: #000000"
+          referrerpolicy="no-referrer-when-downgrade"
+          ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"' : ''}
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
           allowfullscreen>
         </iframe>
       </div>
-
       <script>
         window.open = function() { return null; };
       </script>
@@ -179,20 +178,20 @@ const EmbedPlayer = () => {
               sandboxAllowed ? (
                 <iframe
                   src={videoUrl as string}
-                  style={{ flex: 1, width: "100%", height: "100%" }}
+                  style={{ flex: 1, width: "100%", height: "100%", border: 0, backgroundColor: '#000000' }}
                   referrerPolicy="no-referrer-when-downgrade"
                   sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"
-                  allow="encrypted-media; autoplay; fullscreen"
-                  frameBorder={0}
+                  allow="encrypted-media; autoplay; fullscreen; picture-in-picture"
+                  frameBorder="0"
                   allowFullScreen
                 />
               ) : (
                 <iframe
                   src={videoUrl as string}
-                  style={{ flex: 1, width: "100%", height: "100%" }}
+                  style={{ flex: 1, width: "100%", height: "100%", border: 0, backgroundColor: '#000000' }}
                   referrerPolicy="no-referrer-when-downgrade"
-                  allow="encrypted-media; autoplay; fullscreen"
-                  frameBorder={0}
+                  allow="encrypted-media; autoplay; fullscreen; picture-in-picture"
+                  frameBorder="0"
                   allowFullScreen
                 />
               )
