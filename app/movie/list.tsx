@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   SafeAreaView,
   View as RNView,
+  Platform,
 } from 'react-native';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -112,7 +113,9 @@ const MoviesList = () => {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <RNView style={styles.container}>
+      <RNView style={[styles.container, {
+        marginTop: Platform.OS === 'web' ? 50 : 0
+      }]}>
         <StatusBar />
         {loading ? (
           <View style={styles.centeredContainer}>

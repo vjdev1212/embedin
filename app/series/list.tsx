@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
   SafeAreaView, // ✅ Added
   View as RNView,
+  Platform,
 } from 'react-native';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -111,8 +112,10 @@ const SeriesList = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}> {/* ✅ SafeAreaView added */}
-      <RNView style={styles.container}>
+    <SafeAreaView style={{ flex: 1 }}>
+      <RNView style={[styles.container, {
+        marginTop: Platform.OS === 'web' ? 50 : 0
+      }]}>
         <StatusBar />
         {loading ? (
           <View style={styles.centeredContainer}>
