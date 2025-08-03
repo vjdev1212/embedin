@@ -13,7 +13,7 @@
     "build:android": "eas build -p android --profile preview",
     "build:prod:ios": "eas build -p ios --profile production",
     "build:prod:android": "eas build -p android --profile production",
-    "docker-push:latest": "npx expo export -p web && docker buildx build --no-cache --tag=jarvisnexus/embedin:latest --platform=linux/arm64,linux/amd64,linux/arm/v7 --push ."
+    "docker-push": "node scripts/docker-build.js"
   },
   "jest": {
     "preset": "jest-expo"

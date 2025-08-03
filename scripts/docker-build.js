@@ -15,7 +15,7 @@ const buildArgs = vars
   .map(key => `--build-arg ${key}="${process.env[key] ?? ""}"`)
   .join(" ");
 
-const cmd = `docker buildx build --no-cache ${buildArgs} \
+const cmd = `docker buildx build ${buildArgs} \
 --tag jarvisnexus/embedin:latest \
 --platform linux/arm64,linux/amd64,linux/arm/v7 \
 --push .`;
