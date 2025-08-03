@@ -1,6 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Platform } from 'react-native';
+import { StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ScreenOrientation from 'expo-screen-orientation';
@@ -10,6 +10,7 @@ import {
   defaultSandboxAllowedForMovie,
   defaultSandboxAllowedForTv
 } from '@/constants/Embed';
+import { Text, View } from '@/components/Themed';
 
 const EmbedPlayer = () => {
   const { imdbid, tmdbid, type, season, episode } = useLocalSearchParams();

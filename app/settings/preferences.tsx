@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, TextInput, Text, View, Pressable } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, TextInput, View, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { StatusBar } from '@/components/Themed';
+import { StatusBar, Text } from '@/components/Themed';
 import { isHapticsSupported, showAlert } from '@/utils/platform';
 import * as Haptics from 'expo-haptics';
 
@@ -60,7 +60,7 @@ const PreferencesScreen = () => {
                         submitBehavior={'blurAndSubmit'}
                     />
                 </View>
-                <View style={styles.searchInputContainer}>
+                <View style={styles.searchInputContainer}>                    
                     <Text style={{ color: '#888', marginBottom: 10 }}>Region Code:</Text>
                     <TextInput
                         style={[
