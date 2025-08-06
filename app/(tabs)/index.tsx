@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { router } from 'expo-router'; import React, { useState, useMemo } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -10,10 +10,11 @@ import {
 import { StatusBar, Text } from '@/components/Themed';
 import PosterList from '@/components/PosterList';
 import BottomSpacing from '@/components/BottomSpacing';
-import { CatalogUrl, MovieGneres, TvGneres } from '@/constants/Tmdb';
+import AppleTVCarousel from '@/components/PosterCarousel'; // Import the new carousel
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
+import { CatalogUrl, MovieGneres, TvGneres } from '@/constants/Tmdb';
 
 export default function HomeScreen() {
   const [filter, setFilter] = useState<'all' | 'movies' | 'series'>('all');
@@ -84,46 +85,65 @@ export default function HomeScreen() {
     setFilter(newFilter);
   };
 
-  return (
-    <SafeAreaView style={[styles.container]}>
-      <StatusBar />
-      <View style={[styles.filtersContainer]}>
-        <FlatList
-          data={filters}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.filterRow}
-          keyExtractor={(item) => item.key}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[
-                styles.filterButton,
-                filter === item.key && styles.filterButtonActive
-              ]}
-              onPress={() => handleFilterChange(item.key as 'all' | 'movies' | 'series')}
-            >
-              <Ionicons
-                name={item.icon as any}
-                size={18}
-                color={filter === item.key ? '#fff' : '#bbb'}
-                style={{ marginRight: 6 }}
-              />
-              <Text
-                style={[
-                  styles.filterButtonText,
-                  filter === item.key && styles.filterButtonTextActive
-                ]}
-              >
-                {item.label}
-              </Text>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
+  const handleCarouselItemPress = (item: any) => {
+    const type = item.type == 'movie' ? 'movie' : 'series'
+    router.push({
+      pathname: `/${type}/details`,
+      params: { moviedbid: item.moviedbid },
+    });
+  };
 
+  return (
+    <View style={[styles.container]}>
+      <StatusBar />
       {/* Scrollable content */}
       <ScrollView showsVerticalScrollIndicator={false} key={filter}>
+
+        {/* Apple TV Carousel */}
+        <AppleTVCarousel
+          filter={filter}
+          onItemPress={handleCarouselItemPress}
+          autoPlay={true}
+          autoPlayInterval={6000}
+        />
+
+
         <View style={styles.contentContainer}>
+          {/* Filter buttons - moved to overlay on carousel */}
+          <View style={[styles.filtersContainer]}>
+            <FlatList
+              data={filters}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filterRow}
+              keyExtractor={(item) => item.key}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.filterButton,
+                    filter === item.key && styles.filterButtonActive
+                  ]}
+                  onPress={() => handleFilterChange(item.key as 'all' | 'movies' | 'series')}
+                >
+                  <Ionicons
+                    name={item.icon as any}
+                    size={18}
+                    color={filter === item.key ? '#fff' : '#bbb'}
+                    style={{ marginRight: 6 }}
+                  />
+                  <Text
+                    style={[
+                      styles.filterButtonText,
+                      filter === item.key && styles.filterButtonTextActive
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+
           {activeLists.map((list, i) => (
             <PosterList
               key={`${filter}-${i}`}
@@ -135,7 +155,7 @@ export default function HomeScreen() {
         </View>
         <BottomSpacing space={50} />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -144,7 +164,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filtersContainer: {
-    paddingVertical: 12
+    paddingVertical: 12,
+    paddingHorizontal: 5,
   },
   filterRow: {
     paddingHorizontal: 10,
@@ -156,11 +177,13 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 50,
-    backgroundColor: '#202020',
+    backgroundColor: 'rgba(18, 18, 18, 0.8)',
     marginRight: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   filterButtonActive: {
-    backgroundColor: '#535aff',
+    backgroundColor: 'rgba(83, 90, 255, 0.9)',
   },
   filterButtonText: {
     fontSize: 15,
@@ -170,6 +193,6 @@ const styles = StyleSheet.create({
     color: '#fff'
   },
   contentContainer: {
-    marginTop: 10,
+    marginTop: 20,
   },
 });

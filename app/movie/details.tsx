@@ -26,12 +26,6 @@ const MovieDetails = () => {
   const isPortrait = height > width;
   const ref = useRef<ScrollView | null>(null);
 
-  useFocusEffect(() => {
-    if (ref.current) {
-      ref.current.scrollTo({ y: 0, animated: true });
-    }
-  });
-
   useEffect(() => {
     const fetchDetails = async () => {
       try {
@@ -166,9 +160,6 @@ const MovieDetails = () => {
           }
         </View>
       </View>
-      {
-        isPortrait && (<Divider />)
-      }
       <View style={styles.castContainer}>
         <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
       </View>

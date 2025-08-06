@@ -12,7 +12,6 @@ const SearchButton = ({ onPress, text }: { onPress: () => void, text: string }) 
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#535aff',
     paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 30,
@@ -21,6 +20,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
+    backgroundColor: '#535aff'
   },
   text: {
     color: '#fff',

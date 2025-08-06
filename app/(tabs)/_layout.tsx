@@ -68,7 +68,7 @@ export default function TabLayout() {
           height: getTabBarHeight(),
           backgroundColor: 'transparent',
           borderTopWidth: 0,
-          elevation: 0
+          elevation: 0,
         },
         tabBarBackground: () => tabBarBackground,
       }}

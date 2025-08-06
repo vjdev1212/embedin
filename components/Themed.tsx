@@ -8,10 +8,12 @@ import {
   TextInput as DefaultTextInput,
   Text as DefaultText,
   View as DefaultView,
+  StyleSheet,
   Platform
 } from 'react-native';
 import { StatusBar as DefaultStatusBar } from 'expo-status-bar';
 import Colors from '@/constants/Colors';
+import { useColorScheme } from './useColorScheme';
 
 type ThemeProps = {
   lightColor?: string;
@@ -40,14 +42,14 @@ export function useThemeColor(
 
 export function Text(props: TextProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const color = '#ffffff';
   const webFontStyle = Platform.OS === 'web' ? { fontFamily: 'SF Pro Display, -apple-system, BlinkMacSystemFont, sans-serif' } : {};
   return <DefaultText style={[webFontStyle, { color }, style]} {...otherProps} />;
 }
 
 export function TextInput(props: TextInputProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
-  const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
+  const color = '#ffffff';
 
   return <DefaultTextInput style={[{ color }, style]} {...otherProps} />;
 }
@@ -60,33 +62,23 @@ export function ActivityIndicator(props: ActivityIndicatorProps) {
 }
 
 export function View(props: ViewProps) {
-  const { style, lightColor, darkColor, ...otherProps } = props;
-  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
-
-  return <DefaultView style={[{ backgroundColor }, style]} {...otherProps} />;
+  const { style, ...otherProps } = props;
+  return <DefaultView style={[style]} {...otherProps} />;
 }
 
 export function StatusBar(props: StatusBarProps) {
   const { ...otherProps } = props;
+
   return <DefaultStatusBar translucent backgroundColor="transparent" {...otherProps} />;
 }
 
 export function Card(props: ViewProps) {
   const { style, lightColor, darkColor, ...otherProps } = props;
 
-  // Dynamically adjust border and shadow based on the color scheme
-
-  const backgroundColor = '#101010';
-  const borderColor = '#101010';
-  const shadowColor = '#101010';
-
   return (
     <DefaultView
       style={[
         {
-          backgroundColor,
-          borderColor,
-          borderWidth: 1,
           overflow: 'hidden',
         },
         style,
