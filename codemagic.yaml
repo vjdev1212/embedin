@@ -1,22 +1,81 @@
 workflows:
-  expo-build:
-    name: Expo EAS Build (Signed IPA for iOS, APK for Android)
+  embedin-ios-build:
+    name: Embedin iOS Build
     environment:
+      node: latest
+      xcode: latest
       groups:
-        - expo-env-vars
+        - EXPO
     scripts:
       - name: Install dependencies
+        script: npm install --force
+      
+      - name: Install Expo CLI
+        script: npm install -g @expo/cli@latest --force
+      
+      - name: Check Expo CLI version
+        script: npx expo --version
+      
+      - name: Clean and generate iOS project
         script: |
-          echo "Setting up Node.js..."
-          nvm install $NODE_VERSION
-          npm install
-      - name: Install EAS CLI
+          rm -rf ios android
+          npx expo prebuild --platform ios
+      
+      - name: Install iOS dependencies
         script: |
-          npm install -g eas-cli
-      - name: Build Expo project using EAS Build
+          cd ios
+          pod install
+      
+      - name: Build with Xcode (unsigned)
         script: |
-          eas build --platform ios --profile development --non-interactive
-          eas build --platform android --profile development --non-interactive
+          cd ios
+          WORKSPACE=$(find . -name "*.xcworkspace" -maxdepth 1 | head -1)
+          if [ -z "$WORKSPACE" ]; then
+            echo "❌ No .xcworkspace found"
+            exit 1
+          fi
+          
+          SCHEME_NAME=$(basename "$WORKSPACE" .xcworkspace)
+          echo "📱 Building scheme: $SCHEME_NAME"
+          
+          xcodebuild -workspace "$WORKSPACE" \
+            -scheme "$SCHEME_NAME" \
+            -configuration Release \
+            -destination generic/platform=iOS \
+            -archivePath "build/$SCHEME_NAME.xcarchive" \
+            archive \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            DEVELOPMENT_TEAM=""
+
+          mkdir -p "build/Payload"
+          cp -r "build/$SCHEME_NAME.xcarchive/Products/Applications/"*.app "build/Payload/"
+
+          APP_NAME=$(ls "build/Payload/" | head -1)
+          IPA_NAME="${APP_NAME%.app}"
+
+          echo "📱 App bundle: $APP_NAME"
+          echo "📦 IPA name: $IPA_NAME"
+
+          EXECUTABLE=$(plutil -extract CFBundleExecutable raw "build/Payload/$APP_NAME/Info.plist" 2>/dev/null || echo "$IPA_NAME")
+          if [ ! -f "build/Payload/$APP_NAME/$EXECUTABLE" ]; then
+            echo "⚠️  Warning: Executable $EXECUTABLE not found"
+          else
+            echo "✅ Executable found: $EXECUTABLE"
+          fi
+
+          cd build
+          zip -r "$IPA_NAME.ipa" Payload/
+
+          if [ -f "$IPA_NAME.ipa" ]; then
+            echo "✅ IPA created successfully: $IPA_NAME.ipa"
+            echo "📊 IPA size: $(ls -lh "$IPA_NAME.ipa" | awk '{print $5}')"
+          else
+            echo "❌ Failed to create IPA"
+            exit 1
+          fi
+    
     artifacts:
-      - ./dist/*.ipa
-      - ./dist/*.apk
+      - ios/build/*.ipa
+      - ios/build/**/*.xcarchive

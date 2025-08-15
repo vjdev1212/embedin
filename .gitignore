@@ -43,3 +43,4 @@ android
 .firebaserc
 .firebase
 pglite-debug.log
+firebase-debug.log
