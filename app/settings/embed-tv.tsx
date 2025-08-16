@@ -33,7 +33,6 @@ const EmbedTvShowsSettingsScreen = () => {
             }
 
             const existingSettings = await AsyncStorage.getItem('embedSettings');
-            console.log('Existing settings:', existingSettings);
             const embedSettings = existingSettings ? JSON.parse(existingSettings) : {};
 
             embedSettings.tv = {
@@ -49,51 +48,76 @@ const EmbedTvShowsSettingsScreen = () => {
         }
     };
 
-    const toggleSandBoxAllowed = useCallback(() => setSandboxAllowed(prev => !prev), [setSandboxAllowed]);
-    const textInputStyle = styles.darkTextInput;
-
-    const tmdbHint = "Example (TMDB): https://player.videasy.net/tv/{TMDBID}/{SEASON}/{EPISODE}"
-    const imdbHint = "Example (IMDB): https://player.videasy.net/tv/{IMDBID}/{SEASON}/{EPISODE}"
+    const toggleSandBoxAllowed = useCallback(() => setSandboxAllowed(prev => !prev), []);
 
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar />
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
-                <View style={styles.textInputContainer}>
-                    <Text style={styles.label}>TV Shows Embed URL:</Text>
-                    <TextInput
-                        style={[
-                            styles.textInput,
-                            textInputStyle
-                        ]}
-                        value={tvShowsUrlTemplate}
-                        onChangeText={setTvShowsUrlTemplate}
-                        multiline
-                        submitBehavior={'blurAndSubmit'}
-                    />
+            <ScrollView 
+                showsVerticalScrollIndicator={false} 
+                contentContainerStyle={styles.scrollContent}
+                style={styles.scrollView}
+            >
+                {/* TV Shows URL Section */}
+                <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>TV Shows Embed URL</Text>
+                    </View>
+                    
+                    <View style={styles.inputWrapper}>
+                        <TextInput
+                            style={styles.textInput}
+                            value={tvShowsUrlTemplate}
+                            onChangeText={setTvShowsUrlTemplate}
+                            multiline
+                            submitBehavior={'blurAndSubmit'}
+                            placeholder="Enter your TV shows embed URL template..."
+                            placeholderTextColor="#666"
+                        />
+                    </View>
+                    
                     <View style={styles.hintContainer}>
-                        <Text style={styles.hint}>{tmdbHint}</Text>
-                        <Text style={styles.hint}>{imdbHint}</Text>
+                        <Text style={styles.hintLabel}>TMDB:</Text>
+                        <Text style={styles.hintText}>https://player.videasy.net/tv/{'{TMDBID}'}/{'{SEASON}'}/{'{EPISODE}'}</Text>
+                        <Text style={styles.hintLabel}>IMDB:</Text>
+                        <Text style={styles.hintText}>https://player.videasy.net/tv/{'{IMDBID}'}/{'{SEASON}'}/{'{EPISODE}'}</Text>
                     </View>
                 </View>
-                <View style={styles.textInputContainer}>
-                    <Text style={styles.label}>Disabling this may show ads and popups.</Text>
-                    <View style={styles.switchContainer}>
-                        <Text style={styles.switchLabel}>Allow Sandbox</Text>
+
+                {/* Sandbox Settings Section */}
+                <View style={styles.section}>
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>Security Settings</Text>
+                        <Text style={styles.sectionSubtitle}>Disabling this may show ads and popups</Text>
+                    </View>
+                    
+                    <View style={styles.settingRow}>
+                        <View style={styles.settingInfo}>
+                            <Text style={styles.settingLabel}>Allow Sandbox</Text>
+                            <Text style={styles.settingDescription}>
+                                Enables secure iframe sandboxing
+                            </Text>
+                        </View>
                         <Switch
                             value={sandboxAllowed}
                             onValueChange={toggleSandBoxAllowed}
-                            style={styles.switch}
-                            thumbColor={sandboxAllowed ? '#535aff' : '#ccc'}
-                            trackColor={{ false: '#e0e0e0', true: '#a5afff' }}
+                            thumbColor={sandboxAllowed ? '#535aff' : '#f4f3f4'}
+                            trackColor={{ false: '#767577', true: '#a5afff' }}
+                            ios_backgroundColor="#767577"
                         />
                     </View>
                 </View>
-                <View style={styles.saveButton}>
-                    <Pressable onPress={saveEmbedSettings}>
-                        <Text style={styles.saveButtonText}>Save</Text>
-                    </Pressable>
-                </View>
+
+                {/* Save Button */}
+                <Pressable 
+                    style={({ pressed }) => [
+                        styles.saveButton,
+                        pressed && styles.saveButtonPressed
+                    ]}
+                    onPress={saveEmbedSettings}
+                >
+                    <Text style={styles.saveButtonText}>Save Settings</Text>
+                </Pressable>
             </ScrollView>
         </SafeAreaView>
     );
@@ -107,64 +131,107 @@ const styles = StyleSheet.create({
         maxWidth: 780,
         alignSelf: 'center',
     },
-    content: {
+    scrollView: {
+        flex: 1,
+    },
+    scrollContent: {
         padding: 20,
-        marginTop: 20,
+        paddingBottom: 40,
     },
-    hintContainer:{
-        marginVertical: 10,
+    section: {
+        marginBottom: 32,
     },
-    textInputContainer: {
-        marginBottom: 30,
-        paddingHorizontal: 10,
-        width: '100%',
+    sectionHeader: {
+        marginBottom: 16,
     },
-    label: {
-        marginBottom: 10,
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: '500',
+        color: '#fff',
+        marginBottom: 4,
     },
-    hint: {
+    sectionSubtitle: {
+        fontSize: 14,
         color: '#888',
-        marginBottom: 10,
+        lineHeight: 20,
     },
-    switchContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: '100%',
+    inputWrapper: {
+        marginBottom: 16,
     },
     textInput: {
-        borderRadius: 12,
-        paddingHorizontal: 20,
-        fontSize: 16,
-        paddingVertical: 10,
-        minHeight: 90
-    },
-    lightTextInput: {
-        backgroundColor: '#f0f0f0',
-        color: '#000',
-    },
-    darkTextInput: {
-        backgroundColor: '#1f1f1f',
+        backgroundColor: '#1a1a1a',
         color: '#fff',
+        borderRadius: 12,
+        padding: 16,
+        fontSize: 16,
+        minHeight: 100,
+        textAlignVertical: 'top',
+        borderWidth: 1,
+        borderColor: '#2a2a2a',
+    },
+    hintContainer: {
+        gap: 8,
+        marginTop: 8,
+    },
+    hintLabel: {
+        fontSize: 13,
+        fontWeight: '500',
+        color: 'rgba(255, 255, 255, 0.8)',
+        marginTop: 8,
+    },
+    hintText: {
+        fontSize: 13,
+        color: '#888',
+        fontFamily: 'monospace',
+        marginTop: 2,
+    },
+    settingRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingVertical: 4,
+    },
+    settingInfo: {
+        flex: 1,
+        marginRight: 16,
+    },
+    settingLabel: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#fff',
+        marginBottom: 2,
+    },
+    settingDescription: {
+        fontSize: 13,
+        color: '#888',
+        lineHeight: 18,
     },
     saveButton: {
-        marginTop: 20,
         backgroundColor: '#535aff',
-        padding: 12,
-        borderRadius: 30,
-        alignSelf: 'center',
+        paddingVertical: 16,
+        paddingHorizontal: 32,
+        borderRadius: 12,
         alignItems: 'center',
-        width: 150,
+        marginTop: 20,
+        shadowColor: '#535aff',
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+        width: 200,
+        alignSelf: 'center',
     },
-    switchLabel: {
-        fontSize: 14,
-    },
-    switch: {
-        marginVertical: 5,
+    saveButtonPressed: {
+        backgroundColor: '#4248e6',
+        transform: [{ scale: 0.98 }],
     },
     saveButtonText: {
         color: '#fff',
         fontSize: 16,
+        fontWeight: '500',
     },
 });
 
