@@ -251,6 +251,21 @@ function RootLayoutNav() {
               }
             }} />
             <Stack.Screen
+              name="settings/downloads"
+              options={{
+                headerShown: true,
+                headerTransparent: true,
+                headerBackground: InvisibleHeaderBackground,
+                headerTitle: '',
+                headerTintColor: '#ffffff',
+                headerBackTitle: '',
+                headerShadowVisible: false,
+                headerStyle: {
+                  backgroundColor: 'transparent',
+                }
+              }}
+            />
+            <Stack.Screen
               name="settings/contact"
               options={{
                 headerShown: true,

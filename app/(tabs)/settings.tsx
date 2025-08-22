@@ -19,6 +19,11 @@ const SettingsScreen = () => {
     { title: 'Movie', route: '/settings/embed-movie', icon: 'film-outline' },
     { title: 'TV', route: '/settings/embed-tv', icon: 'tv-outline' },
   ];
+
+  const resourcesList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
+    { title: 'Downloads', route: '/settings/downloads', icon: 'download-outline' },
+  ];
+
   const SettingItem = ({
     title,
     icon,
@@ -110,7 +115,30 @@ const SettingsScreen = () => {
             ))}
           </View>
         </View>
-        
+
+        {resourcesList.length > 0 && (
+          <View style={styles.section}>
+            <Text style={[
+              styles.sectionHeader,
+              { color: '#8E8E93' }
+            ]}>
+              RESOURCES
+            </Text>
+            <View style={styles.settingsGroup}>
+              {resourcesList.map((item, index) => (
+                <SettingItem
+                  key={index}
+                  title={item.title}
+                  icon={item.icon}
+                  onPress={() => onSettingsItemPress(item)}
+                  isFirst={index === 0}
+                  isLast={index === resourcesList.length - 1}
+                />
+              ))}
+            </View>
+          </View>
+        )}
+
         {/* Contact Section - Only render if showContact is true */}
         {showContact && (
           <View style={styles.section}>
