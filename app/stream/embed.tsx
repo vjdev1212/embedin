@@ -109,6 +109,8 @@ const EmbedPlayer = () => {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>EmbedIn</title>
+      <!-- Google Cast SDK -->
+      <script src="https://www.gstatic.com/cast/sdk/libs/sender/1.0/cast_sender.js"></script>
       <style>
         html, body {
           margin: 0;
@@ -140,14 +142,40 @@ const EmbedPlayer = () => {
           style="width: 100%; height: 100%; border: 0; background-color: #000000"
           referrerpolicy="no-referrer-when-downgrade"
           ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"' : ''}
-          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture; web-share"
           allowfullscreen
           x-webkit-airplay="allow"
           webkit-playsinline="false">
         </iframe>
+        <!-- Google Cast button -->
+        <google-cast-launcher class="cast-button" style="position: absolute; top: 10px; right: 10px; z-index: 1000;"></google-cast-launcher>
       </div>
       <script>
         window.open = function() { return null; };
+        
+        // Initialize Google Cast
+        window['__onGCastApiAvailable'] = function(isAvailable) {
+          if (isAvailable) {
+            const castContext = cast.framework.CastContext.getInstance();
+            castContext.setOptions({
+              receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+              autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+            });
+            
+            // Add cast button functionality
+            const castButton = castContext.getCastButton(document.querySelector('.cast-button'));
+          }
+        };
+        
+        // Function to cast video
+        function castVideo() {
+          const castSession = cast.framework.CastContext.getInstance().getCurrentSession();
+          if (castSession) {
+            const mediaInfo = new chrome.cast.media.MediaInfo('${videoUrl}', 'video/mp4');
+            const request = new chrome.cast.media.LoadRequest(mediaInfo);
+            castSession.loadMedia(request);
+          }
+        }
       </script>
 
       <script>
@@ -183,7 +211,7 @@ const EmbedPlayer = () => {
                   style={{ flex: 1, width: "100%", height: "100%", border: 0, backgroundColor: '#000000' }}
                   referrerPolicy="no-referrer-when-downgrade"
                   sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"
-                  allow="encrypted-media; autoplay; fullscreen; picture-in-picture"
+                  allow="encrypted-media; autoplay; fullscreen; picture-in-picture; web-share"
                   frameBorder="0"
                   allowFullScreen
                   x-webkit-airplay="allow"
@@ -194,7 +222,7 @@ const EmbedPlayer = () => {
                   src={videoUrl as string}
                   style={{ flex: 1, width: "100%", height: "100%", border: 0, backgroundColor: '#000000' }}
                   referrerPolicy="no-referrer-when-downgrade"
-                  allow="encrypted-media; autoplay; fullscreen; picture-in-picture"
+                  allow="encrypted-media; autoplay; fullscreen; picture-in-picture; web-share"
                   frameBorder="0"
                   allowFullScreen
                   x-webkit-airplay="allow"
@@ -222,6 +250,8 @@ const EmbedPlayer = () => {
             allowsFullscreenVideo={true}
             allowsAirPlayForMediaPlayback={true}
             allowsPictureInPictureMediaPlayback={true}
+            allowsInlineMediaPlayback={false}
+            bounces={false}
           />
         )
       ) : (
