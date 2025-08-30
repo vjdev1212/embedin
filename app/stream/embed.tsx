@@ -102,7 +102,6 @@ const EmbedPlayer = () => {
       .replace(/(\{EPISODE_NUMBER\})/gi, episode.toString());
   };
 
-  // HTML structure with iframe and popup-blocking JavaScript
   const iframeHtml = `
   <!DOCTYPE html>
   <html lang="en">
@@ -141,8 +140,10 @@ const EmbedPlayer = () => {
           style="width: 100%; height: 100%; border: 0; background-color: #000000"
           referrerpolicy="no-referrer-when-downgrade"
           ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"' : ''}
-          allow="autoplay; fullscreen; encrypted-media"
-          allowfullscreen>
+          allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+          allowfullscreen
+          x-webkit-airplay="allow"
+          webkit-playsinline="false">
         </iframe>
       </div>
       <script>
@@ -182,18 +183,22 @@ const EmbedPlayer = () => {
                   style={{ flex: 1, width: "100%", height: "100%", border: 0, backgroundColor: '#000000' }}
                   referrerPolicy="no-referrer-when-downgrade"
                   sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"
-                  allow="encrypted-media; autoplay; fullscreen"
+                  allow="encrypted-media; autoplay; fullscreen; picture-in-picture"
                   frameBorder="0"
                   allowFullScreen
+                  x-webkit-airplay="allow"
+                  webkit-playsinline="false"
                 />
               ) : (
                 <iframe
                   src={videoUrl as string}
                   style={{ flex: 1, width: "100%", height: "100%", border: 0, backgroundColor: '#000000' }}
                   referrerPolicy="no-referrer-when-downgrade"
-                  allow="encrypted-media; autoplay; fullscreen"
+                  allow="encrypted-media; autoplay; fullscreen; picture-in-picture"
                   frameBorder="0"
                   allowFullScreen
+                  x-webkit-airplay="allow"
+                  webkit-playsinline="false"
                 />
               )
             }
@@ -215,6 +220,8 @@ const EmbedPlayer = () => {
             allowFileAccess
             mediaPlaybackRequiresUserAction={false}
             allowsFullscreenVideo={true}
+            allowsAirPlayForMediaPlayback={true}
+            allowsPictureInPictureMediaPlayback={true}
           />
         )
       ) : (
