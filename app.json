@@ -16,18 +16,18 @@
     "splash": {
       "image": "assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000000"
+      "backgroundColor": "#0a0a0a"
     },
     "ios": {
       "icon": "assets/images/icon.png",
       "supportsTablet": true,
-      "backgroundColor": "#000000",
+      "backgroundColor": "#0a0a0a",
       "bundleIdentifier": "com.vijayyuvi.embedin"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "assets/images/adaptive-icon.png",
-        "backgroundColor": "#000000"
+        "backgroundColor": "#0a0a0a"
       },
       "package": "com.vijayyuvi.embedin",
       "icon": "assets/images/icon.png"
