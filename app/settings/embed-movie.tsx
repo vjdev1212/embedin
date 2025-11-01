@@ -1,10 +1,11 @@
-import { SafeAreaView, ScrollView, StyleSheet, TextInput, Switch, Pressable } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, Switch, Pressable } from 'react-native';
 import { StatusBar, Text, View } from '../../components/Themed';
 import { isHapticsSupported, showAlert } from '@/utils/platform';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
 import { useCallback, useEffect, useState } from 'react';
 import { defaultMovieUrlTemplate, defaultSandboxAllowedForMovie } from '@/constants/Embed';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EmbedMovieSettingsScreen = () => {
     const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
