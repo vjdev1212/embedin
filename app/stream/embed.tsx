@@ -237,7 +237,7 @@ const EmbedPlayer = () => {
             source={{ html: iframeHtml }}
             style={{
               flex: 1,
-              backgroundColor: webViewBgColor,
+              backgroundColor: '#000000',
               marginTop: 30,
               marginBottom: 10
             }}
@@ -253,6 +253,17 @@ const EmbedPlayer = () => {
             allowsPictureInPictureMediaPlayback={true}
             allowsInlineMediaPlayback={false}
             bounces={false}
+            mixedContentMode="always" 
+            thirdPartyCookiesEnabled={true} 
+            sharedCookiesEnabled={true} 
+            onError={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              console.warn('WebView error: ', nativeEvent);
+            }}
+            onHttpError={(syntheticEvent) => {
+              const { nativeEvent } = syntheticEvent;
+              console.warn('HTTP error: ', nativeEvent.statusCode);
+            }}
           />
         )
       ) : (
