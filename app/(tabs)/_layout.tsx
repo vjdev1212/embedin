@@ -14,19 +14,7 @@ function TabBarIcon(props: {
   return <FontAwesome size={24} {...props} />;
 }
 
-export default function TabLayout() {
-
-  const getTabBarHeight = () => {
-    switch (Platform.OS) {
-      case 'web':
-        return 70;
-      case 'ios':
-        return 85;
-      default:
-        return 65;
-    }
-  };
-
+export default function TabLayout() {  
   // Memoize background to avoid re-render crashes
   const tabBarBackground = useMemo(() => (
     <View
@@ -65,7 +53,7 @@ export default function TabLayout() {
         },
         tabBarStyle: {
           position: 'absolute',
-          height: getTabBarHeight(),
+          height: Platform.OS === 'web' ? 70 : undefined,
           backgroundColor: 'transparent',
           borderTopWidth: 0,
           elevation: 0,
