@@ -1,6 +1,6 @@
-import { router } from 'expo-router'; import React, { useState, useMemo } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   View,
@@ -10,7 +10,7 @@ import {
 import { StatusBar, Text } from '@/components/Themed';
 import PosterList from '@/components/PosterList';
 import BottomSpacing from '@/components/BottomSpacing';
-import AppleTVCarousel from '@/components/PosterCarousel'; // Import the new carousel
+import AppleTVCarousel from '@/components/PosterCarousel';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
@@ -79,7 +79,7 @@ export default function HomeScreen() {
 
   const handleFilterChange = async (newFilter: 'all' | 'movies' | 'series') => {
     if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     setFilter(newFilter);
   };
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filtersContainer: {
-    paddingVertical: 12,
+    paddingVertical: 8,
     paddingHorizontal: 5,
   },
   filterRow: {
@@ -173,34 +173,14 @@ const styles = StyleSheet.create({
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 50,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    backdropFilter: 'blur(20px)',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 25,
+    backgroundColor: '#1a1a1a',
     marginRight: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.2)',
-    shadowColor: 'rgba(0, 0, 0, 0.3)',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
   },
   filterButtonActive: {
-    backgroundColor: 'rgba(83, 90, 255, 0.3)',
-    borderColor: 'rgba(83, 90, 255, 0.5)',
-    shadowColor: 'rgba(83, 90, 255, 0.4)',
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 12,
+    backgroundColor: '#535aff',
   },
   filterButtonText: {
     fontSize: 15,
