@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   versionText: {
-    color: '#777',
+    color: '#ccc',
   }
 });
 
