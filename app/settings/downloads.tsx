@@ -6,11 +6,11 @@ import {
   StyleSheet,
   Linking,
   Dimensions,
-  SafeAreaView,
   ScrollView
 } from 'react-native';
 import * as Haptics from 'expo-haptics'
 import { isHapticsSupported } from '@/utils/platform';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
@@ -25,35 +25,38 @@ const AppResourcesScreen = () => {
     },
     {
       id: 2,
-      title: 'App Store (IPA)',
-      subtitle: 'iOS sideloading installation',
+      title: 'Manual IPA Install',
+      subtitle: 'Direct download for sideloading',
       icon: '🍎',
       url: 'https://github.com/vjdev1212/embedin-public/releases',
     },
-    // {
-    //   id: 3,
-    //   title: 'Docker Image',
-    //   subtitle: 'Self-hosted container deployment',
-    //   icon: '🐳',
-    //   url: 'https://hub.docker.com/r/jarvisnexus/embedin',
-    // },
+    {
+      id: 3,
+      title: 'SideStore Source',
+      subtitle: 'One-click install via SideStore',
+      icon: '📦',
+      url: 'sidestore://source?url=https://raw.githubusercontent.com/vjdev1212/embedin-public/refs/heads/main/sources/sidestore-source.json',
+    },
+    {
+      id: 4,
+      title: 'AltStore Source',
+      subtitle: 'One-click install via AltStore',
+      icon: '🔄',
+      url: 'altstore://source?url=https://raw.githubusercontent.com/vjdev1212/embedin-public/refs/heads/main/sources/sidestore-source.json',
+    },
   ];
 
-  const handlePress = async (url: any) => {
+  const handlePress = async (url: string) => {
     try {
       if (isHapticsSupported()) {
         await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
-      const supported = await Linking.canOpenURL(url);
-      if (supported) {
-        await Linking.openURL(url);
-      } else {
-        console.log("Can't open URL: " + url);
-      }
+      await Linking.openURL(url);
     } catch (error) {
-      console.error('Error opening URL:', error);
+      console.error("Error opening URL:", error);
     }
   };
+
 
   return (
     <SafeAreaView style={styles.container}>

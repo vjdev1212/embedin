@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, StatusBar, Text, View } from '../../components/Themed';
 import MediaContentDescription from '@/components/MediaContentDescription';
 import MediaContentHeader from '@/components/MediaContentHeader';
@@ -12,6 +12,7 @@ import MediaCastAndCrews from '@/components/MediaCastAndCrews';
 import PosterList from '@/components/PosterList';
 import MediaContentDetailsList from '@/components/MediaContentDetailsList';
 import PlayButton from '@/components/PlayButton';
+import WatchTrailerButton from '@/components/WatchTrailer';
 import { isHapticsSupported } from '@/utils/platform';
 import * as Haptics from 'expo-haptics';
 
@@ -24,6 +25,7 @@ const SeriesDetails = () => {
   const [imdbid, setImdbId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [cast, setCast] = useState<any[]>([]);
+  const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
   const ref = useRef<ScrollView | null>(null);
@@ -39,9 +41,11 @@ const SeriesDetails = () => {
         if (result) {
           const externalIds = await getExternalIds();
           const castAndCrews = await getCastandCrew();
+          const trailer = await getTrailer();
           setCast(castAndCrews);
-          const logo = `https://images.metahub.space/logo/medium/${externalIds.imdb_id}/img`;
           setImdbId(externalIds.imdb_id);
+          setTrailerKey(trailer);
+          const logo = `https://images.metahub.space/logo/medium/${externalIds.imdb_id}/img`;
 
           const seasonPromises = result.seasons.map(async (season: any) => {
             const episodes = await getEpisodes(season.season_number);
@@ -49,7 +53,7 @@ const SeriesDetails = () => {
               season: season.season_number,
               episode: episode.episode_number,
               number: episode.episode_number,
-              thumbnail: `https://image.tmdb.org/t/p/original/${episode.still_path}`,
+              thumbnail: `https://image.tmdb.org/t/p/w300/${episode.still_path}`,
               name: episode.name,
               firstAired: episode.air_date,
               overview: episode.overview,
@@ -60,7 +64,7 @@ const SeriesDetails = () => {
 
           const seriesData = {
             name: result.name,
-            background: `https://image.tmdb.org/t/p/original${result.backdrop_path}`,
+            background: `https://image.tmdb.org/t/p/${isPortrait ? 'w1280' : 'original'}${result.backdrop_path}`,
             poster: `https://image.tmdb.org/t/p/w780${result.poster_path}`,
             logo: logo,
             genre: result.genres.map((genre: any) => genre.name),
@@ -110,6 +114,49 @@ const SeriesDetails = () => {
     return castAndCrewResult.cast || [];
   }
 
+  const getTrailer = async () => {
+    try {
+      const videosResponse = await fetch(
+        `https://api.themoviedb.org/3/tv/${moviedbid}/videos?api_key=${EXPO_PUBLIC_TMDB_API_KEY}`
+      );
+      const videosResult = await videosResponse.json();
+
+      if (!videosResult.results || videosResult.results.length === 0) {
+        return null;
+      }
+
+      // Filter official trailers/teasers from YouTube
+      const officialTrailers = videosResult.results.filter(
+        (video: any) =>
+          video.site === 'YouTube' &&
+          (video.type === 'Trailer') &&
+          video.official === true
+      );
+
+      if (officialTrailers.length > 0) {
+        const latestTrailer = officialTrailers[0];
+        return latestTrailer.key;
+      }
+
+      const fallbackTeasers = videosResult.results.filter(
+        (video: any) =>
+          video.site === 'YouTube' &&
+          (video.type === 'Teaser') &&
+          video.official === true
+      );
+
+      if (fallbackTeasers.length > 0) {
+        const latestFallback = fallbackTeasers[0];
+        return latestFallback.key;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error fetching trailer:', error);
+      return null;
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.centeredContainer}>
@@ -135,7 +182,7 @@ const SeriesDetails = () => {
 
   const handlePlayPress = async () => {
     if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     router.push({
       pathname: '/stream/embed',
@@ -143,16 +190,10 @@ const SeriesDetails = () => {
     });
   };
 
-  const Divider = () => {
-    const dividerColor = {
-      color: '#ffffff',
-    };
-    return (
-      <View>
-        <Text style={[styles.divider, dividerColor]}>...</Text>
-      </View>
-    )
-  };
+
+  const getFormattedName = (data: any, season: number, episode: number): string | number | (string | number)[] | null | undefined => {
+    return `${data.name} S${String(season).padStart(2, '0')}E${String(episode).padStart(2, '0')}`;
+  }
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={styles.container} ref={ref}>
@@ -183,11 +224,14 @@ const SeriesDetails = () => {
               imdbRating={data.imdbRating}
               releaseInfo={data.releaseInfo}
             />)}
-          <PlayButton onPress={handlePlayPress} />
+          <View style={styles.buttonsContainer}>
+            <PlayButton onPress={handlePlayPress} />
+            <WatchTrailerButton trailerKey={trailerKey} />
+          </View>
           <MediaContentDescription description={data.description} />
           {
             isPortrait && (
-              <MediaContentDetailsList type='series' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
+              <MediaContentDetailsList type='tv' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
             )
           }
           {
@@ -236,6 +280,12 @@ const styles = StyleSheet.create({
   },
   landscapeDetailsContainer: {
     flexWrap: 'wrap',
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    gap: 20,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   activityIndicator: {
     marginBottom: 10,

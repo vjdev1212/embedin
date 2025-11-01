@@ -1,12 +1,14 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { StyleSheet, FlatList, Pressable, useWindowDimensions, Animated } from 'react-native';
+import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import { StyleSheet, Pressable, useWindowDimensions, Animated, TouchableOpacity, Platform } from 'react-native';
 import { Text, View } from './Themed';
 import * as Haptics from 'expo-haptics';
 import { formatDate } from '@/utils/Date';
 import { isHapticsSupported } from '@/utils/platform';
-import { useColorScheme } from './useColorScheme';
 import { SvgXml } from 'react-native-svg';
 import { DefaultEpisodeThumbnailImgXml } from '@/utils/Svg';
+import { MenuView, MenuComponentRef } from '@react-native-menu/menu';
+import CustomContextMenu from './ContextMenu';
+import { Ionicons } from '@expo/vector-icons';
 
 // Type definitions
 interface Episode {
@@ -50,7 +52,7 @@ const getColumnsForDevice = (deviceType: string, isPortrait: boolean) => {
     laptop: { portrait: 2, landscape: 3 },
     desktop: { portrait: 3, landscape: 4 },
   };
-  
+
   return columnConfig[deviceType][isPortrait ? 'portrait' : 'landscape'];
 };
 
@@ -61,7 +63,7 @@ const EPISODE_DESCRIPTION_COLOR = '#efefef';
 const SELECTED_SEASON_COLOR = '#535aff';
 const DARK_SEASON_BUTTON_COLOR = '#101010';
 const LIGHT_SEASON_BUTTON_COLOR = '#f0f0f0';
-const ANIMATION_DURATION = 500;
+const ANIMATION_DURATION = 100;
 const IMAGE_LOAD_DELAY = 100;
 const THUMBNAIL_ASPECT_RATIO = 16 / 9;
 const PORTRAIT_THUMBNAIL_HEIGHT = 80;
@@ -125,7 +127,7 @@ const EpisodeItem: React.FC<EpisodeItemProps> = React.memo(({ item, onEpisodeSel
 
   const handleEpisodeSelect = useCallback(async (season: number, episode: number) => {
     if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     setSelectedEpisode(episode);
     onEpisodeSelect(season, episode);
@@ -210,16 +212,16 @@ const EpisodeItem: React.FC<EpisodeItemProps> = React.memo(({ item, onEpisodeSel
   };
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
-        styles.episodeContainer, 
-        { 
+        styles.episodeContainer,
+        {
           width: itemWidth as any,
           transform: [{ scale: scaleAnim }]
         }
       ]}
     >
-      <Pressable 
+      <Pressable
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
@@ -253,6 +255,11 @@ const EpisodeItem: React.FC<EpisodeItemProps> = React.memo(({ item, onEpisodeSel
 const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisodeSelect }) => {
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
   const { width, height } = useWindowDimensions();
+  const menuRef = useRef<MenuComponentRef>(null);
+
+  // Web-only dropdown state for CustomContextMenu
+  const [webMenuVisible, setWebMenuVisible] = useState(false);
+  const [anchorPosition, setAnchorPosition] = useState({ x: 0, y: 0 });
 
   // Memoized computed values
   const computedValues = useMemo(() => {
@@ -270,7 +277,7 @@ const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisode
       return acc;
     }, {} as Record<number, Episode[]>);
 
-    // Create season data for FlatList
+    // Create season data for dropdown
     const seasonData = [
       ...Object.keys(groupedEpisodes)
         .map(Number)
@@ -279,6 +286,22 @@ const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisode
       ...(groupedEpisodes[0] ? [0] : []),
     ];
 
+    // Create menu actions for @react-native-menu/menu
+    const menuActions = seasonData.map((season) => ({
+      id: `season-${season}`,
+      title: season === 0 ? 'Specials' : `Season ${season}`,
+      titleColor: selectedSeason === season ? SELECTED_SEASON_COLOR : '#ffffff',
+      state: selectedSeason === season ? ('on' as const) : undefined,
+    }));
+
+    // Create menu items for CustomContextMenu (web)
+    const webMenuItems = seasonData.map((season, index) => ({
+      id: `season-${season}-${index}`,
+      title: season === 0 ? 'Specials' : `Season ${season}`,
+      value: season,
+      key: `season-item-${season}-${index}`
+    }));
+
     return {
       isPortrait,
       deviceType,
@@ -286,44 +309,48 @@ const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisode
       itemWidth,
       groupedEpisodes,
       seasonData,
+      menuActions,
+      webMenuItems,
     };
-  }, [videos, height, width]);
+  }, [videos, height, width, selectedSeason]);
 
   // Memoized callbacks
   const handleSeasonSelect = useCallback(async (season: number) => {
     if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     setSelectedSeason(season);
+    setWebMenuVisible(false);
   }, []);
 
-  const getSeasonButtonStyle = useCallback((season: number) => ({
-    ...styles.seasonButton,
-    backgroundColor: season === selectedSeason ? 'rgba(83, 90, 255, 0.3)' : 'rgba(255, 255, 255, 0.08)',
-    borderWidth: 1.5,
-    borderColor: season === selectedSeason ? 'rgba(83, 90, 255, 0.5)' : 'rgba(255, 255, 255, 0.15)',
-  }), [selectedSeason]);
+  const handleMenuPress = useCallback(async ({ nativeEvent }: any) => {
+    if (isHapticsSupported()) {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    const actionId = nativeEvent.event;
+    const seasonMatch = actionId.match(/season-(\d+)/);
+    if (seasonMatch) {
+      const season = parseInt(seasonMatch[1], 10);
+      handleSeasonSelect(season);
+    }
+  }, [handleSeasonSelect]);
 
-  const getSeasonTextStyle = useCallback((season: number) => ({
-    ...styles.seasonText,
-    color: season === selectedSeason ? '#ffffff' : '#cccccc',
-    fontWeight: season === selectedSeason ? '500' : '400',
-  }), [selectedSeason]);
+  // Web dropdown handlers for CustomContextMenu
+  const handleWebSeasonDropdownPress = useCallback(async (event: any) => {
+    const { pageX, pageY } = event.nativeEvent;
+    if (isHapticsSupported()) {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    setAnchorPosition({ x: pageX, y: pageY });
+    setWebMenuVisible(true);
+  }, []);
 
-  const renderSeasonItem = useCallback(({ item }: { item: number }) => (
-    <Pressable
-      style={getSeasonButtonStyle(item)}
-      onPress={() => handleSeasonSelect(item)}
-    >
-      <Text style={getSeasonTextStyle(item) as any}>
-        {item === 0 ? 'Specials' : `Season ${item}`}
-      </Text>
-    </Pressable>
-  ), [getSeasonButtonStyle, getSeasonTextStyle, handleSeasonSelect]);
+  const handleWebContextMenuItemSelect = useCallback((item: any) => {
+    handleSeasonSelect(item.value || item.id);
+  }, [handleSeasonSelect]);
 
-  const renderEpisodeItem = useCallback((episode: Episode) => (
+  const renderEpisodeItem = useCallback((episode: Episode, index: number) => (
     <EpisodeItem
-      key={`${episode.season}-${episode.number}`}
       item={episode}
       onEpisodeSelect={onEpisodeSelect}
       isPortrait={computedValues.isPortrait}
@@ -331,15 +358,13 @@ const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisode
     />
   ), [onEpisodeSelect, computedValues.isPortrait, computedValues.itemWidth]);
 
-  const keyExtractor = useCallback((item: number) => `season-${item}`, []);
-
   // Handle initial selection when videos load
   useEffect(() => {
     if (videos.length > 0) {
       const availableSeasons = Object.keys(
         videos.reduce((acc, video) => ({ ...acc, [video.season]: true }), {})
       ).map(Number).sort((a, b) => a - b);
-      
+
       const defaultSeason = availableSeasons.find(s => s !== 0) || availableSeasons[0] || 1;
       setSelectedSeason(defaultSeason);
     }
@@ -354,27 +379,64 @@ const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisode
     );
   }
 
+  // Get current season display text
+  const getCurrentSeasonText = () => {
+    return selectedSeason === 0 ? 'Specials' : `Season ${selectedSeason}`;
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.seasonListContainer}>
-        <FlatList
-          data={computedValues.seasonData}
-          horizontal
-          keyExtractor={keyExtractor}
-          renderItem={renderSeasonItem}
-          contentContainerStyle={styles.seasonList}
-          showsHorizontalScrollIndicator={false}
-          ItemSeparatorComponent={() => <View style={styles.seasonSeparator} />}
-        />
+        {Platform.OS === 'web' ? (
+          <>
+            <TouchableOpacity
+              style={styles.seasonDropdownButton}
+              onPress={handleWebSeasonDropdownPress}
+            >
+              <Text style={styles.seasonDropdownText}>
+                {getCurrentSeasonText()}
+              </Text>
+              <Text style={styles.seasonDropdownArrow}>▼</Text>
+            </TouchableOpacity>
+
+            <CustomContextMenu
+              visible={webMenuVisible}
+              onClose={() => setWebMenuVisible(false)}
+              items={computedValues.webMenuItems}
+              selectedItem={selectedSeason}
+              onItemSelect={handleWebContextMenuItemSelect}
+              anchorPosition={anchorPosition}
+            />
+          </>
+        ) : (
+          <MenuView
+            ref={menuRef}
+            onPressAction={handleMenuPress}
+            actions={computedValues.menuActions}
+            shouldOpenOnLongPress={false}
+            themeVariant='dark'
+          >
+            <TouchableOpacity style={styles.seasonDropdownButton}>
+              <Text style={styles.seasonDropdownText}>
+                {getCurrentSeasonText()}
+              </Text>
+              <Ionicons name='caret-down-circle-outline' size={24} color='#ffffff' />
+            </TouchableOpacity>
+          </MenuView>
+        )}
       </View>
-      
+
       <View style={styles.episodeList}>
         {computedValues.groupedEpisodes[selectedSeason]?.length > 0 ? (
-          computedValues.groupedEpisodes[selectedSeason].map(renderEpisodeItem)
+          computedValues.groupedEpisodes[selectedSeason].map((episode, index) => (
+            <React.Fragment key={`episode-${episode.season}-${episode.episode || episode.number}-${index}`}>
+              {renderEpisodeItem(episode, index)}
+            </React.Fragment>
+          ))
         ) : (
           <View style={styles.noEpisodesContainer}>
             <Text style={styles.noEpisodesText}>
-              No episodes available for {selectedSeason === 0 ? 'Specials' : `Season ${selectedSeason}`}
+              No episodes available for {getCurrentSeasonText()}
             </Text>
           </View>
         )}
@@ -389,8 +451,35 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   seasonListContainer: {
-    paddingVertical: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
     backgroundColor: 'transparent',
+  },
+  seasonDropdownButton: {
+    backgroundColor: '#202020bf',
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: 160,
+    shadowColor: 'rgba(0, 0, 0, 0.3)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  seasonDropdownText: {
+    fontSize: 16,
+    color: '#ffffff',
+    fontWeight: '500',
+    letterSpacing: 0.3,
+    flex: 1,
+  },
+  seasonDropdownArrow: {
+    fontSize: 14,
+    color: '#cccccc',
   },
   seasonList: {
     paddingHorizontal: 20,
