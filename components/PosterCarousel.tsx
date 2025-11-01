@@ -71,14 +71,14 @@ export default function AppleTVCarousel({
         return {
             screenWidth: width,
             screenHeight: height,
-            carouselHeight: isLandscape ? height * 0.9 : height * 0.65,
+            carouselHeight: isLandscape ? height * 0.9 : height * 0.5,
             itemWidth: width,
             posterWidth: isLandscape ? 180 : 120,
-            posterHeight: isLandscape ? 270 : 180,
-            titleSize: isLandscape ? 28 : 32,
-            subtitleSize: isLandscape ? 14 : 16,
+            posterHeight: isLandscape ? 270 : 120,
+            titleSize: isLandscape ? 28 : 26,
+            subtitleSize: isLandscape ? 14 : 14,
             contentPadding: isLandscape ? 40 : 20,
-            bottomPadding: isLandscape ? 30 : 60,
+            bottomPadding: isLandscape ? 40 : 40,
         };
     };
 
@@ -259,7 +259,7 @@ export default function AppleTVCarousel({
                                     </Text>
                                 )}
                                 <View style={[styles.metaContainer, {
-                                    flexDirection: dimensions.isLandscape ? 'column' : 'row',
+                                    flexDirection: dimensions.isLandscape ? 'row' : 'row',
                                     alignItems: dimensions.isLandscape ? 'flex-start' : 'center',
                                     gap: dimensions.isLandscape ? 8 : 0,
                                 }]}>
@@ -335,7 +335,7 @@ export default function AppleTVCarousel({
             {data.length > 1 && (
                 <View style={[styles.paginationContainer, {
                     bottom: dimensions.isLandscape ? 15 : 20,
-                    left: dimensions.isLandscape ? 30 : 20,
+                    left: dimensions.isLandscape ? 35 : 20,
                 }]}>
                     <BlurView intensity={20} style={[styles.paginationBlur]}>
                         <View style={styles.paginationDots}>
@@ -409,7 +409,6 @@ const styles = StyleSheet.create({
     },
     subtitle: {
         color: 'rgba(255,255,255,0.8)',
-        marginBottom: 12,
         lineHeight: 22,
         textShadowColor: 'rgba(0,0,0,0.6)',
         textShadowOffset: { width: 0, height: 1 },
@@ -449,10 +448,10 @@ const styles = StyleSheet.create({
     paginationContainer: {
         position: 'absolute',
         borderRadius: 20,
-        overflow: 'hidden',
+        overflow: 'hidden'
     },
     paginationBlur: {
-        paddingHorizontal: 16,
+        paddingHorizontal: 8,
         paddingVertical: 8,
     },
     paginationDots: {

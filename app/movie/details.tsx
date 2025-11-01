@@ -13,7 +13,7 @@ import MediaCastAndCrews from '@/components/MediaCastAndCrews';
 import PosterList from '@/components/PosterList';
 import PlayButton from '@/components/PlayButton';
 import MediaContentDetailsList from '@/components/MediaContentDetailsList';
-
+import WatchTrailerButton from '@/components/WatchTrailer';
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
 const MovieDetails = () => {
@@ -22,6 +22,7 @@ const MovieDetails = () => {
   const [imdbid, setImdbId] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [cast, setCast] = useState<any[]>([]);
+  const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
   const ref = useRef<ScrollView | null>(null);
@@ -36,13 +37,15 @@ const MovieDetails = () => {
         if (result) {
           const externalIds = await getExternalIds();
           const castAndCrews = await getCastandCrew();
+          const trailer = await getTrailer();
           setCast(castAndCrews);
           setImdbId(externalIds.imdb_id);
+          setTrailerKey(trailer);
           const logo = `https://images.metahub.space/logo/medium/${externalIds.imdb_id}/img`;
           const movie = result;
           const movieData = {
             name: movie.title,
-            background: `https://image.tmdb.org/t/p/original${movie.backdrop_path}`,
+            background: `https://image.tmdb.org/t/p/${isPortrait ? 'w1280' : 'original'}${movie.backdrop_path}`,
             poster: `https://image.tmdb.org/t/p/w780${movie.poster_path}`,
             logo: logo,
             genre: movie.genres.map((genre: any) => genre.name),
@@ -83,6 +86,45 @@ const MovieDetails = () => {
     return castAndCrewResult.cast || [];
   };
 
+  const getTrailer = async () => {
+    try {
+      const videosResponse = await fetch(
+        `https://api.themoviedb.org/3/movie/${moviedbid}/videos?api_key=${EXPO_PUBLIC_TMDB_API_KEY}`
+      );
+      const videosResult = await videosResponse.json();
+
+      if (!videosResult.results || videosResult.results.length === 0) {
+        return null;
+      }
+
+      // Filter official trailers/teasers from YouTube
+      const officialTrailers = videosResult.results.filter(
+        (video: any) =>
+          video.site === 'YouTube' && (video.type === 'Trailer') && video.official === true
+      );
+
+      if (officialTrailers.length > 0) {
+        const latestTrailer = officialTrailers[0];
+        return latestTrailer.key;
+      }
+
+      const fallbackTeasers = videosResult.results.filter(
+        (video: any) => video.site === 'YouTube' && (video.type === 'Teaser') && video.official === true
+      );
+
+      if (fallbackTeasers.length > 0) {
+        const latestFallback = fallbackTeasers[0];
+        return latestFallback.key;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error fetching trailer:', error);
+      return null;
+    }
+  };
+
+
   if (loading) {
     return (
       <View style={styles.centeredContainer}>
@@ -102,23 +144,12 @@ const MovieDetails = () => {
 
   const handlePlayPress = async () => {
     if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     router.push({
       pathname: '/stream/embed',
       params: { imdbid: imdbid, tmdbid: moviedbid, type: 'movie', name: data.name, season: 0, episode: 0 },
     });
-  };
-
-  const Divider = () => {
-    const dividerColor = {
-      color: '#ffffff',
-    };
-    return (
-      <View>
-        <Text style={[styles.divider, dividerColor]}>...</Text>
-      </View>
-    )
   };
 
   return (
@@ -152,7 +183,10 @@ const MovieDetails = () => {
               imdbRating={data.imdbRating}
               releaseInfo={data.releaseInfo}
             />)}
-          <PlayButton onPress={handlePlayPress} />
+          <View style={styles.buttonsContainer}>
+            <PlayButton onPress={handlePlayPress} />
+            <WatchTrailerButton trailerKey={trailerKey} />
+          </View>
           <MediaContentDescription description={data.description} />
           {
             isPortrait && (
@@ -193,6 +227,12 @@ const styles = StyleSheet.create({
   },
   landscapeDetailsContainer: {
     flexWrap: 'wrap',
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    gap: 20,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   activityIndicator: {
     marginBottom: 10,
