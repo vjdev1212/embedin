@@ -6,10 +6,14 @@ import { useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics'
 import { isHapticsSupported } from '@/utils/platform';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomSpacing from '@/components/BottomSpacing';
+import Constants from 'expo-constants';
 
 const SettingsScreen = () => {
   const showContact = process.env.EXPO_PUBLIC_SHOW_CONTACT === 'true';
   const router = useRouter();
+  const appVersion = Constants.expoConfig?.version;
+
   const contactList: { title: string, route: string, icon: keyof typeof Ionicons.glyphMap }[] = [
     { title: 'Contact', route: '/settings/contact', icon: 'mail-outline' },
     { title: 'Support', route: '/settings/donate', icon: 'cash-outline' },
@@ -162,6 +166,10 @@ const SettingsScreen = () => {
             </View>
           </View>
         )}
+        <View style={styles.versionContainer}>
+          <Text style={styles.versionText}>Version: {appVersion}</Text>
+        </View>
+        <BottomSpacing space={50} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -232,6 +240,15 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     backgroundColor: 'rgba(42, 42, 42, 0.5)',
   },
+   versionContainer: {
+    paddingVertical: 5,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  versionText: {
+    color: '#777',
+  }
 });
 
 export default SettingsScreen;
