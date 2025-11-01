@@ -24,7 +24,7 @@ const EmbedPlayer = () => {
   useEffect(() => {
     const enableOrientation = async () => {
       if (Platform.OS !== 'web') {
-        await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
+        // await ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.ALL);
       }
     };
 
@@ -56,7 +56,7 @@ const EmbedPlayer = () => {
 
     return () => {
       if (Platform.OS !== 'web') {
-        ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+        // ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
       }
     };
   }, [type]);
@@ -241,6 +241,7 @@ const EmbedPlayer = () => {
               marginTop: 30,
               marginBottom: 10
             }}
+            userAgent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15"
             javaScriptEnabled
             domStorageEnabled
             startInLoadingState

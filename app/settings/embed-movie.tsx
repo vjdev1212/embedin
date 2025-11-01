@@ -212,14 +212,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 32,
         borderRadius: 12,
         alignItems: 'center',
-        marginTop: 20,
-        shadowColor: '#535aff',
-        shadowOffset: {
-            width: 0,
-            height: 4,
-        },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
+        marginTop: 20,        
         elevation: 8,
         width: 200,
         alignSelf: 'center'        
