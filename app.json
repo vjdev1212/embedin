@@ -16,18 +16,25 @@
     "splash": {
       "image": "assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0a0a0a"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "icon": "assets/images/icon.png",
       "supportsTablet": true,
-      "backgroundColor": "#0a0a0a",
-      "bundleIdentifier": "com.vijayyuvi.embedin"
+      "backgroundColor": "#000000",
+      "bundleIdentifier": "com.vijayyuvi.embedin",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true,
+          "NSAllowsLocalNetworking": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "assets/images/adaptive-icon.png",
-        "backgroundColor": "#0a0a0a"
+        "backgroundColor": "#000000"
       },
       "package": "com.vijayyuvi.embedin",
       "icon": "assets/images/icon.png"
@@ -47,6 +54,7 @@
         {
           "android": {
             "usesCleartextTraffic": true,
+            "networkSecurityConfig": "@xml/network_security_config",
             "minSdkVersion": 26,
             "compileSdkVersion": 35,
             "targetSdkVersion": 35,
