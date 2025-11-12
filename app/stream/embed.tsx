@@ -17,9 +17,6 @@ const EmbedPlayer = () => {
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
   const [seriesUrlTemplate, setSeriesUrlTemplate] = useState<string>(defaultTvShowUrlTemplate);
-  const [sandboxAllowedForMovie, setSandboxAllowedForMovie] = useState<boolean>(defaultSandboxAllowedForMovie);
-  const [sandboxAllowedForTv, setSandboxAllowedForTv] = useState<boolean>(defaultSandboxAllowedForTv);
-  const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(true);
 
   useEffect(() => {
     const enableOrientation = async () => {
@@ -38,14 +35,6 @@ const EmbedPlayer = () => {
           console.log('Parsed embed settings:', parsedSettings);
           setMovieUrlTemplate(parsedSettings.movie?.template ?? defaultMovieUrlTemplate);
           setSeriesUrlTemplate(parsedSettings.tv?.template ?? defaultTvShowUrlTemplate);
-          setSandboxAllowedForMovie(parsedSettings.movie?.sandboxAllowed ?? defaultSandboxAllowedForMovie);
-          setSandboxAllowedForTv(parsedSettings.tv?.sandboxAllowed ?? defaultSandboxAllowedForTv);
-
-          if (type === 'movie') {
-            setSandboxAllowed(parsedSettings.movie?.sandboxAllowed ?? defaultSandboxAllowedForMovie);
-          } else if (type === 'series') {
-            setSandboxAllowed(parsedSettings.tv?.sandboxAllowed ?? defaultSandboxAllowedForTv);
-          }
         }
       } catch (error) {
         console.error('Failed to load embed settings:', error);
@@ -141,7 +130,6 @@ const EmbedPlayer = () => {
           frameborder="0"
           style="width: 100%; height: 100%; border: 0; background-color: #000000"
           referrerpolicy="no-referrer-when-downgrade"
-          ${sandboxAllowed ? 'sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"' : ''}
           allow="autoplay; fullscreen; encrypted-media; picture-in-picture; web-share"
           allowfullscreen
           x-webkit-airplay="allow"
@@ -204,37 +192,21 @@ const EmbedPlayer = () => {
       {videoUrl ? (
         Platform.OS === 'web' ? (
           <>
-            {
-              sandboxAllowed ? (
-                <iframe
-                  src={videoUrl as string}
-                  style={{ flex: 1, width: "100%", height: "100%", border: 0, backgroundColor: '#000000' }}
-                  referrerPolicy="no-referrer-when-downgrade"
-                  sandbox="allow-same-origin allow-scripts allow-forms allow-presentation"
-                  allow="encrypted-media; autoplay; fullscreen; picture-in-picture; web-share"
-                  frameBorder="0"
-                  allowFullScreen
-                  x-webkit-airplay="allow"
-                  webkit-playsinline="false"
-                />
-              ) : (
-                <iframe
-                  src={videoUrl as string}
-                  style={{ flex: 1, width: "100%", height: "100%", border: 0, backgroundColor: '#000000' }}
-                  referrerPolicy="no-referrer-when-downgrade"
-                  allow="encrypted-media; autoplay; fullscreen; picture-in-picture; web-share"
-                  frameBorder="0"
-                  allowFullScreen
-                  x-webkit-airplay="allow"
-                  webkit-playsinline="false"
-                />
-              )
-            }
+            <iframe
+              src={videoUrl as string}
+              style={{ flex: 1, width: "100%", height: "100%", border: 0, backgroundColor: '#000000' }}
+              referrerPolicy="no-referrer-when-downgrade"
+              allow="encrypted-media; autoplay; fullscreen; picture-in-picture; web-share"
+              frameBorder="0"
+              allowFullScreen
+              x-webkit-airplay="allow"
+              webkit-playsinline="false"
+            />
           </>
         ) : (
           <WebView
             originWhitelist={['*']}
-            source={{ html: iframeHtml }}
+            source={{ uri: videoUrl }}
             style={{
               flex: 1,
               backgroundColor: '#000000',
@@ -253,9 +225,9 @@ const EmbedPlayer = () => {
             allowsPictureInPictureMediaPlayback={true}
             allowsInlineMediaPlayback={false}
             bounces={false}
-            mixedContentMode="always" 
-            thirdPartyCookiesEnabled={true} 
-            sharedCookiesEnabled={true} 
+            mixedContentMode="always"
+            thirdPartyCookiesEnabled={true}
+            sharedCookiesEnabled={true}
             onError={(syntheticEvent) => {
               const { nativeEvent } = syntheticEvent;
               console.warn('WebView error: ', nativeEvent);
