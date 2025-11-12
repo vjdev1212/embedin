@@ -151,7 +151,7 @@ const EmbedMovieSettingsScreen = () => {
                                     : 'Configure Private DNS settings'}
                             </Text>
                         </Pressable>
-                    )}                    
+                    )}
                 </View>
 
                 {/* Save Button */}
@@ -252,24 +252,6 @@ const styles = StyleSheet.create({
     adguardButtonSubtext: {
         color: '#888',
         fontSize: 13,
-    },
-    infoBox: {
-        backgroundColor: '#1a1a1a',
-        borderRadius: 12,
-        padding: 16,
-        borderWidth: 1,
-        borderColor: '#2a2a2a',
-    },
-    infoTitle: {
-        fontSize: 15,
-        fontWeight: '500',
-        color: '#fff',
-        marginBottom: 8,
-    },
-    infoText: {
-        fontSize: 13,
-        color: '#888',
-        lineHeight: 20,
     },
     saveButton: {
         backgroundColor: '#535aff',
