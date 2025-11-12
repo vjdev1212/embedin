@@ -206,6 +206,7 @@ const EmbedPlayer = () => {
         ) : (
           <WebView
             originWhitelist={['*']}
+            forceDarkOn={true}
             source={{ uri: videoUrl }}
             style={{
               flex: 1,
@@ -213,7 +214,7 @@ const EmbedPlayer = () => {
               marginTop: 30,
               marginBottom: 10
             }}
-            userAgent={navigator.userAgent}
+            userAgent={`${navigator.userAgent} prefers-color-scheme: dark`}
             javaScriptEnabled
             domStorageEnabled
             startInLoadingState
