@@ -1,15 +1,14 @@
-import { ScrollView, StyleSheet, TextInput, Switch, Pressable } from 'react-native';
+import { ScrollView, StyleSheet, TextInput, Pressable, Platform, Linking } from 'react-native';
 import { StatusBar, Text, View } from '../../components/Themed';
-import { isHapticsSupported, showAlert } from '@/utils/platform';
+import { confirmAction, isHapticsSupported, showAlert } from '@/utils/platform';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Haptics from 'expo-haptics';
-import { useCallback, useEffect, useState } from 'react';
-import { defaultTvShowUrlTemplate, defaultSandboxAllowedForTv } from '@/constants/Embed';
+import { useEffect, useState } from 'react';
+import { defaultTvShowUrlTemplate } from '@/constants/Embed';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const EmbedTvShowsSettingsScreen = () => {
     const [tvShowsUrlTemplate, setTvShowsUrlTemplate] = useState<string>(defaultTvShowUrlTemplate);
-    const [sandboxAllowed, setSandboxAllowed] = useState<boolean>(defaultSandboxAllowedForTv);
 
     useEffect(() => {
         const loadEmbedSettings = async () => {
@@ -18,7 +17,6 @@ const EmbedTvShowsSettingsScreen = () => {
                 if (storedEmbedSettings) {
                     const parsedSettings = JSON.parse(storedEmbedSettings);
                     setTvShowsUrlTemplate(parsedSettings.tv?.template ?? defaultTvShowUrlTemplate);
-                    setSandboxAllowed(parsedSettings.tv?.sandboxAllowed ?? defaultSandboxAllowedForTv);
                 }
             } catch (error) {
                 console.error('Failed to load preferences:', error);
@@ -38,7 +36,6 @@ const EmbedTvShowsSettingsScreen = () => {
 
             embedSettings.tv = {
                 template: tvShowsUrlTemplate,
-                sandboxAllowed: sandboxAllowed,
             };
 
             await AsyncStorage.setItem('embedSettings', JSON.stringify(embedSettings));
@@ -49,7 +46,46 @@ const EmbedTvShowsSettingsScreen = () => {
         }
     };
 
-    const toggleSandBoxAllowed = useCallback(() => setSandboxAllowed(prev => !prev), []);
+    const installAdGuard = async () => {
+        try {
+            if (isHapticsSupported()) {
+                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            }
+
+            if (Platform.OS === 'ios') {
+                const adguardProfileUrl = 'https://adguard-dns.io/public_api/v1/settings/ad1aed6b-c448-4c08-97b5-76ac3ab3cffb/doh_mobileconfig.xml';
+
+                const canOpen = await Linking.canOpenURL(adguardProfileUrl);
+                if (canOpen) {
+                    await Linking.openURL(adguardProfileUrl);
+                    showAlert(
+                        'Install AdGuard Profile',
+                        'You will be redirected to Settings. Please follow the instructions to install the AdGuard DNS profile.'
+                    );
+                } else {
+                    showAlert('Error', 'Unable to open profile installation URL.');
+                }
+            } else if (Platform.OS === 'android') {
+                const isConfirmed = confirmAction('AdGuard DNS Setup', 'To block ads system-wide on Android:\n\n1. Go to Settings > Network & Internet > Private DNS\n2. Select "Private DNS provider hostname"\n3. Enter: dns.adguard-dns.com\n4. Tap Save\n\nWould you like to open DNS settings now?', 'Open Settings');
+                if (!isConfirmed) {
+                    return;
+                }
+                try {
+                    await Linking.openSettings();
+                } catch (error) {
+                    console.error('Failed to open settings:', error);
+                }
+            } else {
+                showAlert(
+                    'AdGuard Not Available',
+                    'AdGuard DNS profile installation is only available on mobile devices. Please use a browser extension for ad blocking on web.'
+                );
+            }
+        } catch (error) {
+            console.error('Failed to install AdGuard:', error);
+            showAlert('Error', 'Failed to initiate AdGuard installation.');
+        }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -85,28 +121,37 @@ const EmbedTvShowsSettingsScreen = () => {
                     </View>
                 </View>
 
-                {/* Sandbox Settings Section */}
+                {/* AdGuard Section */}
                 <View style={styles.section}>
                     <View style={styles.sectionHeader}>
-                        <Text style={styles.sectionTitle}>Security Settings</Text>
-                        <Text style={styles.sectionSubtitle}>Disabling this may show ads and popups</Text>
+                        <Text style={styles.sectionTitle}>Ad Blocking</Text>
+                        <Text style={styles.sectionSubtitle}>
+                            {Platform.OS === 'ios'
+                                ? 'Install AdGuard DNS profile to block ads and popups system-wide'
+                                : Platform.OS === 'android'
+                                    ? 'Configure Private DNS to block ads and popups system-wide'
+                                    : 'AdGuard is not available on web platform'}
+                        </Text>
                     </View>
-                    
-                    <View style={styles.settingRow}>
-                        <View style={styles.settingInfo}>
-                            <Text style={styles.settingLabel}>Allow Sandbox</Text>
-                            <Text style={styles.settingDescription}>
-                                Enables secure iframe sandboxing
+
+                    {Platform.OS !== 'web' && (
+                        <Pressable
+                            style={({ pressed }) => [
+                                styles.adguardButton,
+                                pressed && styles.adguardButtonPressed
+                            ]}
+                            onPress={installAdGuard}
+                        >
+                            <Text style={styles.adguardButtonText}>
+                                {Platform.OS === 'ios' ? '📱 Install AdGuard Profile' : '⚙️ Setup AdGuard DNS'}
                             </Text>
-                        </View>
-                        <Switch
-                            value={sandboxAllowed}
-                            onValueChange={toggleSandBoxAllowed}
-                            thumbColor={sandboxAllowed ? '#535aff' : '#f4f3f4'}
-                            trackColor={{ false: '#767577', true: '#a5afff' }}
-                            ios_backgroundColor="#767577"
-                        />
-                    </View>
+                            <Text style={styles.adguardButtonSubtext}>
+                                {Platform.OS === 'ios'
+                                    ? 'Blocks ads and Popups'
+                                    : 'Configure Private DNS settings'}
+                            </Text>
+                        </Pressable>
+                    )}                    
                 </View>
 
                 {/* Save Button */}
@@ -186,26 +231,27 @@ const styles = StyleSheet.create({
         fontFamily: 'monospace',
         marginTop: 2,
     },
-    settingRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        paddingVertical: 4,
+    adguardButton: {
+        backgroundColor: '#1a1a1a',
+        paddingVertical: 16,
+        paddingHorizontal: 20,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#2a2a2a',
     },
-    settingInfo: {
-        flex: 1,
-        marginRight: 16,
+    adguardButtonPressed: {
+        backgroundColor: '#252525',
+        transform: [{ scale: 0.98 }],
     },
-    settingLabel: {
+    adguardButtonText: {
+        color: '#fff',
         fontSize: 16,
         fontWeight: '500',
-        color: '#fff',
-        marginBottom: 2,
+        marginBottom: 4,
     },
-    settingDescription: {
-        fontSize: 13,
+    adguardButtonSubtext: {
         color: '#888',
-        lineHeight: 18,
+        fontSize: 13,
     },
     saveButton: {
         backgroundColor: '#535aff',
@@ -213,7 +259,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 32,
         borderRadius: 12,
         alignItems: 'center',
-        marginTop: 20,        
+        marginTop: 10,        
         elevation: 8,
         width: 200,
         alignSelf: 'center',
