@@ -49,7 +49,7 @@ const EmbedTvShowsSettingsScreen = () => {
     const installAdGuard = async () => {
         try {
             if (isHapticsSupported()) {
-                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
             }
 
             if (Platform.OS === 'ios') {
