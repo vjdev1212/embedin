@@ -53,7 +53,7 @@ const EmbedMovieSettingsScreen = () => {
             }
 
             if (Platform.OS === 'ios') {
-                const adguardProfileUrl = 'https://github.com/vjdev1212/embedin-public/raw/refs/heads/main/adguard-dns.mobileconfig';
+                const adguardProfileUrl = 'https://github.com/vjdev1212/embedin/raw/refs/heads/main/adguard-dns.mobileconfig';
 
                 const canOpen = await Linking.canOpenURL(adguardProfileUrl);
                 if (canOpen) {

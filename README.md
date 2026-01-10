@@ -4,8 +4,8 @@ A simple and sleek frontend for VidSrc and similar services that provide embedde
 
 ## Store Listing
 [![Get it on Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.vijayyuvi.embedin)
-[![Install via AltStore](https://img.shields.io/badge/AltStore-4CAF50?style=for-the-badge&logo=apple&logoColor=white)](https://raw.githubusercontent.com/vjdev1212/embedin-public/refs/heads/main/sources/sidestore-source.json)
-[![Install via SideStore](https://img.shields.io/badge/SideStore-A020F0?style=for-the-badge&logo=apple&logoColor=white)](https://raw.githubusercontent.com/vjdev1212/embedin-public/refs/heads/main/sources/sidestore-source.json)
+[![Install via AltStore](https://img.shields.io/badge/AltStore-4CAF50?style=for-the-badge&logo=apple&logoColor=white)](https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/sources/sidestore-source.json)
+[![Install via SideStore](https://img.shields.io/badge/SideStore-A020F0?style=for-the-badge&logo=apple&logoColor=white)](https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/sources/sidestore-source.json)
 
 ## Framework
 

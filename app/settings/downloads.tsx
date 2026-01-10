@@ -28,21 +28,21 @@ const AppResourcesScreen = () => {
       title: 'Manual IPA Install',
       subtitle: 'Direct download for sideloading',
       icon: '🍎',
-      url: 'https://github.com/vjdev1212/embedin-public/releases',
+      url: 'https://github.com/vjdev1212/embedin/releases',
     },
     {
       id: 3,
       title: 'SideStore Source',
       subtitle: 'One-click install via SideStore',
       icon: '📦',
-      url: 'sidestore://source?url=https://raw.githubusercontent.com/vjdev1212/embedin-public/refs/heads/main/sources/sidestore-source.json',
+      url: 'sidestore://source?url=https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/sources/sidestore-source.json',
     },
     {
       id: 4,
       title: 'AltStore Source',
       subtitle: 'One-click install via AltStore',
       icon: '🔄',
-      url: 'altstore://source?url=https://raw.githubusercontent.com/vjdev1212/embedin-public/refs/heads/main/sources/sidestore-source.json',
+      url: 'altstore://source?url=https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/sources/sidestore-source.json',
     },
   ];
 
