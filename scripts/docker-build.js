@@ -16,7 +16,7 @@ const buildArgs = vars
   .join(" ");
 
 const cmd = `docker buildx build ${buildArgs} \
---tag jarvisnexus/embedin:latest \
+--tag vjdev1212/embedin:latest \
 --platform linux/arm64,linux/amd64,linux/arm/v7 \
 --push .`;
 

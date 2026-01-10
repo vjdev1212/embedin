@@ -5,7 +5,7 @@ services:
   embedin:
     container_name: embedin
     hostname: embedin
-    image: jarvisnexus/embedin:latest
+    image: vjdev1212/embedin:latest
     ports:
       - "4444:80"
     restart: unless-stopped

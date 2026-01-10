@@ -2,6 +2,11 @@
 
 A simple and sleek frontend for VidSrc and similar services that provide embedded movies and TV shows. Easily search, browse, and watch content with a user-friendly interface.
 
+## Store Listing
+[![Get it on Google Play](https://img.shields.io/badge/Google_Play-414141?style=for-the-badge&logo=google-play&logoColor=white)](https://play.google.com/store/apps/details?id=com.vijayyuvi.embedin)
+[![Install via AltStore](https://img.shields.io/badge/AltStore-4CAF50?style=for-the-badge&logo=apple&logoColor=white)](https://raw.githubusercontent.com/vjdev1212/embedin-public/refs/heads/main/sources/sidestore-source.json)
+[![Install via SideStore](https://img.shields.io/badge/SideStore-A020F0?style=for-the-badge&logo=apple&logoColor=white)](https://raw.githubusercontent.com/vjdev1212/embedin-public/refs/heads/main/sources/sidestore-source.json)
+
 ## Framework
 
 This app is built using the Expo React Native framework. 
@@ -16,8 +21,8 @@ This app is built using the Expo React Native framework.
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/jarvisnexus/embedin.git
-   cd vidsrcstream
+   git clone https://github.com/vjdev1212/embedin.git
+   cd embedin
    ```
 2. Create a `.env` file in the project root and set the TMDB API Key
    ```cmd
@@ -70,7 +75,7 @@ services:
   embedin:
     container_name: embedin
     hostname: embedin
-    image: jarvisnexus/embedin:latest
+    image: vjdev1212/embedin:latest
     ports:
       - "4444:80"
     restart: unless-stopped
