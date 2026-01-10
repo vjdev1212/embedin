@@ -1,0 +1,67 @@
+{
+  "name": "EmbedIn",
+  "identifier": "com.vijayyuvi.embedin",
+  "subtitle": "EmbedIn",
+  "description": "EmbedIn is your ultimate streaming companion, offering a simple and elegant way to explore and watch movies and TV shows from VidSrc and similar services. With a sleek interface and intuitive navigation, you can easily search for your favorite content, browse trending titles, and enjoy seamless playback—all in one place.",
+  "iconURL": "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/assets/images/icon.png",
+  "headerURL": "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/assets/banners/EmbedIn-feature-graphic.png",
+  "website": "https://github.com/vjdev1212/embedin",
+  "tintColor": "#535aff",
+  "featuredApps": [
+    "com.vijayyuvi.embedin"
+  ],
+  "apps": [
+    {
+      "name": "EmbedIn",
+      "bundleIdentifier": "com.vijayyuvi.embedin",
+      "developerName": "vjdev1212",
+      "subtitle": "EmbedIn - Your streaming companion for discovering and watching content from multiple sources.",
+      "localizedDescription": "EmbedIn is your ultimate streaming companion, offering a simple and elegant way to explore and watch movies and TV shows from VidSrc and similar services. With a sleek interface and intuitive navigation, you can easily search for your favorite content, browse trending titles, and enjoy seamless playback—all in one place.",
+      "iconURL": "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/assets/images/icon.png",
+      "downloadURL": "https://github.com/vjdev1212/embedin/releases/download/v1.0.14/EmbedIn_v1.0.14.ipa",
+      "tintColor": "#535aff",
+      "category": "entertainment",
+      "screenshots": [
+        "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/EmbedIn-screenshots/iPhone/5-Carousel.png",
+        "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/EmbedIn-screenshots/iPhone/1-Home%20Screen.png",
+        "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/EmbedIn-screenshots/iPhone/2-Movie-Details.png",
+        "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/EmbedIn-screenshots/iPhone/3-TV-Details.png",
+        "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/EmbedIn-screenshots/iPhone/4-Search.png"
+      ],
+      "versions": [
+        {
+          "version": "1.0.14",
+          "date": "2025-11-12",
+          "localizedDescription": "• Removed Sandbox settings as it was not working with many providers. Use Adblockers instead.",
+          "downloadURL": "https://github.com/vjdev1212/embedin/releases/download/v1.0.14/EmbedIn_v1.0.14.ipa",
+          "size": 8680000,
+          "minOSVersion": "18.0"
+        },
+        {
+          "version": "1.0.13",
+          "date": "2025-11-01",
+          "localizedDescription": "• Fixed Android Issues. \n• UI Improvements.",
+          "downloadURL": "https://github.com/vjdev1212/embedin/releases/download/v1.0.13/EmbedIn_v1.0.13.ipa",
+          "size": 8680000,
+          "minOSVersion": "18.0"
+        }
+      ],
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": []
+      }
+    }
+  ],
+  "news": [
+    {
+      "title": "EmbedIn v1.0.14 Released",
+      "identifier": "embedin-v1.0.14-release",
+      "caption": "1. Removed Sandbox settings as it was not working with many providers. Use Adblockers instead.",
+      "date": "2025-11-12",
+      "tintColor": "#535aff",
+      "imageURL": "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/assets/banners/EmbedIn-feature-graphic.png",
+      "notify": true,
+      "url": "https://github.com/vjdev1212/embedin/releases/tag/v1.0.14"
+    }
+  ]
+}
