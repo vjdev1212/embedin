@@ -90,8 +90,8 @@ const EmbedTvShowsSettingsScreen = () => {
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar />
-            <ScrollView 
-                showsVerticalScrollIndicator={false} 
+            <ScrollView
+                showsVerticalScrollIndicator={false}
                 contentContainerStyle={styles.scrollContent}
                 style={styles.scrollView}
             >
@@ -100,7 +100,7 @@ const EmbedTvShowsSettingsScreen = () => {
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>TV Shows Embed URL</Text>
                     </View>
-                    
+
                     <View style={styles.inputWrapper}>
                         <TextInput
                             style={styles.textInput}
@@ -112,7 +112,7 @@ const EmbedTvShowsSettingsScreen = () => {
                             placeholderTextColor="#666"
                         />
                     </View>
-                    
+
                     <View style={styles.hintContainer}>
                         <Text style={styles.hintLabel}>TMDB:</Text>
                         <Text style={styles.hintText}>https://player.videasy.net/tv/{'{TMDBID}'}/{'{SEASON}'}/{'{EPISODE}'}</Text>
@@ -126,36 +126,20 @@ const EmbedTvShowsSettingsScreen = () => {
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>Ad Blocking</Text>
                         <Text style={styles.sectionSubtitle}>
-                            {Platform.OS === 'ios'
-                                ? 'Install AdGuard DNS profile to block ads and popups system-wide'
-                                : Platform.OS === 'android'
-                                    ? 'Configure Private DNS to block ads and popups system-wide'
-                                    : 'AdGuard is not available on web platform'}
+                            We recommend AdGuard DNS for blocking ads and popups system-wide.{' '}
+                            <Text
+                                style={styles.linkText}
+                                onPress={() => Linking.openURL('https://adguard-dns.io/en/public-dns.html')}
+                            >
+                                Follow the guide here
+                            </Text>
+                            {' '}to set it up on your device.
                         </Text>
                     </View>
-
-                    {Platform.OS !== 'web' && (
-                        <Pressable
-                            style={({ pressed }) => [
-                                styles.adguardButton,
-                                pressed && styles.adguardButtonPressed
-                            ]}
-                            onPress={installAdGuard}
-                        >
-                            <Text style={styles.adguardButtonText}>
-                                {Platform.OS === 'ios' ? '📱 Install AdGuard Profile' : '⚙️ Setup AdGuard DNS'}
-                            </Text>
-                            <Text style={styles.adguardButtonSubtext}>
-                                {Platform.OS === 'ios'
-                                    ? 'Blocks ads and Popups'
-                                    : 'Configure Private DNS settings'}
-                            </Text>
-                        </Pressable>
-                    )}                    
                 </View>
 
                 {/* Save Button */}
-                <Pressable 
+                <Pressable
                     style={({ pressed }) => [
                         styles.saveButton,
                         pressed && styles.saveButtonPressed
@@ -253,13 +237,17 @@ const styles = StyleSheet.create({
         color: '#888',
         fontSize: 13,
     },
+    linkText: {
+        color: '#535aff',
+        textDecorationLine: 'underline',
+    },
     saveButton: {
         backgroundColor: '#535aff',
         paddingVertical: 16,
         paddingHorizontal: 32,
         borderRadius: 12,
         alignItems: 'center',
-        marginTop: 10,        
+        marginTop: 10,
         elevation: 8,
         width: 200,
         alignSelf: 'center',

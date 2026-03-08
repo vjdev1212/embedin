@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from 'expo-router';
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -15,12 +15,52 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { CatalogUrl, MovieGneres, TvGneres } from '@/constants/Tmdb';
+import BlurGradientBackground from '@/components/BlurGradientBackground';
+
+// Lazy loading wrapper component
+const LazyPosterList = ({
+  apiUrl,
+  title,
+  type,
+  index
+}: {
+  apiUrl: string;
+  title: string;
+  type: 'movie' | 'series';
+  index: number;
+}) => {
+  const [shouldLoad, setShouldLoad] = useState(index < 2); // Load first 2 immediately
+
+  return (
+    <View
+      onLayout={() => {
+        if (!shouldLoad) {
+          setShouldLoad(true);
+        }
+      }}
+    >
+      {shouldLoad ? (
+        <PosterList apiUrl={apiUrl} title={title} type={type} />
+      ) : (
+        <View style={{ height: 280, marginBottom: 20 }} />
+      )}
+    </View>
+  );
+};
 
 export default function HomeScreen() {
   const [filter, setFilter] = useState<'all' | 'movies' | 'series'>('all');
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  // Refresh watch history when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      setRefreshKey(prev => prev + 1);
+    }, [])
+  );
 
   const filters = [
-    { key: 'all', label: 'All', icon: 'apps' },
+    { key: 'all', label: 'All', icon: 'albums-outline' },
     { key: 'movies', label: 'Movies', icon: 'film-outline' },
     { key: 'series', label: 'Series', icon: 'tv-outline' }
   ];
@@ -78,8 +118,8 @@ export default function HomeScreen() {
   }, [filter, allLists, movieLists, seriesLists]);
 
   const handleFilterChange = async (newFilter: 'all' | 'movies' | 'series') => {
-    if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (await isHapticsSupported()) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     setFilter(newFilter);
   };
@@ -95,6 +135,7 @@ export default function HomeScreen() {
   return (
     <View style={[styles.container]}>
       <StatusBar />
+      <BlurGradientBackground />
       {/* Scrollable content */}
       <ScrollView showsVerticalScrollIndicator={false} key={filter}>
 
@@ -106,9 +147,8 @@ export default function HomeScreen() {
           autoPlayInterval={6000}
         />
 
-
         <View style={styles.contentContainer}>
-          {/* Filter buttons - moved to overlay on carousel */}
+          {/* Filter buttons */}
           <View style={[styles.filtersContainer]}>
             <FlatList
               data={filters}
@@ -123,12 +163,13 @@ export default function HomeScreen() {
                     filter === item.key && styles.filterButtonActive
                   ]}
                   onPress={() => handleFilterChange(item.key as 'all' | 'movies' | 'series')}
+                  activeOpacity={0.7}
                 >
                   <Ionicons
                     name={item.icon as any}
                     size={18}
-                    color={filter === item.key ? '#fff' : '#bbb'}
-                    style={{ marginRight: 6 }}
+                    color={filter === item.key ? '#000000' : '#8E8E93'}
+                    style={styles.filterIcon}
                   />
                   <Text
                     style={[
@@ -144,11 +185,12 @@ export default function HomeScreen() {
           </View>
 
           {activeLists.map((list, i) => (
-            <PosterList
+            <LazyPosterList
               key={`${filter}-${i}`}
               apiUrl={list.apiUrl}
               title={list.title}
               type={list.type as 'movie' | 'series'}
+              index={i}
             />
           ))}
         </View>
@@ -163,35 +205,41 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filtersContainer: {
-    paddingVertical: 8,
+    paddingVertical: 12,
     paddingHorizontal: 5,
   },
   filterRow: {
     paddingHorizontal: 10,
-    gap: 10,
+    gap: 15,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 25,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 20,
     backgroundColor: '#1a1a1a',
-    marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
   },
   filterButtonActive: {
-    backgroundColor: '#535aff',
+    backgroundColor: '#ffffff',
+    borderColor: '#ffffff',
+  },
+  filterIcon: {
+    marginRight: 6,
   },
   filterButtonText: {
     fontSize: 15,
-    color: 'rgba(255, 255, 255, 0.9)',
-    fontWeight: '500',
+    color: '#8E8E93',
+    fontWeight: '600',
+    letterSpacing: -0.2,
   },
   filterButtonTextActive: {
-    color: '#ffffff',
-    fontWeight: '600',
+    color: '#000000',
+    fontWeight: '700',
   },
   contentContainer: {
-    marginTop: 20,
+    marginTop: 16,
   },
 });

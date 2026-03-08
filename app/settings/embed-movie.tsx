@@ -126,34 +126,17 @@ const EmbedMovieSettingsScreen = () => {
                     <View style={styles.sectionHeader}>
                         <Text style={styles.sectionTitle}>Ad Blocking</Text>
                         <Text style={styles.sectionSubtitle}>
-                            {Platform.OS === 'ios'
-                                ? 'Install AdGuard DNS profile to block ads and popups system-wide'
-                                : Platform.OS === 'android'
-                                    ? 'Configure Private DNS to block ads and popups system-wide'
-                                    : 'AdGuard is not available on web platform'}
+                            We recommend AdGuard DNS for blocking ads and popups system-wide.{' '}
+                            <Text
+                                style={styles.linkText}
+                                onPress={() => Linking.openURL('https://adguard-dns.io/en/public-dns.html')}
+                            >
+                                Follow the guide here
+                            </Text>
+                            {' '}to set it up on your device.
                         </Text>
                     </View>
-
-                    {Platform.OS !== 'web' && (
-                        <Pressable
-                            style={({ pressed }) => [
-                                styles.adguardButton,
-                                pressed && styles.adguardButtonPressed
-                            ]}
-                            onPress={installAdGuard}
-                        >
-                            <Text style={styles.adguardButtonText}>
-                                {Platform.OS === 'ios' ? '📱 Install AdGuard Profile' : '⚙️ Setup AdGuard DNS'}
-                            </Text>
-                            <Text style={styles.adguardButtonSubtext}>
-                                {Platform.OS === 'ios'
-                                    ? 'Blocks ads and Popups'
-                                    : 'Configure Private DNS settings'}
-                            </Text>
-                        </Pressable>
-                    )}
                 </View>
-
                 {/* Save Button */}
                 <Pressable
                     style={({ pressed }) => [
@@ -252,6 +235,10 @@ const styles = StyleSheet.create({
     adguardButtonSubtext: {
         color: '#888',
         fontSize: 13,
+    },
+    linkText: {
+        color: '#535aff',
+        textDecorationLine: 'underline',
     },
     saveButton: {
         backgroundColor: '#535aff',
