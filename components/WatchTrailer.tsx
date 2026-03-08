@@ -53,10 +53,10 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         flexDirection: 'row',
         justifyContent: 'center',
-        backgroundColor: '#303030',
+        backgroundColor: '#202020',
     },
     buttonDisabled: {
-        backgroundColor: '#303030ff',
+        backgroundColor: '#202020ff',
         borderColor: 'rgba(255, 255, 255, 0.1)',
         opacity: 1,
     },
