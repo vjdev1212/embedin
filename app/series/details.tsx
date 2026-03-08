@@ -13,9 +13,7 @@ import PosterList from '@/components/PosterList';
 import MediaContentDetailsList from '@/components/MediaContentDetailsList';
 import PlayButton from '@/components/PlayButton';
 import WatchTrailerButton from '@/components/WatchTrailer';
-import { isHapticsSupported } from '@/utils/platform';
 import * as Haptics from 'expo-haptics';
-
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -29,7 +27,8 @@ const SeriesDetails = () => {
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
   const ref = useRef<ScrollView | null>(null);
-
+  const [season, setSeason] = useState<number>(1);
+  const [episode, setEpisode] = useState<number>(1);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -53,7 +52,7 @@ const SeriesDetails = () => {
               season: season.season_number,
               episode: episode.episode_number,
               number: episode.episode_number,
-              thumbnail: `https://image.tmdb.org/t/p/w300/${episode.still_path}`,
+              thumbnail: `https://image.tmdb.org/t/p/w1280/${episode.still_path}`,
               name: episode.name,
               firstAired: episode.air_date,
               overview: episode.overview,
@@ -181,9 +180,8 @@ const SeriesDetails = () => {
   };
 
   const handlePlayPress = async () => {
-    if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
     router.push({
       pathname: '/stream/embed',
       params: { imdbid: imdbid, tmdbid: moviedbid, type: 'series', name: data.name, season: 1, episode: 1 },
@@ -230,11 +228,6 @@ const SeriesDetails = () => {
           </View>
           <MediaContentDescription description={data.description} />
           {
-            isPortrait && (
-              <MediaContentDetailsList type='tv' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
-            )
-          }
-          {
             isPortrait ? (null) : (
               <>
                 <BottomSpacing space={80} />
@@ -243,14 +236,19 @@ const SeriesDetails = () => {
           }
         </View>
       </View>
-      <View style={styles.castContainer}>
-        <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
-      </View>
       <View>
         <View style={{ justifyContent: 'center', marginTop: 5 }}>
           <SeasonEpisodeList videos={data.videos} onEpisodeSelect={handleEpisodeSelect} />
         </View>
       </View>
+      <View style={styles.castContainer}>
+        <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
+      </View>
+      {
+        isPortrait && (
+          <MediaContentDetailsList type='tv' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
+        )
+      }
       <View style={styles.recommendationsContainer}>
         <PosterList apiUrl={`https://api.themoviedb.org/3/tv/${moviedbid}/recommendations`} title='Recommended' type='series' />
       </View>

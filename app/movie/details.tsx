@@ -1,19 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
-import { router, useFocusEffect, useLocalSearchParams } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, StatusBar, Text, View } from '../../components/Themed';
 import MediaContentDescription from '@/components/MediaContentDescription';
 import MediaContentHeader from '@/components/MediaContentHeader';
 import MediaContentPoster from '@/components/MediaContentPoster';
-import * as Haptics from 'expo-haptics';
 import BottomSpacing from '@/components/BottomSpacing';
-import { isHapticsSupported } from '@/utils/platform';
 import MediaLogo from '@/components/MediaLogo';
 import MediaCastAndCrews from '@/components/MediaCastAndCrews';
 import PosterList from '@/components/PosterList';
 import PlayButton from '@/components/PlayButton';
 import MediaContentDetailsList from '@/components/MediaContentDetailsList';
 import WatchTrailerButton from '@/components/WatchTrailer';
+import * as Haptics from 'expo-haptics';
+
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
 const MovieDetails = () => {
@@ -50,6 +50,7 @@ const MovieDetails = () => {
             logo: logo,
             genre: movie.genres.map((genre: any) => genre.name),
             released: movie.release_date,
+            year: movie.release_date?.split('-')[0],
             country: movie.origin_country,
             languages: movie.spoken_languages,
             status: movie.status,
@@ -143,9 +144,7 @@ const MovieDetails = () => {
   }
 
   const handlePlayPress = async () => {
-    if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push({
       pathname: '/stream/embed',
       params: { imdbid: imdbid, tmdbid: moviedbid, type: 'movie', name: data.name, season: 0, episode: 0 },
@@ -188,16 +187,16 @@ const MovieDetails = () => {
             <WatchTrailerButton trailerKey={trailerKey} />
           </View>
           <MediaContentDescription description={data.description} />
-          {
-            isPortrait && (
-              <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
-            )
-          }
         </View>
       </View>
       <View style={styles.castContainer}>
         <MediaCastAndCrews cast={cast}></MediaCastAndCrews>
       </View>
+      {
+        isPortrait && (
+          <MediaContentDetailsList type='movie' released={data.released} country={data.country} languages={data.languages} genre={data.genre || data.genres} runtime={data.runtime} imdbRating={data.imdbRating} />
+        )
+      }
       <View style={styles.recommendationsContainer}>
         <PosterList apiUrl={`https://api.themoviedb.org/3/movie/${moviedbid}/recommendations`} title='Recommended' type='movie' />
       </View>
