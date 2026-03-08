@@ -32,7 +32,7 @@
         {
           "version": "1.1.0",
           "date": "2026-03-08",
-          "localizedDescription": "1. UI Improvments. \n 2. Bug fixes.",
+          "localizedDescription": "1. UI Improvments. \n2. Bug fixes.",
           "downloadURL": "https://github.com/vjdev1212/embedin/releases/download/v1.1.0/EmbedIn_v1.1.0.ipa",
           "size": 8680000,
           "minOSVersion": "18.0"
@@ -56,7 +56,7 @@
     {
       "title": "EmbedIn v1.1.0 Released",
       "identifier": "embedin-v1.1.0-release",
-      "caption": "1. UI Improvements. \n 2. Bug fixes.",
+      "caption": "1. UI Improvements. \n2. Bug fixes.",
       "date": "2026-03-08",
       "tintColor": "#535aff",
       "imageURL": "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/assets/banners/EmbedIn-feature-graphic.png",
