@@ -3,11 +3,12 @@ import { StyleSheet, Pressable, View, ScrollView } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { StatusBar, Text } from '@/components/Themed';
 import { useRouter } from 'expo-router';
-import * as Haptics from 'expo-haptics'
+import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomSpacing from '@/components/BottomSpacing';
 import Constants from 'expo-constants';
+import BlurGradientBackground from '@/components/BlurGradientBackground';
 
 const SettingsScreen = () => {
   const showContact = process.env.EXPO_PUBLIC_SHOW_CONTACT === 'true';
@@ -41,39 +42,40 @@ const SettingsScreen = () => {
     isFirst?: boolean,
     isLast?: boolean
   }) => {
+    const [isPressed, setIsPressed] = React.useState(false);
+
     return (
       <Pressable
         style={[
           styles.settingItem,
           {
-            backgroundColor: '#101010',
-            borderTopLeftRadius: isFirst ? 10 : 0,
-            borderTopRightRadius: isFirst ? 10 : 0,
-            borderBottomLeftRadius: isLast ? 10 : 0,
-            borderBottomRightRadius: isLast ? 10 : 0,
+            backgroundColor: isPressed ? '#1a1a1a' : '#101010',
+            borderTopLeftRadius: isFirst ? 12 : 0,
+            borderTopRightRadius: isFirst ? 12 : 0,
+            borderBottomLeftRadius: isLast ? 12 : 0,
+            borderBottomRightRadius: isLast ? 12 : 0,
           }
         ]}
         onPress={onPress}
-        android_ripple={{ color: '#2C2C2E' }}
+        onPressIn={() => setIsPressed(true)}
+        onPressOut={() => setIsPressed(false)}
       >
         <View style={styles.leftContent}>
-          <Ionicons
-            name={icon}
-            size={20}
-            color='#535aff'
-            style={styles.icon}
-          />
-          <Text style={[
-            styles.settingText,
-            { color: '#FFFFFF' }
-          ]}>
+          <View style={styles.iconContainer}>
+            <Ionicons
+              name={icon}
+              size={22}
+              color='#535aff'
+            />
+          </View>
+          <Text style={styles.settingText}>
             {title}
           </Text>
         </View>
         <MaterialIcons
           name="chevron-right"
-          size={20}
-          color='#8E8E93'
+          size={22}
+          color='#6E6E73'
         />
         {!isLast && (
           <View style={styles.separator} />
@@ -83,27 +85,27 @@ const SettingsScreen = () => {
   };
 
   const onSettingsItemPress = async (item: any) => {
-    if (isHapticsSupported()) {
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (await isHapticsSupported()) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     }
     router.push({ pathname: item.route });
-  }
+  };
 
   return (
-    <SafeAreaView style={[
-      styles.container,
-    ]}>
+    <SafeAreaView style={styles.container}>
       <StatusBar />
+      <BlurGradientBackground />
       <ScrollView
         contentContainerStyle={styles.scrollViewContent}
         showsVerticalScrollIndicator={false}
       >
+        <View style={styles.headerContainer}>
+          <Text style={styles.headerTitle}>Settings</Text>
+        </View>
+
         {/* General Section */}
         <View style={styles.section}>
-          <Text style={[
-            styles.sectionHeader,
-            { color: '#8E8E93' }
-          ]}>
+          <Text style={styles.sectionHeader}>
             EMBED SETTINGS
           </Text>
           <View style={styles.settingsGroup}>
@@ -122,10 +124,7 @@ const SettingsScreen = () => {
 
         {resourcesList.length > 0 && (
           <View style={styles.section}>
-            <Text style={[
-              styles.sectionHeader,
-              { color: '#8E8E93' }
-            ]}>
+            <Text style={styles.sectionHeader}>
               RESOURCES
             </Text>
             <View style={styles.settingsGroup}>
@@ -143,13 +142,10 @@ const SettingsScreen = () => {
           </View>
         )}
 
-        {/* Contact Section - Only render if showContact is true */}
+        {/* Contact Section */}
         {showContact && (
           <View style={styles.section}>
-            <Text style={[
-              styles.sectionHeader,
-              { color: '#8E8E93' }
-            ]}>
+            <Text style={styles.sectionHeader}>
               CONTACT
             </Text>
             <View style={styles.settingsGroup}>
@@ -166,8 +162,9 @@ const SettingsScreen = () => {
             </View>
           </View>
         )}
+
         <View style={styles.versionContainer}>
-          <Text style={styles.versionText}>Version: {appVersion}</Text>
+          <Text style={styles.versionText}>Version {appVersion}</Text>
         </View>
         <BottomSpacing space={50} />
       </ScrollView>
@@ -178,37 +175,41 @@ const SettingsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 30,
-    width: '100%',
-    maxWidth: 780,
-    margin: 'auto'
   },
   scrollViewContent: {
-    paddingTop: 20,
     paddingBottom: 40,
+    maxWidth: 780,
+    margin: 'auto',
+    width: '100%',
+  },
+  headerContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 24,
+  },
+  headerTitle: {
+    fontSize: 34,
+    fontWeight: '700',
+    color: '#ffffff',
+    letterSpacing: 0.3,
   },
   section: {
-    marginBottom: 35,
+    marginBottom: 32,
   },
   sectionHeader: {
     fontSize: 13,
-    fontWeight: '400',
+    fontWeight: '500',
     textTransform: 'uppercase',
-    marginBottom: 8,
+    color: '#8E8E93',
+    marginBottom: 10,
     marginLeft: 20,
     marginRight: 20,
+    letterSpacing: 0.5,
   },
   settingsGroup: {
     marginHorizontal: 16,
-    // iOS uses subtle shadow for grouped sections
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 1,
-    elevation: 1,
+    overflow: 'hidden',
+    borderRadius: 12,
   },
   settingItem: {
     flexDirection: 'row',
@@ -216,7 +217,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     justifyContent: 'space-between',
     alignItems: 'center',
-    minHeight: 4, // iOS minimum touch target
+    minHeight: 52,
     position: 'relative',
   },
   leftContent: {
@@ -224,31 +225,42 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  settingText: {
-    fontSize: 16,
-    flex: 1,
-  },
-  icon: {
+  iconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#1a1a2e',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginRight: 12,
-    width: 22, // Fixed width for consistent alignment
+  },
+  settingText: {
+    fontSize: 17,
+    fontWeight: '400',
+    color: '#FFFFFF',
+    letterSpacing: -0.2,
   },
   separator: {
     position: 'absolute',
     bottom: 0,
-    left: 50, // Start separator from where the title begins (icon width + margin + padding)
-    right: 0,
+    left: 60,
+    right: 16,
     height: StyleSheet.hairlineWidth,
-    backgroundColor: 'rgba(42, 42, 42, 0.5)',
+    backgroundColor: '#2a2a2a',
   },
-   versionContainer: {
-    paddingVertical: 5,
+  versionContainer: {
+    paddingVertical: 20,
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: 8,
   },
   versionText: {
-    color: '#ccc',
-  }
+    fontSize: 13,
+    color: '#6E6E73',
+    fontWeight: '500',
+    letterSpacing: 0.2,
+  },
 });
 
 export default SettingsScreen;
