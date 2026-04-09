@@ -41,10 +41,6 @@ This app is built using the Expo React Native framework.
 
 - Scan the QR code from the Expo CLI output using the Expo Go app on your mobile device.
 
-## Stopping the Development Server
-
-To stop the running process, press `Ctrl + C` in the terminal.
-
 ## Embed URL Templates
 
 The embed URL templates can be modified in the Settings > Embed Settings page. Update them as needed to customize the embed URLs.
