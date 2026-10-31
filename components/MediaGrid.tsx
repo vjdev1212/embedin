@@ -188,11 +188,6 @@ const MediaGrid: React.FC<MediaGridProps> = ({
         const metadata = compact
             ? [item.type === 'series' ? 'TV Show' : 'Movie', year].filter(Boolean).join(' · ')
             : genreMetadata;
-        const compactGenreMetadata = item.genres.length > 0
-            ? item.genres.join(' · ')
-            : item.imdbRating
-                ? `★ ${item.imdbRating}`
-                : '';
         const menuButton = (
             <Pressable accessibilityRole="button" accessibilityLabel={`More actions for ${item.name}`} hitSlop={10} style={styles.menuButton}>
                 <Ionicons name="ellipsis-horizontal" size={21} color={colors.text} />
@@ -238,10 +233,11 @@ const MediaGrid: React.FC<MediaGridProps> = ({
                             <NativeColumn alignment="start" spacing={compact ? 3 : 7} style={{ width: mediaInfoWidth, paddingTop: 4 }}>
                                 <NativeText textStyle={compact ? styles.compactMediaTitle : styles.mediaTitle}>{item.name}</NativeText>
                                 {compact ? (
-                                    <>
-                                        {metadata.length > 0 && <NativeText textStyle={{ ...styles.compactMediaMetadata, color: `${colors.text}CC` }}>{metadata}</NativeText>}
-                                        {compactGenreMetadata.length > 0 && <NativeText textStyle={{ ...styles.compactMediaMetadata, color: `${colors.text}CC` }}>{compactGenreMetadata}</NativeText>}
-                                    </>
+                                    metadata.length > 0 && (
+                                        <NativeText textStyle={{ ...styles.compactMediaMetadata, color: `${colors.text}CC` }}>
+                                            {metadata}
+                                        </NativeText>
+                                    )
                                 ) : metadata.length > 0 && (
                                     <NativeText textStyle={{ ...styles.mediaMetadata, color: `${colors.text}CC` }}>{metadata}</NativeText>
                                 )}
