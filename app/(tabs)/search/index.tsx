@@ -16,6 +16,10 @@ const FILTER_OPTIONS: { id: SearchFilter; title: string }[] = [
   { id: 'series', title: 'Series' },
 ];
 
+const SearchHeaderBackground = () => (
+  <View style={{ flex: 1, backgroundColor: 'transparent' }} />
+);
+
 interface TMDBSearchItem {
   id: number;
   title?: string;
@@ -115,8 +119,12 @@ export default function SearchScreen() {
         options={{
           headerShown: true,
           headerBackVisible: false,
+          headerTransparent: Platform.OS === 'ios',
+          headerBackground: SearchHeaderBackground,
+          headerShadowVisible: true,
           headerTitle: 'Search',
-          headerStyle: { backgroundColor: systemDarkBackground },
+          headerStyle: { backgroundColor: Platform.OS === 'ios' ? 'transparent' : systemDarkBackground },
+          headerBlurEffect: 'none',
           headerUserInterfaceStyle: 'dark',
           headerTintColor: colors.text,
           headerSearchBarOptions: Platform.OS === 'ios' ? {
@@ -129,6 +137,24 @@ export default function SearchScreen() {
           } : undefined,
         }}
       />
+      {Platform.OS !== 'web' && (
+        <Stack.Toolbar placement="right">
+          {FILTER_OPTIONS.map((option) => {
+            const isSelected = selectedFilter === option.id;
+            return (
+              <Stack.Toolbar.Button
+                key={option.id}
+                accessibilityLabel={`Filter by ${option.title}`}
+                selected={isSelected}
+                tintColor={isSelected ? colors.text : colors.textMuted}
+                onPress={() => setSelectedFilter(option.id)}
+              >
+                {option.title}
+              </Stack.Toolbar.Button>
+            );
+          })}
+        </Stack.Toolbar>
+      )}
       {Platform.OS !== 'ios' && (
         <View style={styles.searchHeader}>
           <View style={styles.searchField}>
@@ -150,32 +176,34 @@ export default function SearchScreen() {
           </View>
         </View>
       )}
-      <View accessibilityRole="tablist" style={styles.filterRow}>
-        {FILTER_OPTIONS.map((option) => {
-          const isSelected = selectedFilter === option.id;
-          return (
-            <Pressable
-              key={option.id}
-              accessibilityRole="tab"
-              accessibilityState={{ selected: isSelected }}
-              onPress={() => setSelectedFilter(option.id)}
-              style={[
-                styles.filterButton,
-                { backgroundColor: isSelected ? colors.text : colors.primaryCard },
-              ]}
-            >
-              <Text
+      {Platform.OS === 'web' && (
+        <View accessibilityRole="tablist" style={styles.filterRow}>
+          {FILTER_OPTIONS.map((option) => {
+            const isSelected = selectedFilter === option.id;
+            return (
+              <Pressable
+                key={option.id}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: isSelected }}
+                onPress={() => setSelectedFilter(option.id)}
                 style={[
-                  styles.filterLabel,
-                  { color: isSelected ? '#000000' : colors.textMuted },
+                  styles.filterButton,
+                  { backgroundColor: isSelected ? colors.text : colors.primaryCard },
                 ]}
               >
-                {option.title}
-              </Text>
-            </Pressable>
-          );
-        })}
-      </View>
+                <Text
+                  style={[
+                    styles.filterLabel,
+                    { color: isSelected ? '#000000' : colors.textMuted },
+                  ]}
+                >
+                  {option.title}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      )}
 
       <View style={styles.resultsContainer}>
         {loading ? (
