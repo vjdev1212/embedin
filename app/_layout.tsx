@@ -16,8 +16,7 @@ export {
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
-  initialRouteName: '(tabs)',
+  anchor: '(tabs)',
 };
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -77,7 +76,7 @@ function RootLayoutNav() {
     <View style={styles.container}>
       {/* Global Background Gradient */}
       <LinearGradient
-        colors={['#000000', '#333333', '#666666']}
+        colors={['#000000', '#101014', '#000000']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.backgroundGradient}
@@ -87,6 +86,9 @@ function RootLayoutNav() {
         <ThemeProvider value={theme}>
           <Stack
             screenOptions={{
+              headerUserInterfaceStyle: 'dark',
+              headerTintColor: '#ffffff',
+              headerBackTitle: '',
               headerStyle: styles.glassHeader,
               headerBackground: HeaderBackground,
               contentStyle: styles.screenContent,
@@ -103,7 +105,7 @@ function RootLayoutNav() {
                 headerTintColor: '#ffffff',
                 headerBackTitle: '',
                 title: 'Home',
-                contentStyle: { backgroundColor: 'transparent' } // Only tabs can be transparent
+                contentStyle: styles.screenContent,
               }}
             />
             <Stack.Screen
@@ -281,12 +283,12 @@ function RootLayoutNav() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#000000',
   },
   backgroundGradient: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
-  screenContent: {
-  },
+  screenContent: { backgroundColor: '#000000' },
   modalContent: {
     backgroundColor: 'rgba(0, 0, 0, 0.95)',
   },

@@ -1,19 +1,17 @@
 import React, { useState } from 'react';
 import {
   StyleSheet,
-  Pressable,
   LayoutAnimation,
-  Platform,
-  UIManager,
 } from 'react-native';
 import { Text, View } from './Themed';
+import { NativeButton } from '@/components/NativeUiControls';
 
 interface MediaContentDescriptionProps {
   description: string;
 }
 
 const animationConfig = {
-  duration: 5000, // 0.5 seconds
+  duration: 220,
   update: {
     type: LayoutAnimation.Types.easeInEaseOut,
     property: LayoutAnimation.Properties.opacity,
@@ -42,7 +40,7 @@ const MediaContentDescription: React.FC<MediaContentDescriptionProps> = ({
 
   return (
     <View style={styles.container}>
-      <Pressable onPress={toggleExpand}>
+      <NativeButton onPress={toggleExpand} variant="text" accessibilityLabel={expanded ? 'Show less description' : 'Show full description'}>
         <Text
           style={styles.description}
           numberOfLines={expanded ? undefined : 3}
@@ -54,7 +52,7 @@ const MediaContentDescription: React.FC<MediaContentDescriptionProps> = ({
             {expanded ? 'LESS' : 'MORE'}
           </Text>
         )}
-      </Pressable>
+      </NativeButton>
     </View>
   );
 };

@@ -10,15 +10,16 @@ import {
   View as DefaultView,
   Platform
 } from 'react-native';
+import type { ComponentProps } from 'react';
 import { StatusBar as DefaultStatusBar } from 'expo-status-bar';
 import Colors from '@/constants/Colors';
 
 
-export type TextProps = DefaultText['props'];
-export type TextInputProps = DefaultTextInput['props'];
-export type ViewProps = DefaultView['props'];
+export type TextProps = ComponentProps<typeof DefaultText>;
+export type TextInputProps = ComponentProps<typeof DefaultTextInput>;
+export type ViewProps = ComponentProps<typeof DefaultView>;
 export type StatusBarProps = React.ComponentProps<typeof DefaultStatusBar>;
-export type ActivityIndicatorProps = DefaultActivityIndicator['props'];
+export type ActivityIndicatorProps = ComponentProps<typeof DefaultActivityIndicator>;
 
 export function useThemeColor(
   props: { light?: string; dark?: string },
@@ -63,7 +64,7 @@ export function View(props: ViewProps) {
 export function StatusBar(props: StatusBarProps) {
   const { ...otherProps } = props;
 
-  return <DefaultStatusBar {...otherProps} style="light" translucent backgroundColor="transparent" />;
+  return <DefaultStatusBar {...otherProps} style="light" />;
 }
 
 export function Card(props: ViewProps) {

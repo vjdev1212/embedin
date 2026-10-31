@@ -3,7 +3,6 @@ import {
     FlatList,
     Image,
     StyleSheet,
-    Pressable,
     useWindowDimensions,
 } from 'react-native';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
@@ -11,6 +10,7 @@ import { useRouter } from 'expo-router';
 import { getYear } from '@/utils/Date';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomSpacing from './BottomSpacing';
+import { NativeButton } from '@/components/NativeUiControls';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -85,13 +85,13 @@ const MediaGrid: React.FC<MediaGridProps> = ({ apiUrl, detailsPath }) => {
         };
 
         return (
-            <Pressable
-                style={({ pressed }) => [
+            <NativeButton
+                accessibilityLabel={`Open ${item.name}`}
+                style={[
                     styles.posterContainer,
                     {
                         flexBasis: `${100 / numColumns}%`,
                         paddingHorizontal: spacing / 2,
-                        opacity: pressed ? 0.7 : 1,
                     },
                 ]}
                 onPress={handlePress}
@@ -109,7 +109,7 @@ const MediaGrid: React.FC<MediaGridProps> = ({ apiUrl, detailsPath }) => {
                     </Text>
                     <Text style={styles.posterYear}>{year}</Text>
                 </View>
-            </Pressable>
+            </NativeButton>
         );
     };
 

@@ -1,14 +1,11 @@
-import React, { useEffect, useState, useMemo, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { StyleSheet, Pressable, useWindowDimensions, Animated, TouchableOpacity, Platform, ScrollView } from 'react-native';
 import { Text, View } from './Themed';
-import * as Haptics from 'expo-haptics';
 import { formatDate } from '@/utils/Date';
-import { isHapticsSupported } from '@/utils/platform';
 import { SvgXml } from 'react-native-svg';
 import { DefaultEpisodeThumbnailImgXml } from '@/utils/Svg';
-import { MenuView, MenuComponentRef } from '@react-native-menu/menu';
 import CustomContextMenu from './ContextMenu';
-import { Ionicons } from '@expo/vector-icons';
+import { NativeSelect } from '@/components/NativeUiControls';
 
 // Type definitions
 interface Episode {
@@ -38,7 +35,6 @@ interface EpisodeItemProps {
 // Constants
 const THUMBNAIL_BACKGROUND_COLOR = '#0f0f0f';
 const EPISODE_AIRED_COLOR = '#cccccc';
-const SELECTED_SEASON_COLOR = '#535aff';
 const ANIMATION_DURATION = 100;
 const IMAGE_LOAD_DELAY = 100;
 const THUMBNAIL_ASPECT_RATIO = 16 / 9;
@@ -206,8 +202,6 @@ const EpisodeItem: React.FC<EpisodeItemProps> = React.memo(({ item, onEpisodeSel
 const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisodeSelect }) => {
   const [selectedSeason, setSelectedSeason] = useState<number>(1);
   const { width, height } = useWindowDimensions();
-  const menuRef = useRef<MenuComponentRef>(null);
-
   // Web-only dropdown state for CustomContextMenu
   const [webMenuVisible, setWebMenuVisible] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState({ x: 0, y: 0 });
@@ -235,14 +229,6 @@ const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisode
       ...(groupedEpisodes[0] ? [0] : []),
     ];
 
-    // Create menu actions for @react-native-menu/menu
-    const menuActions = seasonData.map((season) => ({
-      id: `season-${season}`,
-      title: season === 0 ? 'Specials' : `Season ${season}`,
-      titleColor: selectedSeason === season ? SELECTED_SEASON_COLOR : '#ffffff',
-      state: selectedSeason === season ? ('on' as const) : undefined,
-    }));
-
     // Create menu items for CustomContextMenu (web)
     const webMenuItems = seasonData.map((season, index) => ({
       id: `season-${season}-${index}`,
@@ -256,25 +242,15 @@ const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisode
       cardWidth,
       groupedEpisodes,
       seasonData,
-      menuActions,
       webMenuItems,
     };
-  }, [videos, height, width, selectedSeason]);
+  }, [videos, height, width]);
 
   // Memoized callbacks
-  const handleSeasonSelect = useCallback(async (season: number) => {
+  const handleSeasonSelect = useCallback((season: number) => {
     setSelectedSeason(season);
     setWebMenuVisible(false);
   }, []);
-
-  const handleMenuPress = useCallback(async ({ nativeEvent }: any) => {
-    const actionId = nativeEvent.event;
-    const seasonMatch = actionId.match(/season-(\d+)/);
-    if (seasonMatch) {
-      const season = parseInt(seasonMatch[1], 10);
-      handleSeasonSelect(season);
-    }
-  }, [handleSeasonSelect]);
 
   // Web dropdown handlers for CustomContextMenu
   const handleWebSeasonDropdownPress = useCallback(async (event: any) => {
@@ -347,20 +323,15 @@ const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisode
             />
           </>
         ) : (
-          <MenuView
-            ref={menuRef}
-            onPressAction={handleMenuPress}
-            actions={computedValues.menuActions}
-            shouldOpenOnLongPress={false}
-            themeVariant='dark'
-          >
-            <TouchableOpacity style={styles.seasonDropdownButton}>
-              <Text style={styles.seasonDropdownText}>
-                {getCurrentSeasonText()}
-              </Text>
-              <Ionicons name='chevron-expand' size={24} color='#ffffff' />
-            </TouchableOpacity>
-          </MenuView>
+          <NativeSelect
+            selectedValue={selectedSeason}
+            onValueChange={handleSeasonSelect}
+            options={computedValues.seasonData.map((season) => ({
+              label: season === 0 ? 'Specials' : `Season ${season}`,
+              value: season,
+            }))}
+            style={styles.seasonSelect}
+          />
         )}
       </View>
 
@@ -405,6 +376,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     width: 150,
     maxWidth: 130,
+  },
+  seasonSelect: {
+    width: 180,
+    minHeight: 40,
   },
   seasonDropdownText: {
     fontSize: 20,

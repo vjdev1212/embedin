@@ -1,7 +1,7 @@
 import { Text, ActivityIndicator, TextInput, View, StatusBar } from '@/components/Themed';
 import { useRouter } from 'expo-router';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { ScrollView, Pressable, StyleSheet } from 'react-native';
+import { ScrollView, Pressable, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
@@ -10,6 +10,7 @@ import BottomSpacing from '@/components/BottomSpacing';
 import PosterList from '@/components/PosterList';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BlurGradientBackground from '@/components/BlurGradientBackground';
+import { NativeTextInput } from '@/components/NativeUiControls';
 
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -39,7 +40,6 @@ const SearchScreen = () => {
     if (!query.trim()) {
       setMoviesUrl(null);
       setSeriesUrl(null);
-      return;
     }
 
     debounceTimeoutRef.current = setTimeout(() => {
@@ -88,16 +88,29 @@ const SearchScreen = () => {
           <View style={styles.searchIconContainer}>
             <Ionicons name="search-outline" size={20} color="#6E6E73" />
           </View>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search movies or series..."
-            placeholderTextColor="#6E6E73"
-            value={query}
-            onChangeText={handleTextChange}
-            submitBehavior="blurAndSubmit"
-            autoCorrect={false}
-            autoCapitalize="none"
-          />
+          {Platform.OS === 'web' ? (
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search movies or series..."
+              placeholderTextColor="#6E6E73"
+              value={query}
+              onChangeText={handleTextChange}
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+          ) : (
+            <NativeTextInput
+              style={styles.searchInputHost}
+              textStyle={{ color: '#ffffff', fontSize: 17 }}
+              placeholder="Search movies or series..."
+              placeholderTextColor="#6E6E73"
+              value={query}
+              onChangeText={handleTextChange}
+              autoCorrect={false}
+              autoCapitalize="none"
+              accessibilityLabel="Search movies or series"
+            />
+          )}
           {query.length > 0 && (
             <Pressable onPress={clearSearch} style={styles.clearButton}>
               <View style={styles.clearIconContainer}>
@@ -200,7 +213,10 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontWeight: '400',
     letterSpacing: -0.2,
-    outline: 'none',
+  },
+  searchInputHost: {
+    flex: 1,
+    minWidth: 0,
   },
   clearButton: {
     marginLeft: 8,

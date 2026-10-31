@@ -3,7 +3,6 @@ import {
   FlatList,
   Image,
   StyleSheet,
-  Pressable,
   useWindowDimensions,
   View as RNView,
 } from 'react-native';
@@ -15,6 +14,7 @@ import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { DefaultPosterImgXml } from '@/utils/Svg';
 import { Ionicons } from '@expo/vector-icons';
+import { NativeButton } from '@/components/NativeUiControls';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -46,7 +46,6 @@ const PosterItem = ({
   spacing: number;
 }) => {
   const [imgError, setImgError] = useState(false);
-  const [isPressed, setIsPressed] = useState(false);
   const year = item.year?.split('–')[0] || item.year;
 
   const handlePress = async () => {
@@ -60,15 +59,10 @@ const PosterItem = ({
   };
 
   return (
-    <Pressable
+    <NativeButton
       onPress={handlePress}
-      onPressIn={() => setIsPressed(true)}
-      onPressOut={() => setIsPressed(false)}
-      style={[
-        styles.posterContainer,
-        { width: posterWidth, marginRight: spacing },
-        isPressed && styles.posterPressed,
-      ]}
+      variant="text"
+      style={[styles.posterContainer, { width: posterWidth, marginRight: spacing }]}
     >
       {!imgError ? (
         <Image
@@ -99,7 +93,7 @@ const PosterItem = ({
         {item.name}
       </Text>
       <Text style={styles.posterYear}>{year}</Text>
-    </Pressable>
+    </NativeButton>
   );
 };
 
@@ -133,10 +127,12 @@ const PosterList = ({
   apiUrl,
   title,
   type,
+  compact = false,
 }: {
   apiUrl: string;
   title: string;
   type: 'movie' | 'series';
+  compact?: boolean;
 }) => {
   const { width, height } = useWindowDimensions();
   const shortSide = Math.min(width, height);
@@ -231,7 +227,7 @@ const PosterList = ({
   // Show skeleton loader while loading
   if (loading) {
     return (
-      <RNView style={styles.container}>
+      <RNView style={[styles.container, compact && styles.compactContainer]}>
         <RNView style={styles.header}>
           <Text style={styles.title}>{title}</Text>
         </RNView>
@@ -256,13 +252,13 @@ const PosterList = ({
   if (!data || data.length === 0) return null;
 
   return (
-    <RNView style={styles.container}>
+    <RNView style={[styles.container, compact && styles.compactContainer]}>
       <RNView style={styles.header}>
         <Text style={styles.title}>{title}</Text>
-        <Pressable onPress={handleSeeAllPress} style={styles.seeAllButton}>
+        <NativeButton onPress={handleSeeAllPress} style={styles.seeAllButton} variant="text">
           <Text style={styles.seeAllText}>See All</Text>
           <Ionicons name="chevron-forward" size={16} color="#cccccc" style={styles.chevronIcon} />
-        </Pressable>
+        </NativeButton>
       </RNView>
 
       <FlatList
@@ -294,6 +290,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginHorizontal: 15
   },
+  compactContainer: {
+    paddingTop: 4,
+    marginBottom: 4,
+    marginHorizontal: 20,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -324,9 +325,6 @@ const styles = StyleSheet.create({
   },
   posterContainer: {
     marginBottom: 10,
-  },
-  posterPressed: {
-    opacity: 0.7,
   },
   posterImage: {
     borderRadius: 6,

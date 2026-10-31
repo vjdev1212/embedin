@@ -1,9 +1,9 @@
 import React from 'react';
-import { TouchableOpacity, StyleSheet, Linking, Alert } from 'react-native';
-import { Text } from './Themed';
+import { StyleSheet, Linking } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported, showAlert } from '@/utils/platform';
 import { Ionicons } from '@expo/vector-icons';
+import { NativeButton } from '@/components/NativeUiControls';
 
 interface WatchTrailerButtonProps {
     trailerKey: string | null;
@@ -11,13 +11,12 @@ interface WatchTrailerButtonProps {
 
 const WatchTrailerButton: React.FC<WatchTrailerButtonProps> = ({ trailerKey }) => {
     const handleTrailerPress = async () => {
-        if (isHapticsSupported()) {
-            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        }
-
         if (!trailerKey) {
             showAlert('No Trailer Available', 'Sorry, no trailer is available for this movie.');
             return;
+        }
+        if (await isHapticsSupported()) {
+            await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
         }
 
         const youtubeUrl = `https://www.youtube.com/watch?v=${trailerKey}`;
@@ -31,42 +30,35 @@ const WatchTrailerButton: React.FC<WatchTrailerButtonProps> = ({ trailerKey }) =
     };
 
     return (
-        <TouchableOpacity
-            style={[styles.button]}
+        <NativeButton
+            accessibilityLabel={trailerKey ? 'Watch trailer on YouTube' : 'No trailer available'}
+            style={[
+                styles.button,
+                !trailerKey && styles.buttonDisabled,
+            ]}
             onPress={handleTrailerPress}
             disabled={!trailerKey}
+            variant="text"
         >
-            <Ionicons name="film-outline" size={24} color="#fff" style={styles.icon} />
-            <Text style={styles.buttonText}> {trailerKey ? 'Trailer' : 'NA'}</Text>
-        </TouchableOpacity>
+            <Ionicons name="logo-youtube" size={24} color={trailerKey ? '#ffffff' : '#8e8e93'} />
+        </NativeButton>
     );
 };
 
 const styles = StyleSheet.create({
     button: {
-        paddingVertical: 12,
-        paddingHorizontal: 20,
+        width: 50,
+        height: 50,
         borderRadius: 25,
-        minWidth: 150,
         alignItems: 'center',
-        marginVertical: 20,
         alignSelf: 'center',
-        flexDirection: 'row',
         justifyContent: 'center',
-        backgroundColor: '#202020',
+        backgroundColor: '#1c1c1e',
+        borderWidth: 1,
+        borderColor: '#38383a',
     },
     buttonDisabled: {
-        backgroundColor: '#202020ff',
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        opacity: 1,
-    },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: '500',
-    },
-    icon: {
-        marginRight: 8,
+        opacity: 0.5,
     }
 });
 

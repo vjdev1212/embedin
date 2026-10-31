@@ -7,6 +7,7 @@ import {
     StyleSheet,
     Image,
     ImageBackground,
+    ScaledSize,
 } from 'react-native';
 import { ActivityIndicator, Text } from '@/components/Themed';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -53,7 +54,7 @@ export default function AppleTVCarousel({
 
     // Handle orientation changes
     useEffect(() => {
-        const subscription = Dimensions.addEventListener('change', ({ window }) => {
+        const subscription = Dimensions.addEventListener('change', ({ window }: { window: ScaledSize }) => {
             setDimensions({
                 width: window.width,
                 height: window.height,

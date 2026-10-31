@@ -1,13 +1,14 @@
 import React from 'react';
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from './Themed';
+import { NativeButton } from '@/components/NativeUiControls';
 
 const SearchButton = ({ onPress, text }: { onPress: () => void, text: string }) => (
-  <Pressable style={styles.button} onPress={onPress}>
+  <NativeButton style={styles.button} onPress={onPress} variant="filled">
     <Ionicons name="search" size={20} color="#fff" style={styles.icon} />
     <Text style={styles.text}>Search {text}</Text>
-  </Pressable>
+  </NativeButton>
 );
 
 const styles = StyleSheet.create({

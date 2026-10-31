@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, useWindowDimensions } from 'react-native';
+import type { ScrollViewInstance } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ActivityIndicator, StatusBar, Text, View } from '../../components/Themed';
 import MediaContentDescription from '@/components/MediaContentDescription';
@@ -26,7 +27,7 @@ const SeriesDetails = () => {
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const { width, height } = useWindowDimensions();
   const isPortrait = height > width;
-  const ref = useRef<ScrollView | null>(null);
+  const ref = useRef<ScrollViewInstance | null>(null);
   const [season, setSeason] = useState<number>(1);
   const [episode, setEpisode] = useState<number>(1);
 
@@ -250,10 +251,10 @@ const SeriesDetails = () => {
         )
       }
       <View style={styles.recommendationsContainer}>
-        <PosterList apiUrl={`https://api.themoviedb.org/3/tv/${moviedbid}/recommendations`} title='Recommended' type='series' />
+        <PosterList apiUrl={`https://api.themoviedb.org/3/tv/${moviedbid}/recommendations`} title='Recommended' type='series' compact />
       </View>
       <View style={styles.recommendationsContainer}>
-        <PosterList apiUrl={`https://api.themoviedb.org/3/tv/${moviedbid}/similar`} title='Similar to this' type='series' />
+        <PosterList apiUrl={`https://api.themoviedb.org/3/tv/${moviedbid}/similar`} title='Similar to this' type='series' compact />
       </View>
       <BottomSpacing space={50} />
     </ScrollView>
