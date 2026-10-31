@@ -1,15 +1,21 @@
-import { ActivityIndicator, StatusBar, Text, TextInput, View } from '@/components/Themed';
+import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import MediaGrid, { GENRE_NAMES, type MediaGridItem } from '@/components/MediaGrid';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Stack } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
-import { Keyboard, Platform, Pressable, StyleSheet } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Platform, Pressable, StyleSheet, TextInput as NativeTextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { radius, spacing, systemDarkBackground, typography } from '@/constants/theme';
+import { WebMenu } from '@/components/WebMenuView';
 
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 type SearchFilter = 'all' | 'movie' | 'series';
+const FILTER_OPTIONS: { id: SearchFilter; title: string }[] = [
+  { id: 'all', title: 'All' },
+  { id: 'movie', title: 'Movies' },
+  { id: 'series', title: 'Series' },
+];
 
 interface TMDBSearchItem {
   id: number;
@@ -70,18 +76,12 @@ export default function SearchScreen() {
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [selectedFilter, setSelectedFilter] = useState<SearchFilter>('all');
-  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const trimmedQuery = useMemo(() => query.trim(), [query]);
+  const selectedFilterTitle = FILTER_OPTIONS.find(({ id }) => id === selectedFilter)?.title ?? 'All';
   const filteredResults = useMemo(
     () => selectedFilter === 'all' ? results : results.filter((item) => item.type === selectedFilter),
     [results, selectedFilter],
   );
-
-  useEffect(() => {
-    const show = Keyboard.addListener('keyboardDidShow', () => setKeyboardVisible(true));
-    const hide = Keyboard.addListener('keyboardDidHide', () => setKeyboardVisible(false));
-    return () => { show.remove(); hide.remove(); };
-  }, []);
 
   useEffect(() => {
     if (!trimmedQuery) {
@@ -105,55 +105,79 @@ export default function SearchScreen() {
     return () => { clearTimeout(timeout); controller.abort(); };
   }, [retryCount, trimmedQuery]);
 
-  const clearSearch = () => setQuery('');
   const changeQuery = (value: string) => { setQuery(value); setSelectedFilter('all'); };
-  const showFilters = Boolean(trimmedQuery) && !loading && !error && !keyboardVisible;
+  const handleWebFilterSelect = useCallback((id: string) => {
+    const filter = FILTER_OPTIONS.find((option) => option.id === id);
+    if (filter) setSelectedFilter(filter.id);
+  }, []);
 
   return (
     <SafeAreaView
-      edges={Platform.OS === 'ios' ? ['left', 'right', 'bottom'] : ['top', 'left', 'right', 'bottom']}
+      edges={['left', 'right', 'bottom']}
       style={[styles.container, { backgroundColor: systemDarkBackground }]}
     >
       <StatusBar />
       <Stack.Screen
         options={{
-          headerShown: Platform.OS === 'ios',
+          headerShown: true,
           headerBackVisible: false,
-          headerTransparent: false,
-          headerShadowVisible: true,
+          headerTitle: 'Search',
           headerStyle: { backgroundColor: systemDarkBackground },
           headerUserInterfaceStyle: 'dark',
           headerTintColor: colors.text,
-          headerTitle: '',
           headerSearchBarOptions: Platform.OS === 'ios' ? {
             placeholder: 'Search movies or series',
             autoCapitalize: 'none',
-            barTintColor: '#1C1C1E',
-            textColor: '#FFFFFF',
-            hintTextColor: '#8E8E93',
-            headerIconColor: '#FFFFFF',
-            tintColor: '#0A84FF',
             hideWhenScrolling: false,
             onChangeText: (event) => changeQuery(event.nativeEvent.text),
-            onFocus: () => setKeyboardVisible(true),
-            onBlur: () => setKeyboardVisible(false),
-            onCancelButtonPress: clearSearch,
+            onCancelButtonPress: () => changeQuery(''),
             onSearchButtonPress: (event) => changeQuery(event.nativeEvent.text),
           } : undefined,
+          headerRight: Platform.OS === 'web' ? () => (
+            <WebMenu
+              title="Filter results"
+              actions={FILTER_OPTIONS.map((option) => ({
+                id: option.id,
+                title: option.title,
+                state: selectedFilter === option.id ? 'on' as const : undefined,
+              }))}
+              onPressAction={handleWebFilterSelect}
+            >
+              <View style={styles.webFilterTrigger}>
+                <Text style={[styles.webFilterLabel, { color: colors.text }]}>{selectedFilterTitle}</Text>
+                <Ionicons name="chevron-down" size={16} color={colors.text} />
+              </View>
+            </WebMenu>
+          ) : undefined,
         }}
       />
+      {Platform.OS !== 'web' && (
+        <Stack.Toolbar placement="right">
+          <Stack.Toolbar.Menu title="Filter" accessibilityLabel="Filter search results">
+            <Stack.Toolbar.Label>{selectedFilterTitle}</Stack.Toolbar.Label>
+            {FILTER_OPTIONS.map((option) => (
+              <Stack.Toolbar.MenuAction
+                key={option.id}
+                isOn={selectedFilter === option.id}
+                onPress={() => setSelectedFilter(option.id)}
+              >
+                {option.title}
+              </Stack.Toolbar.MenuAction>
+            ))}
+          </Stack.Toolbar.Menu>
+        </Stack.Toolbar>
+      )}
       {Platform.OS !== 'ios' && (
         <View style={styles.searchHeader}>
           <View style={styles.searchField}>
             <Ionicons name="search-outline" size={22} color={colors.text} />
-            <TextInput
+            <NativeTextInput
               accessibilityLabel="Search movies or series"
               autoCapitalize="none"
               autoCorrect={false}
+              clearButtonMode="never"
               keyboardAppearance="dark"
               onChangeText={changeQuery}
-              onFocus={() => setKeyboardVisible(true)}
-              onBlur={() => setKeyboardVisible(false)}
               placeholder="Search movies or series"
               placeholderTextColor={colors.textDim}
               returnKeyType="search"
@@ -162,34 +186,11 @@ export default function SearchScreen() {
               value={query}
             />
             {query.length > 0 && (
-              <Pressable accessibilityLabel="Clear search text" accessibilityRole="button" hitSlop={8} onPress={clearSearch}>
+              <Pressable accessibilityLabel="Clear search text" accessibilityRole="button" hitSlop={8} onPress={() => changeQuery('')}>
                 <Ionicons name="close-circle" size={20} color="#D1D1D6" />
               </Pressable>
             )}
           </View>
-        </View>
-      )}
-
-      {showFilters && (
-        <View accessibilityRole="tablist" style={styles.filterBar}>
-          {([
-            { id: 'all', label: 'All' },
-            { id: 'movie', label: 'Movies' },
-            { id: 'series', label: 'TV Shows' },
-          ] as const).map((filter) => {
-            const selected = selectedFilter === filter.id;
-            return (
-              <Pressable
-                accessibilityRole="tab"
-                accessibilityState={{ selected }}
-                key={filter.id}
-                onPress={() => setSelectedFilter(filter.id)}
-                style={[styles.filterButton, selected && styles.selectedFilterButton]}
-              >
-                <Text style={[styles.filterLabel, { color: selected ? '#000000' : colors.textMuted }]}>{filter.label}</Text>
-              </Pressable>
-            );
-          })}
         </View>
       )}
 
@@ -251,22 +252,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderWidth: 0,
   },
-  filterBar: {
+  webFilterTrigger: {
     flexDirection: 'row',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.sm,
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
   },
-  filterButton: {
-    minHeight: 36,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.capsule,
-    backgroundColor: '#1C1C1E',
-  },
-  selectedFilterButton: { backgroundColor: '#FFFFFF' },
-  filterLabel: { ...typography.subhead, fontWeight: '600' },
+  webFilterLabel: { ...typography.subhead, fontWeight: '600' },
   resultsContainer: { flex: 1 },
   statusContainer: {
     flex: 1,
