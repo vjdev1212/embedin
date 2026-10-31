@@ -1,12 +1,13 @@
-import React, { useMemo } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   StyleSheet,
-  ScrollView,
   Image,
-  Pressable,
+  FlatList,
   useWindowDimensions,
 } from "react-native";
 import { View, Text } from "./Themed";
+import { NativeButton } from '@/components/NativeUiControls';
+import PersonDetailsScreen from '@/components/person-details-screen';
 
 const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/h632";
 
@@ -30,8 +31,48 @@ interface MediaCastAndCrewsProps {
   cast: CastMember[];
 }
 
+interface CastListItemProps {
+  item: {
+    id: number;
+    uniqueKey: string;
+    name: string;
+    hasImage: boolean;
+    imageUri: string | null;
+    initials: string | null;
+    displayCharacter: string;
+  };
+  onSelectPerson: (personId: number) => void;
+  avatarSize: number;
+}
+
+const CastListItem = React.memo(({ item, onSelectPerson, avatarSize }: CastListItemProps) => (
+  <NativeButton
+    accessibilityLabel={`View ${item.name}'s profile`}
+    onPress={() => onSelectPerson(item.id)}
+    style={[styles.avatarContainer, { width: avatarSize + 20 }]}
+  >
+    <View style={styles.avatarContent}>
+      <View style={styles.avatarWrapper}>
+        {item.hasImage ? (
+          <Image source={{ uri: item.imageUri! }} style={[styles.avatar, { width: avatarSize, height: avatarSize, borderRadius: avatarSize / 2 }]} />
+        ) : (
+          <View style={[styles.placeholderAvatar, { width: avatarSize, height: avatarSize, borderRadius: avatarSize / 2 }]}>
+            <Text style={[styles.initials, { color: '#ffffff', fontSize: avatarSize * 0.3 }]}>{item.initials}</Text>
+          </View>
+        )}
+        <View style={[styles.avatarBorder, { width: avatarSize + 4, height: avatarSize + 4, borderRadius: (avatarSize + 4) / 2 }]} />
+      </View>
+      <View style={styles.textContainer}>
+        <Text style={[styles.name, { fontSize: Math.max(13, avatarSize * 0.12) }]} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
+        <Text style={[styles.character, { fontSize: Math.max(11, avatarSize * 0.1) }]} numberOfLines={1} ellipsizeMode="tail">{item.displayCharacter}</Text>
+      </View>
+    </View>
+  </NativeButton>
+));
+
 const MediaCastAndCrews: React.FC<MediaCastAndCrewsProps> = ({ cast }) => {
   const { width, height } = useWindowDimensions();
+  const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
 
   // Device orientation and size logic
   const isPortrait = height > width;
@@ -90,95 +131,40 @@ const MediaCastAndCrews: React.FC<MediaCastAndCrewsProps> = ({ cast }) => {
     });
   }, [cast]);
 
+  const renderCastItem = useCallback(({ item }: { item: (typeof castItems)[number] }) => (
+    <CastListItem item={item} onSelectPerson={setSelectedPersonId} avatarSize={avatarSize} />
+  ), [avatarSize, castItems]);
+
   // Early return if no cast members
   if (cast.length === 0) {
     return null;
   }
 
   return (
-    <View style={styles.container}>
-      <View style={[styles.headerContainer, { paddingHorizontal: containerMargin }]}>
-        <Text style={[styles.sectionTitle, { color: COLORS.primary }]}>
-          Cast & Crew
-        </Text>
+    <>
+      <View style={styles.container}>
+        <View style={[styles.headerContainer, { paddingHorizontal: containerMargin }]}>
+          <Text style={[styles.sectionTitle, { color: COLORS.primary }]}>Cast & Crew</Text>
+        </View>
+        <FlatList
+          horizontal
+          data={castItems}
+          keyExtractor={(item) => item.uniqueKey}
+          initialNumToRender={Math.min(castPerScreen + 2, castItems.length)}
+          maxToRenderPerBatch={castPerScreen}
+          windowSize={3}
+          showsHorizontalScrollIndicator={false}
+          style={{ height: avatarSize + 60 }}
+          contentContainerStyle={[styles.scrollContent, { paddingHorizontal: containerMargin, gap: spacing }]}
+          renderItem={renderCastItem}
+        />
       </View>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={[styles.scrollContent, { paddingRight: containerMargin }]}
-        style={[styles.scrollView, { paddingLeft: containerMargin }]}
-      >
-        {castItems.map((item, index) => (
-          <Pressable
-            key={item.uniqueKey}
-            style={[
-              styles.avatarContainer,
-              {
-                width: avatarSize + 20, // Extra space for text
-                marginRight: index === castItems.length - 1 ? 0 : spacing,
-              }
-            ]}
-          >
-            <View style={styles.avatarWrapper}>
-              {item.hasImage ? (
-                <Image
-                  source={{ uri: item.imageUri! }}
-                  style={[styles.avatar, {
-                    width: avatarSize,
-                    height: avatarSize,
-                    borderRadius: avatarSize / 2,
-                  }]}
-                />
-              ) : (
-                <View style={[styles.placeholderAvatar, {
-                  width: avatarSize,
-                  height: avatarSize,
-                  borderRadius: avatarSize / 2,
-                  backgroundColor: COLORS.placeholderBg,
-                  borderColor: COLORS.border,
-                }]}>
-                  <Text style={[styles.initials, {
-                    color: COLORS.primary,
-                    fontSize: avatarSize * 0.3, // Scale initials with avatar size
-                  }]}>{item.initials}</Text>
-                </View>
-              )}
-
-              {/* Optional: Add online indicator or badge */}
-              <View style={[styles.avatarBorder, {
-                width: avatarSize + 4,
-                height: avatarSize + 4,
-                borderRadius: (avatarSize + 4) / 2,
-              }]} />
-            </View>
-
-            <View style={styles.textContainer}>
-              <Text
-                style={[styles.name, {
-                  color: COLORS.primary,
-                  fontSize: Math.max(13, avatarSize * 0.12), // Scale text with avatar
-                }]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {item.name}
-              </Text>
-              <Text
-                style={[styles.character, {
-                  color: COLORS.secondary,
-                  fontSize: Math.max(11, avatarSize * 0.1), // Scale text with avatar
-                }]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {item.displayCharacter}
-              </Text>
-            </View>
-          </Pressable>
-        ))}
-      </ScrollView>
-    </View>
+      <PersonDetailsScreen
+        visible={selectedPersonId !== null}
+        personId={selectedPersonId}
+        onClose={() => setSelectedPersonId(null)}
+      />
+    </>
   );
 };
 
@@ -204,6 +190,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 8,
   },
+  avatarContent: { alignItems: 'center' },
   avatarWrapper: {
     position: 'relative',
     marginBottom: 12   

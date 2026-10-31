@@ -1,15 +1,23 @@
-import React from 'react';
-import { useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import MediaGrid from '@/components/MediaGrid';
-import BottomSpacing from '@/components/BottomSpacing';
 
 const MoviesList = () => {
-  const { apiUrl } = useLocalSearchParams();
+  const { apiUrl, title } = useLocalSearchParams<{ apiUrl?: string; title?: string }>();
+  const pageTitle = title || 'Movies';
 
   return (
-    <MediaGrid
-      apiUrl={apiUrl as string}
-      detailsPath="/movie/details" />
+    <>
+      <Stack.Screen options={{
+        title: pageTitle,
+        headerTitle: pageTitle,
+        headerTitleAlign: 'left',
+        headerTransparent: true,
+        headerShadowVisible: false,
+        headerUserInterfaceStyle: 'dark',
+        headerStyle: { backgroundColor: 'transparent' },
+      }} />
+      <MediaGrid apiUrl={apiUrl} detailsPath="/movie/details" />
+    </>
   );
 };
 

@@ -4,9 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { StatusBar, Text } from '@/components/Themed';
 import { isHapticsSupported, showAlert } from '@/utils/platform';
 import * as Haptics from 'expo-haptics';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeTextInput } from '@/components/NativeUiControls';
-import { SettingsPage, SettingsRow, SettingsSection, SettingsTitle } from '@/components/NativeSettings';
+import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
 import { storageService } from '@/utils/StorageService';
 
 const PreferencesScreen = () => {
@@ -45,37 +44,43 @@ const PreferencesScreen = () => {
         showAlert('Preferences Saved', 'Your preferences have been saved.'); // Moved outside the try-catch
     };
     return (
-        <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.container}>
             <StatusBar />
             <SettingsPage>
-                <SettingsTitle title="Preferences" subtitle="Set the language and region used for discovery." />
                 <SettingsSection title="Language and Region">
-                    <View style={styles.field}>
-                        <Text style={styles.fieldLabel}>Language Code</Text>
-                        <NativeTextInput
-                            style={styles.inputHost}
-                            inputStyle={styles.searchInput}
-                            textStyle={styles.inputText}
-                            value={language}
-                            onChangeText={setLanguage}
-                            maxLength={2}
-                            autoCapitalize="none"
-                            accessibilityLabel="Language code"
-                        />
-                    </View>
-                    <View style={styles.field}>
-                        <Text style={styles.fieldLabel}>Region Code</Text>
-                        <NativeTextInput
-                            style={styles.inputHost}
-                            inputStyle={styles.searchInput}
-                            textStyle={styles.inputText}
-                            value={region}
-                            onChangeText={(text) => setRegion(text.toUpperCase())}
-                            maxLength={2}
-                            autoCapitalize="characters"
-                            accessibilityLabel="Region code"
-                        />
-                    </View>
+                    <SettingsRow
+                        title="Language"
+                        detail="Language Code"
+                        trailing={(
+                            <NativeTextInput
+                                style={styles.inputHost}
+                                inputStyle={styles.inputStyle}
+                                textStyle={styles.inputText}
+                                value={language}
+                                onChangeText={setLanguage}
+                                maxLength={2}
+                                autoCapitalize="none"
+                                accessibilityLabel="Language code"
+                            />
+                        )}
+                    />
+                    <SettingsRow
+                        title="Region"
+                        detail="Region Code"
+                        trailing={(
+                            <NativeTextInput
+                                style={styles.inputHost}
+                                inputStyle={styles.inputStyle}
+                                textStyle={styles.inputText}
+                                value={region}
+                                onChangeText={(text) => setRegion(text.toUpperCase())}
+                                maxLength={2}
+                                autoCapitalize="characters"
+                                accessibilityLabel="Region code"
+                            />
+                        )}
+                        isLast
+                    />
                 </SettingsSection>
                 <SettingsSection>
                     <SettingsRow
@@ -87,17 +92,15 @@ const PreferencesScreen = () => {
                     />
                 </SettingsSection>
             </SettingsPage>
-        </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#000000' },
-    field: { paddingVertical: 8, paddingHorizontal: 16, gap: 8 },
-    fieldLabel: { color: '#8e8e93', fontSize: 13 },
-    inputHost: { width: '100%' },
-    searchInput: { minHeight: 40, backgroundColor: '#1c1c1e', borderRadius: 8, paddingHorizontal: 12 },
-    inputText: { color: '#f2f2f7', fontSize: 16 },
+    inputHost: { width: 64, minHeight: 36 },
+    inputStyle: { minHeight: 36, paddingHorizontal: 2, backgroundColor: 'transparent' },
+    inputText: { color: '#f2f2f7', fontSize: 16, textAlign: 'right' },
     saveButton: { width: '100%', maxWidth: 340, alignSelf: 'center' },
 });
 

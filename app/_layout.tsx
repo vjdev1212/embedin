@@ -7,7 +7,6 @@ import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 
 export {
@@ -60,17 +59,22 @@ function RootLayoutNav() {
 
   const theme = GlassDarkTheme;
 
-  // Custom header background component
-  const HeaderBackground = () => (
-    <BlurView intensity={20} style={styles.headerBlur}>
-      <View style={styles.headerGlass} />
-    </BlurView>
-  );
-
-  // Custom header background component for invisible header
   const InvisibleHeaderBackground = () => (
     <View style={{ flex: 1, backgroundColor: 'transparent' }} />
   );
+
+  const settingsScreenOptions = (title: string) => ({
+    headerShown: true,
+    headerTransparent: true,
+    headerBackground: InvisibleHeaderBackground,
+    headerTitle: title,
+    title,
+    headerUserInterfaceStyle: 'dark' as const,
+    headerTintColor: '#ffffff',
+    headerBackTitle: '',
+    headerShadowVisible: false,
+    headerStyle: { backgroundColor: 'transparent' },
+  });
 
   return (
     <View style={styles.container}>
@@ -89,8 +93,10 @@ function RootLayoutNav() {
               headerUserInterfaceStyle: 'dark',
               headerTintColor: '#ffffff',
               headerBackTitle: '',
-              headerStyle: styles.glassHeader,
-              headerBackground: HeaderBackground,
+              headerTransparent: true,
+              headerStyle: { backgroundColor: 'transparent' },
+              headerBackground: InvisibleHeaderBackground,
+              headerShadowVisible: false,
               contentStyle: styles.screenContent,
             }}
           >
@@ -190,89 +196,13 @@ function RootLayoutNav() {
                 }
               }}
             />
-            <Stack.Screen name="settings/embed-movie"
-              options={{
-                headerShown: true,
-                headerTransparent: true,
-                headerBackground: InvisibleHeaderBackground,
-                headerTitle: '',
-                headerTintColor: '#ffffff',
-                headerBackTitle: '',
-                headerShadowVisible: false,
-                headerStyle: {
-                  backgroundColor: 'transparent',
-                }
-              }} />
-            <Stack.Screen name="settings/embed-tv"
-              options={{
-                headerShown: true,
-                headerTransparent: true,
-                headerBackground: InvisibleHeaderBackground,
-                headerTitle: '',
-                headerTintColor: '#ffffff',
-                headerBackTitle: '',
-                headerShadowVisible: false,
-                headerStyle: {
-                  backgroundColor: 'transparent',
-                }
-              }} />
-            <Stack.Screen name="settings/preferences" options={{
-              headerShown: true,
-              headerTransparent: true,
-              headerBackground: InvisibleHeaderBackground,
-              headerTitle: '',
-              headerTintColor: '#ffffff',
-              headerBackTitle: '',
-              headerShadowVisible: false,
-              headerStyle: {
-                backgroundColor: 'transparent',
-              }
-            }} />
-            <Stack.Screen
-              name="settings/downloads"
-              options={{
-                headerShown: true,
-                headerTransparent: true,
-                headerBackground: InvisibleHeaderBackground,
-                headerTitle: '',
-                headerTintColor: '#ffffff',
-                headerBackTitle: '',
-                headerShadowVisible: false,
-                headerStyle: {
-                  backgroundColor: 'transparent',
-                }
-              }}
-            />
-            <Stack.Screen
-              name="settings/contact"
-              options={{
-                headerShown: true,
-                headerTransparent: true,
-                headerBackground: InvisibleHeaderBackground,
-                headerTitle: '',
-                headerTintColor: '#ffffff',
-                headerBackTitle: '',
-                headerShadowVisible: false,
-                headerStyle: {
-                  backgroundColor: 'transparent',
-                }
-              }}
-            />
-            <Stack.Screen
-              name="settings/donate"
-              options={{
-                headerShown: true,
-                headerTransparent: true,
-                headerBackground: InvisibleHeaderBackground,
-                headerTitle: '',
-                headerTintColor: '#ffffff',
-                headerBackTitle: '',
-                headerShadowVisible: false,
-                headerStyle: {
-                  backgroundColor: 'transparent',
-                }
-              }}
-            />            
+            <Stack.Screen name="settings/embed-movie" options={settingsScreenOptions('Movie Embed')} />
+            <Stack.Screen name="settings/embed-tv" options={settingsScreenOptions('TV Embed')} />
+            <Stack.Screen name="settings/preferences" options={settingsScreenOptions('Language & Region')} />
+            <Stack.Screen name="settings/downloads" options={settingsScreenOptions('Downloads')} />
+            <Stack.Screen name="settings/contact" options={settingsScreenOptions('Contact')} />
+            <Stack.Screen name="settings/donate" options={settingsScreenOptions('Support Embedin')} />
+            <Stack.Screen name="settings/disclaimer" options={settingsScreenOptions('Disclaimer')} />
           </Stack>
         </ThemeProvider>
       </ActionSheetProvider>
@@ -291,23 +221,6 @@ const styles = StyleSheet.create({
   screenContent: { backgroundColor: '#000000' },
   modalContent: {
     backgroundColor: 'rgba(0, 0, 0, 0.95)',
-  },
-  glassHeader: {
-    backgroundColor: 'transparent',
-    elevation: 0,
-    shadowOpacity: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
-  },
-  headerBlur: {
-    flex: 1,
-    backgroundColor: 'transparent',
-  },
-  headerGlass: {
-    flex: 1,
-    backgroundColor: 'rgba(18, 18, 18, 0.8)',
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.1)',
   },
 });
 

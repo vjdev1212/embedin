@@ -122,7 +122,7 @@ export function SettingsTitle({ title, subtitle }: { title: string; subtitle?: s
 
 const styles = StyleSheet.create({
   page: { flex: 1, backgroundColor: '#000000' },
-  pageContent: { width: '100%', maxWidth: 780, alignSelf: 'center', paddingHorizontal: 16, paddingTop: 8, paddingBottom: 32, gap: 24 },
+  pageContent: { width: '100%', maxWidth: 780, alignSelf: 'center', paddingHorizontal: 16, paddingBottom: 32, gap: 24 },
   section: { gap: 8 },
   sectionTitle: { fontSize: 13, fontWeight: '600', paddingHorizontal: 16, color: '#8e8e93' },
   group: { backgroundColor: '#1c1c1e', borderRadius: 12, overflow: 'hidden' },

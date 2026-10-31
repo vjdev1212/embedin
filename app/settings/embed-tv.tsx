@@ -1,13 +1,12 @@
-import { Linking, StyleSheet } from 'react-native';
+import { Linking, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar, Text } from '../../components/Themed';
 import { isHapticsSupported, showAlert } from '@/utils/platform';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from 'react';
 import { defaultTvShowUrlTemplate } from '@/constants/Embed';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { NativeTextInput } from '@/components/NativeUiControls';
-import { SettingsPage, SettingsRow, SettingsSection, SettingsTitle } from '@/components/NativeSettings';
+import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
 import { storageService } from '@/utils/StorageService';
 
 interface EmbedSettings {
@@ -54,11 +53,10 @@ const EmbedTvShowsSettingsScreen = () => {
     };
 
     return (
-        <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={styles.container}>
             <StatusBar />
             <SettingsPage>
-                <SettingsTitle title="TV Embed" subtitle="Choose the player URL used for TV episodes." />
-                <SettingsSection title="Embed URL" footer="Use {TMDBID} or {IMDBID}, plus {SEASON} and {EPISODE}.">
+                <SettingsSection title="Embed URL">
                     <NativeTextInput
                         style={styles.inputHost}
                         inputStyle={styles.textInput}
@@ -69,8 +67,19 @@ const EmbedTvShowsSettingsScreen = () => {
                         placeholder="Enter your TV shows embed URL template..."
                         placeholderTextColor="#8e8e93"
                     />
+                </SettingsSection>
+                <View style={styles.hints}>
                     <Text style={styles.example}>TMDB: https://player.videasy.net/tv/{'{TMDBID}'}/{'{SEASON}'}/{'{EPISODE}'}</Text>
-                    <Text style={styles.example}>IMDB: https://player.videasy.net/tv/{'{IMDBID}'}/{'{SEASON}'}/{'{EPISODE}'}</Text>
+                    <Text style={styles.example}>IMDb: https://player.videasy.net/tv/{'{IMDBID}'}/{'{SEASON}'}/{'{EPISODE}'}</Text>
+                </View>
+                <SettingsSection>
+                    <SettingsRow
+                        title="Save Settings"
+                        titleColor="#0a84ff"
+                        onPress={saveEmbedSettings}
+                        leading={<Ionicons name="checkmark-circle-outline" size={20} color="#0a84ff" />}
+                        isLast
+                    />
                 </SettingsSection>
                 <SettingsSection title="Ad Blocking">
                     <Text style={styles.sectionSubtitle}>
@@ -81,23 +90,15 @@ const EmbedTvShowsSettingsScreen = () => {
                         {' '}to set it up on your device.
                     </Text>
                 </SettingsSection>
-                <SettingsSection>
-                    <SettingsRow
-                        title="Save Settings"
-                        titleColor="#0a84ff"
-                        onPress={saveEmbedSettings}
-                        leading={<Ionicons name="checkmark-circle-outline" size={20} color="#0a84ff" />}
-                        isLast
-                    />
-                </SettingsSection>
             </SettingsPage>
-        </SafeAreaView>
+        </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#000000' },
     inputHost: { width: '100%', minHeight: 120, marginBottom: 8 },
+    hints: { paddingHorizontal: 16, gap: 4 },
     sectionSubtitle: {
         fontSize: 14,
         color: '#888',
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
         borderColor: '#38383a',
     },
     inputText: { color: '#f2f2f7', fontSize: 15 },
-    example: { fontSize: 13, color: '#8e8e93', fontFamily: 'monospace', marginTop: 6 },
+    example: { fontSize: 13, color: '#8e8e93', fontFamily: 'monospace' },
     saveButton: {
         alignSelf: 'center',
         width: '100%',

@@ -5,7 +5,7 @@ import {
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SettingsPage, SettingsRow, SettingsSection, SettingsTitle } from '@/components/NativeSettings';
+import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
 
 const AppResourcesScreen = () => {
   const resources = [
@@ -56,9 +56,8 @@ const AppResourcesScreen = () => {
     <View style={styles.container}>
       <StatusBar />
       <SettingsPage>
-        <SettingsTitle title="Downloads" subtitle="Choose your preferred platform." />
-          {resources.map((resource, index) => (
-            <SettingsSection key={resource.id} title={index === 0 ? 'Install Embedin' : undefined} footer={`${resource.subtitle}.`}>
+          {resources.map((resource) => (
+            <SettingsSection key={resource.id} footer={`${resource.subtitle}.`}>
               <SettingsRow
                 title={resource.title}
                 onPress={() => handlePress(resource.url)}

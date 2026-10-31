@@ -220,7 +220,7 @@ const PosterList = ({
     }
     router.push({
       pathname: `/${type}/list`,
-      params: { apiUrl },
+      params: { apiUrl, title },
     });
   }, [apiUrl, type]);
 
