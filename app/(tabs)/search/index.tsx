@@ -2,7 +2,9 @@ import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import MediaGrid, { GENRE_NAMES, type MediaGridItem } from '@/components/MediaGrid';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import SegmentedControl from '@expo/ui/community/segmented-control';
 import { Stack } from 'expo-router';
+import { useHeaderHeight } from 'expo-router/react-navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextInput as NativeTextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -73,6 +75,7 @@ async function fetchSearchResults(query: string, signal: AbortSignal): Promise<M
 
 export default function SearchScreen() {
   const { colors } = useTheme();
+  const headerHeight = useHeaderHeight();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MediaGridItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -112,7 +115,13 @@ export default function SearchScreen() {
   return (
     <SafeAreaView
       edges={['left', 'right', 'bottom']}
-      style={[styles.container, { backgroundColor: systemDarkBackground }]}
+      style={[
+        styles.container,
+        {
+          backgroundColor: systemDarkBackground,
+          paddingTop: Platform.OS === 'ios' ? headerHeight : 0,
+        },
+      ]}
     >
       <StatusBar />
       <Stack.Screen
@@ -137,24 +146,6 @@ export default function SearchScreen() {
           } : undefined,
         }}
       />
-      {Platform.OS !== 'web' && (
-        <Stack.Toolbar placement="right">
-          {FILTER_OPTIONS.map((option) => {
-            const isSelected = selectedFilter === option.id;
-            return (
-              <Stack.Toolbar.Button
-                key={option.id}
-                accessibilityLabel={`Filter by ${option.title}`}
-                selected={isSelected}
-                tintColor={isSelected ? colors.text : colors.textMuted}
-                onPress={() => setSelectedFilter(option.id)}
-              >
-                {option.title}
-              </Stack.Toolbar.Button>
-            );
-          })}
-        </Stack.Toolbar>
-      )}
       {Platform.OS !== 'ios' && (
         <View style={styles.searchHeader}>
           <View style={styles.searchField}>
@@ -176,34 +167,19 @@ export default function SearchScreen() {
           </View>
         </View>
       )}
-      {Platform.OS === 'web' && (
-        <View accessibilityRole="tablist" style={styles.filterRow}>
-          {FILTER_OPTIONS.map((option) => {
-            const isSelected = selectedFilter === option.id;
-            return (
-              <Pressable
-                key={option.id}
-                accessibilityRole="tab"
-                accessibilityState={{ selected: isSelected }}
-                onPress={() => setSelectedFilter(option.id)}
-                style={[
-                  styles.filterButton,
-                  { backgroundColor: isSelected ? colors.text : colors.primaryCard },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.filterLabel,
-                    { color: isSelected ? '#000000' : colors.textMuted },
-                  ]}
-                >
-                  {option.title}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </View>
-      )}
+      <View style={styles.filterRow}>
+        <SegmentedControl
+          accessibilityLabel="Filter search results"
+          appearance="dark"
+          selectedIndex={FILTER_OPTIONS.findIndex((option) => option.id === selectedFilter)}
+          tintColor={colors.primary}
+          values={FILTER_OPTIONS.map((option) => option.title)}
+          onValueChange={(value) => {
+            const option = FILTER_OPTIONS.find((filter) => filter.title === value);
+            if (option) setSelectedFilter(option.id);
+          }}
+        />
+      </View>
 
       <View style={styles.resultsContainer}>
         {loading ? (
@@ -264,21 +240,9 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   filterRow: {
-    flexDirection: 'row',
-    gap: spacing.sm,
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
     paddingBottom: spacing.sm,
-  },
-  filterButton: {
-    minHeight: 36,
-    justifyContent: 'center',
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.capsule,
-  },
-  filterLabel: {
-    ...typography.subhead,
-    fontWeight: '600',
   },
   resultsContainer: { flex: 1 },
   statusContainer: {
