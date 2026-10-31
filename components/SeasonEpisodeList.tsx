@@ -1,13 +1,25 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
-import { StyleSheet, Pressable, useWindowDimensions, Animated, TouchableOpacity, Platform, ScrollView } from 'react-native';
-import { Text, View } from './Themed';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Animated,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  useWindowDimensions,
+} from 'react-native';
+import { MenuView } from '@expo/ui/community/menu';
+import type { MenuAction, NativeActionEvent } from '@expo/ui/community/menu';
+import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/context/ThemeContext';
+import { radius, spacing, typography } from '@/constants/theme';
 import { formatDate } from '@/utils/Date';
-import { SvgXml } from 'react-native-svg';
 import { DefaultEpisodeThumbnailImgXml } from '@/utils/Svg';
+import { SvgXml } from 'react-native-svg';
 import CustomContextMenu from './ContextMenu';
-import { NativeSelect } from '@/components/NativeUiControls';
+import { Text, View } from './Themed';
+import PosterArtwork from '@/components/PosterArtwork';
 
-// Type definitions
 interface Episode {
   name: string;
   title: string;
@@ -32,271 +44,240 @@ interface EpisodeItemProps {
   cardWidth: number;
 }
 
-// Constants
-const THUMBNAIL_BACKGROUND_COLOR = '#0f0f0f';
-const EPISODE_AIRED_COLOR = '#cccccc';
-const ANIMATION_DURATION = 100;
-const IMAGE_LOAD_DELAY = 100;
+interface WebSeasonMenuItem {
+  id: string;
+  title: string;
+  value: number;
+  key: string;
+}
+
 const THUMBNAIL_ASPECT_RATIO = 16 / 9;
-const CARD_GAP = 16;
+const CARD_GAP = spacing.md;
 
-// Function to calculate card width based on screen dimensions
-const getCardWidth = (screenWidth: number, screenHeight: number) => {
-  const isPortrait = screenHeight > screenWidth;
+const getCardWidth = (screenWidth: number, screenHeight: number) =>
+  screenHeight > screenWidth ? 210 : 240;
 
-  if (isPortrait) {
-    return 210;
-  } else {
-    return 240;
-  }
-};
+const EpisodeItem: React.FC<EpisodeItemProps> = React.memo(
+  ({ item, onEpisodeSelect, cardWidth }) => {
+    const { colors } = useTheme();
+    const [isLoading, setIsLoading] = useState(Boolean(item.thumbnail));
+    const [imgError, setImgError] = useState(!item.thumbnail);
+    const [scaleAnim] = useState(() => new Animated.Value(1));
 
-const EpisodeItem: React.FC<EpisodeItemProps> = React.memo(({ item, onEpisodeSelect, cardWidth }) => {
-  const [selectedEpisode, setSelectedEpisode] = useState<number>(1);
-  const [isLoading, setIsLoading] = useState(true);
-  const [fadeAnim] = useState(() => new Animated.Value(0));
-  const [imgError, setImgError] = useState(false);
-  const [scaleAnim] = useState(() => new Animated.Value(1));
+    const computedValues = useMemo(
+      () => ({
+        episodeTitle: `${item.episode || item.number}. ${item.name || item.title}`,
+        episodeAired: formatDate(item.firstAired) || formatDate(item.released),
+      }),
+      [item],
+    );
 
-  // Memoized computed values
-  const computedValues = useMemo(() => {
-    const episodeTitle = `${item.episode || item.number}. ${item.name || item.title}`;
-    const episodeAired = formatDate(item.firstAired) || formatDate(item.released);
-
-    return {
-      episodeTitle,
-      episodeAired,
-    };
-  }, [item]);
-
-  // Memoized styles
-  const thumbnailStyle = useMemo(() => ({
-    ...styles.thumbnail,
-    backgroundColor: THUMBNAIL_BACKGROUND_COLOR,
-    aspectRatio: THUMBNAIL_ASPECT_RATIO,
-  }), []);
-
-  const placeholderStyle = useMemo(() => ({
-    ...styles.thumbnailPlaceHolder,
-    backgroundColor: THUMBNAIL_BACKGROUND_COLOR,
-    aspectRatio: THUMBNAIL_ASPECT_RATIO,
-  }), []);
-
-  const episodeAiredStyle = useMemo(() => ({
-    ...styles.episodeAired,
-    color: EPISODE_AIRED_COLOR,
-  }), []);
-
-  // Memoized callbacks
-  const handleImageError = useCallback(() => {
-    setImgError(true);
-  }, []);
-
-  const handleEpisodeSelect = useCallback(async (season: number, episode: number) => {
-    setSelectedEpisode(episode);
-    onEpisodeSelect(season, episode);
-  }, [onEpisodeSelect]);
-
-  const handlePress = useCallback(() => {
-    handleEpisodeSelect(item.season, item.number);
-  }, [handleEpisodeSelect, item.season, item.number]);
-
-  const handlePressIn = useCallback(() => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.96,
-      useNativeDriver: true,
-    }).start();
-  }, [scaleAnim]);
-
-  const handlePressOut = useCallback(() => {
-    Animated.spring(scaleAnim, {
-      toValue: 1,
-      useNativeDriver: true,
-    }).start();
-  }, [scaleAnim]);
-
-  // Animation effect
-  useEffect(() => {
-    const imageLoader = setTimeout(() => {
+    const handleImageLoad = useCallback((onImageLoad: () => void) => {
       setIsLoading(false);
-      const animation = Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: ANIMATION_DURATION,
-        useNativeDriver: true,
-      });
-      animation.start();
-    }, IMAGE_LOAD_DELAY);
+      onImageLoad();
+    }, []);
 
-    return () => clearTimeout(imageLoader);
-  }, [fadeAnim]);
+    const handleImageError = useCallback(() => {
+      setImgError(true);
+      setIsLoading(false);
+    }, []);
 
-  // Reset image error when thumbnail changes
-  useEffect(() => {
-    setImgError(false);
-  }, [item.thumbnail]);
+    const handlePress = useCallback(
+      () => onEpisodeSelect(item.season, item.number),
+      [onEpisodeSelect, item.season, item.number],
+    );
 
-  const renderThumbnail = () => {
-    if (isLoading) {
-      return (
-        <View style={styles.thumbnailWrapper}>
-          <View style={[styles.skeletonBackground, thumbnailStyle]} />
-        </View>
-      );
-    }
+    const handlePressIn = useCallback(
+      () => Animated.spring(scaleAnim, { toValue: 0.96, useNativeDriver: true }).start(),
+      [scaleAnim],
+    );
 
-    if (!imgError) {
-      return (
-        <View style={styles.thumbnailWrapper}>
-          <Animated.Image
-            source={{ uri: item.thumbnail }}
-            onError={handleImageError}
-            style={[thumbnailStyle, { opacity: fadeAnim }]}
-          />
-        </View>
-      );
-    }
+    const handlePressOut = useCallback(
+      () => Animated.spring(scaleAnim, { toValue: 1, useNativeDriver: true }).start(),
+      [scaleAnim],
+    );
+
+    useEffect(() => {
+      setImgError(!item.thumbnail);
+      setIsLoading(Boolean(item.thumbnail));
+    }, [item.thumbnail]);
 
     return (
-      <View style={styles.thumbnailWrapper}>
-        <View style={placeholderStyle}>
-          <SvgXml xml={DefaultEpisodeThumbnailImgXml} width="40%" height="40%" />
-        </View>
-      </View>
+      <Animated.View style={{ width: cardWidth, transform: [{ scale: scaleAnim }] }}>
+        <Pressable
+          onPress={handlePress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          style={styles.episodePressable}
+        >
+          <View style={styles.episodeCard}>
+            <PosterArtwork
+              key={item.thumbnail}
+              style={[styles.thumbnailArtwork, { backgroundColor: colors.background }]}
+            >
+              {(onImageLoad) => (
+                <>
+                  {!imgError && (
+                    <Animated.Image
+                      source={{ uri: item.thumbnail }}
+                      onLoad={() => handleImageLoad(onImageLoad)}
+                      onError={handleImageError}
+                      style={styles.thumbnail}
+                      resizeMode="cover"
+                    />
+                  )}
+                  {isLoading && (
+                    <View
+                      pointerEvents="none"
+                      style={[
+                        StyleSheet.absoluteFill,
+                        styles.skeletonBackground,
+                        { backgroundColor: colors.background },
+                      ]}
+                    />
+                  )}
+                  {imgError && (
+                    <View
+                      style={[
+                        StyleSheet.absoluteFill,
+                        styles.thumbnailPlaceHolder,
+                        { backgroundColor: colors.background },
+                      ]}
+                    >
+                      <SvgXml xml={DefaultEpisodeThumbnailImgXml} width="40%" height="40%" />
+                    </View>
+                  )}
+                </>
+              )}
+            </PosterArtwork>
+            <View style={styles.episodeInfo}>
+              <Text
+                style={[styles.episodeTitle, { color: colors.text }]}
+                numberOfLines={2}
+              >
+                {computedValues.episodeTitle}
+              </Text>
+              <Text style={[styles.episodeAired, { color: colors.textMuted }]}>
+                {computedValues.episodeAired}
+              </Text>
+            </View>
+          </View>
+        </Pressable>
+      </Animated.View>
     );
-  };
-
-  return (
-    <Animated.View
-      style={[
-        styles.episodeContainer,
-        {
-          width: cardWidth,
-          transform: [{ scale: scaleAnim }]
-        }
-      ]}
-    >
-      <Pressable
-        onPress={handlePress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={styles.episodePressable}
-      >
-        <View style={styles.episodeCard}>
-          <View style={styles.thumbnailContainer}>
-            {renderThumbnail()}
-          </View>
-          <View style={styles.episodeInfo}>
-            <Text style={styles.episodeTitle} numberOfLines={2}>
-              {computedValues.episodeTitle}
-            </Text>
-            <Text style={episodeAiredStyle}>
-              {computedValues.episodeAired}
-            </Text>
-          </View>
-        </View>
-      </Pressable>
-    </Animated.View>
-  );
-});
+  },
+);
 
 const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisodeSelect }) => {
-  const [selectedSeason, setSelectedSeason] = useState<number>(1);
+  const { colors } = useTheme();
+  const [selectedSeason, setSelectedSeason] = useState(1);
   const { width, height } = useWindowDimensions();
-  // Web-only dropdown state for CustomContextMenu
+  const menuRef = useRef<React.ElementRef<typeof MenuView>>(null);
   const [webMenuVisible, setWebMenuVisible] = useState(false);
   const [anchorPosition, setAnchorPosition] = useState({ x: 0, y: 0 });
 
-  // Memoized computed values
-  const computedValues = useMemo(() => {
-    const isPortrait = height > width;
-    const cardWidth = getCardWidth(width, height);
+  const cardWidth = useMemo(() => getCardWidth(width, height), [height, width]);
 
-    // Group episodes by season
-    const groupedEpisodes = videos.reduce((acc, video) => {
-      if (!acc[video.season]) {
-        acc[video.season] = [];
-      }
-      acc[video.season].push(video);
-      return acc;
-    }, {} as Record<number, Episode[]>);
+  const groupedEpisodes = useMemo(
+    () =>
+      videos.reduce((acc, video) => {
+        if (!acc[video.season]) acc[video.season] = [];
+        acc[video.season].push(video);
+        return acc;
+      }, {} as Record<number, Episode[]>),
+    [videos],
+  );
 
-    // Create season data for dropdown
-    const seasonData = [
+  const seasonData = useMemo(
+    () => [
       ...Object.keys(groupedEpisodes)
         .map(Number)
         .filter((season) => season !== 0)
         .sort((a, b) => a - b),
       ...(groupedEpisodes[0] ? [0] : []),
-    ];
+    ],
+    [groupedEpisodes],
+  );
 
-    // Create menu items for CustomContextMenu (web)
-    const webMenuItems = seasonData.map((season, index) => ({
-      id: `season-${season}-${index}`,
-      title: season === 0 ? 'Specials' : `Season ${season}`,
-      value: season,
-      key: `season-item-${season}-${index}`
-    }));
+  const menuActions = useMemo<MenuAction[]>(
+    () =>
+      seasonData.map((season) => ({
+        id: `season-${season}`,
+        title: season === 0 ? 'Specials' : `Season ${season}`,
+        titleColor: selectedSeason === season ? colors.primary : '#ffffff',
+        state: selectedSeason === season ? 'on' : undefined,
+      })),
+    [colors.primary, seasonData, selectedSeason],
+  );
 
-    return {
-      isPortrait,
-      cardWidth,
-      groupedEpisodes,
-      seasonData,
-      webMenuItems,
-    };
-  }, [videos, height, width]);
+  const webMenuItems = useMemo<WebSeasonMenuItem[]>(
+    () =>
+      seasonData.map((season, index) => ({
+        id: `season-${season}-${index}`,
+        title: season === 0 ? 'Specials' : `Season ${season}`,
+        value: season,
+        key: `season-item-${season}-${index}`,
+      })),
+    [seasonData],
+  );
 
-  // Memoized callbacks
   const handleSeasonSelect = useCallback((season: number) => {
     setSelectedSeason(season);
     setWebMenuVisible(false);
   }, []);
 
-  // Web dropdown handlers for CustomContextMenu
-  const handleWebSeasonDropdownPress = useCallback(async (event: any) => {
+  const handleMenuPress = useCallback(
+    ({ nativeEvent }: NativeActionEvent) => {
+      const match = nativeEvent.event.match(/season-(\d+)/);
+      if (match) handleSeasonSelect(Number(match[1]));
+    },
+    [handleSeasonSelect],
+  );
+
+  const handleWebSeasonDropdownPress = useCallback((event: { nativeEvent: { pageX: number; pageY: number } }) => {
     const { pageX, pageY } = event.nativeEvent;
     setAnchorPosition({ x: pageX, y: pageY });
     setWebMenuVisible(true);
   }, []);
 
-  const handleWebContextMenuItemSelect = useCallback((item: any) => {
-    handleSeasonSelect(item.value || item.id);
-  }, [handleSeasonSelect]);
+  const handleWebContextMenuItemSelect = useCallback(
+    (item: WebSeasonMenuItem) => handleSeasonSelect(item.value),
+    [handleSeasonSelect],
+  );
 
-  const renderEpisodeItem = useCallback((episode: Episode, index: number) => (
-    <EpisodeItem
-      key={`episode-${episode.season}-${episode.episode || episode.number}-${index}`}
-      item={episode}
-      onEpisodeSelect={onEpisodeSelect}
-      cardWidth={computedValues.cardWidth}
-    />
-  ), [onEpisodeSelect, computedValues.cardWidth]);
+  const renderEpisodeItem = useCallback(
+    (episode: Episode, index: number) => (
+      <EpisodeItem
+        key={`episode-${episode.season}-${episode.episode || episode.number}-${episode.thumbnail}-${index}`}
+        item={episode}
+        onEpisodeSelect={onEpisodeSelect}
+        cardWidth={cardWidth}
+      />
+    ),
+    [onEpisodeSelect, cardWidth],
+  );
 
-  // Handle initial selection when videos load
   useEffect(() => {
     if (videos.length > 0) {
-      const availableSeasons = Object.keys(
-        videos.reduce((acc, video) => ({ ...acc, [video.season]: true }), {})
-      ).map(Number).sort((a, b) => a - b);
-
-      const defaultSeason = availableSeasons.find(s => s !== 0) || availableSeasons[0] || 1;
-      setSelectedSeason(defaultSeason);
+      const seasons = Array.from(new Set(videos.map((video) => video.season))).sort(
+        (a, b) => a - b,
+      );
+      setSelectedSeason(seasons.find((season) => season !== 0) || seasons[0] || 1);
     }
   }, [videos]);
 
-  // Early return if no videos
   if (!videos || videos.length === 0) {
     return (
       <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No episodes available</Text>
+        <Text style={[styles.emptyText, { color: colors.textMuted }]}>
+          No episodes available
+        </Text>
       </View>
     );
   }
 
-  // Get current season display text
-  const getCurrentSeasonText = () => {
-    return selectedSeason === 0 ? 'Specials' : `Season ${selectedSeason}`;
-  };
+  const currentSeasonText =
+    selectedSeason === 0 ? 'Specials' : `Season ${selectedSeason}`;
 
   return (
     <View style={styles.container}>
@@ -307,178 +288,107 @@ const SeasonEpisodeList: React.FC<SeasonEpisodeListProps> = ({ videos, onEpisode
               style={styles.seasonDropdownButton}
               onPress={handleWebSeasonDropdownPress}
             >
-              <Text style={styles.seasonDropdownText}>
-                {getCurrentSeasonText()}
+              <Text style={[styles.seasonDropdownText, { color: colors.text }]}>
+                {currentSeasonText}
               </Text>
-              <Text style={styles.seasonDropdownArrow}>▼</Text>
+              <Text style={[styles.seasonDropdownArrow, { color: colors.text }]}>▼</Text>
             </TouchableOpacity>
-
             <CustomContextMenu
               visible={webMenuVisible}
               onClose={() => setWebMenuVisible(false)}
-              items={computedValues.webMenuItems}
-              selectedItem={selectedSeason}
+              items={webMenuItems}
+              selectedItem={webMenuItems.find((item) => item.value === selectedSeason)}
               onItemSelect={handleWebContextMenuItemSelect}
               anchorPosition={anchorPosition}
             />
           </>
         ) : (
-          <NativeSelect
-            selectedValue={selectedSeason}
-            onValueChange={handleSeasonSelect}
-            options={computedValues.seasonData.map((season) => ({
-              label: season === 0 ? 'Specials' : `Season ${season}`,
-              value: season,
-            }))}
-            style={styles.seasonSelect}
-          />
+          <MenuView
+            ref={menuRef}
+            onPressAction={handleMenuPress}
+            actions={menuActions}
+            shouldOpenOnLongPress={false}
+            colorScheme="dark"
+          >
+            <TouchableOpacity style={styles.seasonDropdownButton}>
+              <Text style={[styles.seasonDropdownText, { color: colors.text }]}>
+                {currentSeasonText}
+              </Text>
+              <Ionicons name="chevron-expand" size={24} color={colors.text} />
+            </TouchableOpacity>
+          </MenuView>
         )}
       </View>
-
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.episodeScrollContent}
-        style={styles.episodeScrollView}
-      >
-        {computedValues.groupedEpisodes[selectedSeason]?.length > 0 ? (
-          computedValues.groupedEpisodes[selectedSeason].map((episode, index) =>
-            renderEpisodeItem(episode, index)
-          )
-        ) : (
-          <View style={styles.noEpisodesContainer}>
-            <Text style={styles.noEpisodesText}>
-              No episodes available for {getCurrentSeasonText()}
-            </Text>
-          </View>
-        )}
-      </ScrollView>
+      {groupedEpisodes[selectedSeason]?.length > 0 ? (
+        <ScrollView
+          horizontal
+          nestedScrollEnabled
+          showsHorizontalScrollIndicator={false}
+          style={styles.episodeScrollView}
+          contentContainerStyle={styles.episodeScrollContent}
+        >
+          {groupedEpisodes[selectedSeason].map(renderEpisodeItem)}
+        </ScrollView>
+      ) : (
+        <View style={styles.noEpisodesContainer}>
+          <Text style={[styles.noEpisodesText, { color: colors.textMuted }]}>
+            No episodes available for {currentSeasonText}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    marginBottom: 20
-  },
+  container: { backgroundColor: 'transparent', marginBottom: spacing.md },
   seasonListContainer: {
-    paddingVertical: 8,
-    paddingHorizontal: 20,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.mdLg,
     backgroundColor: 'transparent',
   },
   seasonDropdownButton: {
-    paddingTop: 10,
-    paddingHorizontal: 5,
+    minHeight: 40,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-evenly',
-    width: 150,
-    maxWidth: 130,
+    justifyContent: 'flex-start',
+    alignSelf: 'flex-start',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    borderRadius: radius.capsule,
+    backgroundColor: 'transparent',
   },
-  seasonSelect: {
-    width: 180,
-    minHeight: 40,
-  },
-  seasonDropdownText: {
-    fontSize: 20,
-    color: '#ffffff',
-    fontWeight: '500',
-    letterSpacing: 0.3,
-    flex: 1,
-  },
-  seasonDropdownArrow: {
-    fontSize: 18,
-    color: '#ffffff',
-    fontWeight: '600'
-  },
-  episodeScrollView: {
-    flex: 1,
-  },
+  seasonDropdownText: { ...typography.headline, flexShrink: 0 },
+  seasonDropdownArrow: { ...typography.subhead, fontWeight: '600' },
+  episodeScrollView: { width: '100%' },
   episodeScrollContent: {
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.sm,
     gap: CARD_GAP,
   },
-  episodeContainer: {
-    marginRight: CARD_GAP,
-  },
-  episodePressable: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  episodeCard: {
-    backgroundColor: 'transparent',
-    padding: 0,
-  },
-  thumbnailContainer: {
-    width: '100%',
-    position: 'relative',
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-  },
+  episodePressable: { borderRadius: radius.md, overflow: 'hidden' },
+  episodeCard: { backgroundColor: 'transparent', padding: 0 },
+  thumbnailArtwork: { width: '100%', aspectRatio: THUMBNAIL_ASPECT_RATIO },
   episodeInfo: {
-    paddingTop: 10,
-    paddingHorizontal: 4,
-    gap: 4,
+    paddingTop: spacing.sm,
+    paddingHorizontal: spacing.xs,
+    gap: spacing.xs,
     backgroundColor: 'transparent',
   },
-  thumbnailPlaceHolder: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    aspectRatio: THUMBNAIL_ASPECT_RATIO,
-  },
-  thumbnail: {
-    width: '100%',
-    aspectRatio: THUMBNAIL_ASPECT_RATIO,
-  },
-  episodeTitle: {
-    fontSize: 14,
-    fontWeight: '500',
-    lineHeight: 18,
-    color: '#ffffff',
-  },
-  episodeAired: {
-    fontSize: 12,
-    fontWeight: '400',
-    letterSpacing: 0.1,
-  },
-  skeletonBackground: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    opacity: 1,
-  },
+  thumbnailPlaceHolder: { justifyContent: 'center', alignItems: 'center' },
+  thumbnail: StyleSheet.absoluteFill,
+  episodeTitle: { ...typography.subhead, fontWeight: '600' },
+  episodeAired: { ...typography.caption },
+  skeletonBackground: { opacity: 1 },
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingVertical: 40,
+    paddingVertical: spacing.xxl,
   },
-  emptyText: {
-    fontSize: 16,
-    color: '#888',
-    textAlign: 'center',
-  },
-  noEpisodesContainer: {
-    paddingVertical: 40,
-    alignItems: 'center',
-  },
-  noEpisodesText: {
-    fontSize: 14,
-    color: '#888',
-    textAlign: 'center',
-  },
-  thumbnailWrapper: {
-    position: 'relative',
-    overflow: 'hidden',
-  }
+  emptyText: { ...typography.body, textAlign: 'center' },
+  noEpisodesContainer: { paddingVertical: spacing.xxl, alignItems: 'center' },
+  noEpisodesText: { ...typography.subhead, textAlign: 'center' },
 });
 
-export default SeasonEpisodeList;
+export default React.memo(SeasonEpisodeList);

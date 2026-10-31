@@ -1,17 +1,14 @@
-import { StyleSheet, View } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { Text } from '@/components/Themed';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Constants from 'expo-constants';
 import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
 
 const SettingsScreen = () => {
   const showContact = process.env.EXPO_PUBLIC_SHOW_CONTACT === 'true';
   const router = useRouter();
-  const appVersion = Constants.expoConfig?.version;
+  const version = Constants.expoConfig?.version ?? 'Unknown';
 
   const contactList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap }[] = [
     { title: 'Contact', route: '/settings/contact', icon: 'mail-outline' },
@@ -39,10 +36,8 @@ const SettingsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <View style={styles.headerContainer}>
-        <Text style={styles.headerTitle}>Settings</Text>
-      </View>
+    <>
+      <Stack.Screen options={{ title: 'Settings' }} />
       <SettingsPage hideScrollIndicator>
         <SettingsSection title="General">
           {generalList.map((item, index) => (
@@ -106,17 +101,17 @@ const SettingsScreen = () => {
           />
         </SettingsSection>
         <SettingsSection title="EmbedIn">
-          <SettingsRow title="Version" detail={appVersion ?? 'Unknown'} isLast />
+          <SettingsRow
+            title="Version"
+            detail={version}
+            detailColor="#EBEBF599"
+            detailFontSize={13}
+            isLast
+          />
         </SettingsSection>
       </SettingsPage>
-    </SafeAreaView>
+    </>
   );
 };
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000000' },
-  headerContainer: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 16 },
-  headerTitle: { fontSize: 34, lineHeight: 41, fontWeight: '700', color: '#ffffff' },
-});
 
 export default SettingsScreen;

@@ -1,77 +1,44 @@
-import React from 'react';
-import { Linking, StyleSheet } from 'react-native';
+import { Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import * as Haptics from 'expo-haptics';
-import { View, StatusBar } from '@/components/Themed';
-import { isHapticsSupported } from '@/utils/platform';
-import { SettingsPage, SettingsRow, SettingsSection, SettingsTitle } from '@/components/NativeSettings';
+import { StatusBar, View } from '@/components/Themed';
+import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
+import { showAlert } from '@/utils/platform';
+import { useTheme } from '@/context/ThemeContext';
+import { systemDarkBackground } from '@/constants/theme';
 
-type IconLibrary = 'AntDesign' | 'Ionicons';
+const reportBugUrl = process.env.EXPO_PUBLIC_REPORT_BUG_URL ?? '';
 
-interface ContactItem {
-    type: string;
-    value: string;
-    icon: string;
-    iconLibrary: IconLibrary;
-    action: () => Promise<void>;
-}
+export default function ContactScreen() {
+    const { colors } = useTheme();
 
-const ContactScreen = () => {
-    const feedbackUrl = process.env.EXPO_PUBLIC_FEEDBACK_URL || '';
-    const reportBugUrl = process.env.EXPO_PUBLIC_REPORT_BUG_URL || '';
-    
-    const contactInfo: ContactItem[] = [
-        {
-            type: 'Feedback',
-            value: 'Submit your feedback',
-            icon: 'form',
-            iconLibrary: 'AntDesign',
-            action: async () => {
-                if (await isHapticsSupported()) {
-                    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-                }
-                await Linking.openURL(feedbackUrl);
-            },
-        },
-        {
-            type: 'Report Bug',
-            value: 'Found a Bug? Report here',
-            icon: 'bug-outline',
-            iconLibrary: 'Ionicons',
-            action: async () => {
-                if (await isHapticsSupported()) {
-                    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-                }
-                await Linking.openURL(reportBugUrl);
-            },
-        }        
-    ];
+    const openReportBug = async () => {
+        if (!reportBugUrl) {
+            showAlert('Link Unavailable', 'This contact link has not been configured.');
+            return;
+        }
+
+        try {
+            await Linking.openURL(reportBugUrl);
+        } catch (error) {
+            console.error('Failed to open contact link:', error);
+            showAlert('Unable to Open Link', 'Please try again later.');
+        }
+    };
 
     return (
-        <View style={styles.container}>
+        <View style={{ flex: 1, backgroundColor: systemDarkBackground }}>
             <StatusBar />
             <SettingsPage>
-                <SettingsTitle title="Get in Touch" subtitle="Your input makes the app better." />
-                <SettingsSection title="Contact">
-                    {contactInfo.map((item, index) => (
-                        <SettingsRow
-                            key={item.type}
-                            title={item.type}
-                            detail={item.value}
-                            onPress={item.action}
-                            leading={<Ionicons name={item.icon as React.ComponentProps<typeof Ionicons>['name']} size={20} color="#0a84ff" />}
-                            trailing={<Ionicons name="open-outline" size={17} color="#8e8e93" />}
-                            isLast={index === contactInfo.length - 1}
-                        />
-                    ))}
+                <SettingsSection title="Contact" footer="Let us know when something is not working">
+                    <SettingsRow
+                        title="Report a Bug"
+                        onPress={openReportBug}
+                        isLast
+                        leading={<Ionicons name="bug-outline" size={20} color="#FF453A" />}
+                        trailing={<Ionicons name="open-outline" size={17} color={colors.textDim} />}
+                    />
                 </SettingsSection>
             </SettingsPage>
         </View>
     );
-};
-
-const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#000000' },
-});
-
-export default ContactScreen;
+}

@@ -68,6 +68,9 @@ interface SettingsRowProps {
   selected?: boolean;
   disabled?: boolean;
   titleColor?: string;
+  detailSameFont?: boolean;
+  detailColor?: string;
+  detailFontSize?: number;
 }
 
 export function SettingsRow({
@@ -82,13 +85,25 @@ export function SettingsRow({
   selected,
   disabled = false,
   titleColor,
+  detailSameFont = false,
+  detailColor,
+  detailFontSize,
 }: SettingsRowProps) {
   const content = (
     <>
       {leading ? <View style={styles.leading}>{leading}</View> : null}
       <View style={styles.rowText}>
         <Text numberOfLines={1} style={[styles.rowTitle, { color: destructive ? '#ff453a' : titleColor ?? '#f2f2f7' }]}>{title}</Text>
-        {detail ? <Text style={styles.rowDetail}>{detail}</Text> : null}
+        {detail ? (
+          <Text
+            style={[
+              detailSameFont ? styles.rowTitle : styles.rowDetail,
+              { color: detailColor, fontSize: detailFontSize },
+            ]}
+          >
+            {detail}
+          </Text>
+        ) : null}
       </View>
       {trailing ? <View style={styles.trailing}>{trailing}</View> : null}
     </>
@@ -134,7 +149,7 @@ const styles = StyleSheet.create({
   leading: { alignItems: 'center', justifyContent: 'center' },
   rowText: { flex: 1, gap: 4 },
   rowTitle: { fontSize: 17, color: '#f2f2f7', flexShrink: 1 },
-  rowDetail: { fontSize: 13, color: '#8e8e93' },
+  rowDetail: { fontSize: 13, lineHeight: 18, color: '#8e8e93' },
   trailing: { alignItems: 'center', justifyContent: 'center' },
   titleBlock: { gap: 4, paddingHorizontal: 16, paddingBottom: 4 },
   title: { fontSize: 34, fontWeight: '700', color: '#ffffff' },

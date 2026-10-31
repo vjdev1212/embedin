@@ -20,6 +20,8 @@ import { showAlert } from '@/utils/platform';
 import { WebMenu } from '@/components/WebMenuView';
 import PosterArtwork from '@/components/PosterArtwork';
 import NativeStackList from '@/components/NativeStackList';
+import { useTheme } from '@/context/ThemeContext';
+import { spacing, typography } from '@/constants/theme';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -30,6 +32,7 @@ export interface MediaGridItem {
     poster: string;
     background: string;
     imdbRating?: string;
+    imdbid?: string;
     genres: string[];
     type?: 'movie' | 'series';
     popularity?: number;
@@ -52,6 +55,7 @@ interface TMDBMediaItem {
     release_date?: string;
     first_air_date?: string;
     vote_average?: number;
+    imdb_id?: string;
     genre_ids?: number[];
     popularity?: number;
 }
@@ -83,6 +87,7 @@ const MediaGrid: React.FC<MediaGridProps> = ({
     compact = false,
     safeAreaEdges = ['left', 'right', 'bottom'],
 }) => {
+    const { colors } = useTheme();
     const { width } = useWindowDimensions();
     const insets = useSafeAreaInsets();
     const [data, setData] = useState<MediaGridItem[]>([]);
@@ -123,7 +128,7 @@ const MediaGrid: React.FC<MediaGridProps> = ({
                 const result = await response.json();
                 const type: MediaGridItem['type'] = detailsPath === '/movie/details' ? 'movie' : 'series';
                 const list = ((result?.results ?? []) as TMDBMediaItem[])
-                    .filter((item) => item.poster_path || item.backdrop_path)
+                    .filter((item) => item.poster_path && item.backdrop_path)
                     .map((item) => ({
                         moviedbid: item.id,
                         name: item.title || item.name || 'Untitled',
@@ -131,6 +136,7 @@ const MediaGrid: React.FC<MediaGridProps> = ({
                         poster: item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : '',
                         background: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : '',
                         imdbRating: item.vote_average?.toFixed(1),
+                        imdbid: item.imdb_id,
                         genres: (item.genre_ids ?? []).map((id) => GENRE_NAMES[id]).filter(Boolean),
                         type,
                         popularity: item.popularity ?? 0,
@@ -180,7 +186,7 @@ const MediaGrid: React.FC<MediaGridProps> = ({
             : genreMetadata;
         const menuButton = (
             <Pressable accessibilityRole="button" accessibilityLabel={`More actions for ${item.name}`} hitSlop={10} style={styles.menuButton}>
-                <Ionicons name="ellipsis-horizontal" size={21} color="#ffffff" />
+                <Ionicons name="ellipsis-horizontal" size={21} color={colors.text} />
             </Pressable>
         );
         const menu = Platform.OS === 'web' ? (
@@ -210,19 +216,19 @@ const MediaGrid: React.FC<MediaGridProps> = ({
                                         <Image
                                             source={{ uri: item.poster }}
                                             onLoad={onImageLoad}
-                                            style={[styles.poster, { width: posterWidth, height: posterHeight }]}
+                                            style={[styles.poster, { width: posterWidth, height: posterHeight, backgroundColor: colors.backgroundOverlay }]}
                                             resizeMode="cover"
                                         />
                                     ) : (
-                                        <RNView style={[styles.posterPlaceholder, { width: posterWidth, height: posterHeight }]}>
-                                            <Ionicons name="film-outline" size={compact ? 20 : 30} color="#8e8e93" />
+                                        <RNView style={[styles.posterPlaceholder, { width: posterWidth, height: posterHeight, backgroundColor: colors.backgroundOverlay }]}>
+                                            <Ionicons name="film-outline" size={compact ? 20 : 30} color={colors.textDim} />
                                         </RNView>
                                     )}
                                 </PosterArtwork>
                             </RNHostView>
                             <NativeColumn alignment="start" spacing={compact ? 3 : 7} style={{ width: mediaInfoWidth, paddingTop: 4 }}>
                                 <NativeText textStyle={compact ? styles.compactMediaTitle : styles.mediaTitle}>{item.name}</NativeText>
-                                {metadata.length > 0 && <NativeText textStyle={compact ? styles.compactMediaMetadata : styles.mediaMetadata}>{metadata}</NativeText>}
+                                {metadata.length > 0 && <NativeText textStyle={{ ...(compact ? styles.compactMediaMetadata : styles.mediaMetadata), color: `${colors.text}CC` }}>{metadata}</NativeText>}
                             </NativeColumn>
                         </NativeRow>
                     </NativeButton>
@@ -235,22 +241,25 @@ const MediaGrid: React.FC<MediaGridProps> = ({
                 </RNHostView>
             </NativeColumn>
         );
-    }, [compact, handleMenuAction, mediaButtonWidth, mediaInfoWidth, menuActionWidth, openDetails, posterHeight, posterTextGap, posterWidth, rowHorizontalPadding, rowWidth]);
+    }, [colors.backgroundOverlay, colors.text, colors.textDim, compact, handleMenuAction, mediaButtonWidth, mediaInfoWidth, menuActionWidth, openDetails, posterHeight, posterTextGap, posterWidth, rowHorizontalPadding, rowWidth]);
 
     const visibleItems = items ?? data;
 
     return (
-        <SafeAreaView edges={safeAreaEdges} style={styles.container}>
+        <SafeAreaView
+            edges={safeAreaEdges.filter((edge) => edge !== 'bottom')}
+            style={styles.container}
+        >
             <StatusBar />
             {items === undefined && loading ? (
-                <View style={styles.centeredContainer}><ActivityIndicator size="large" color="#0a84ff" /><Text style={styles.statusText}>Loading content...</Text></View>
+                <View style={styles.centeredContainer}><ActivityIndicator size="large" color={colors.primary} /><Text style={[styles.statusText, { color: colors.textMuted }]}>Loading content...</Text></View>
             ) : error ? (
                 <View style={styles.centeredContainer}>
-                    <Text style={styles.statusText}>{error}</Text>
-                    <Pressable accessibilityRole="button" onPress={() => setRetryCount((count) => count + 1)}><Text style={styles.retryText}>Try again</Text></Pressable>
+                    <Text style={[styles.statusText, { color: colors.textMuted }]}>{error}</Text>
+                    <Pressable accessibilityRole="button" onPress={() => setRetryCount((count) => count + 1)}><Text style={[styles.retryText, { color: colors.primary }]}>Try again</Text></Pressable>
                 </View>
             ) : visibleItems.length === 0 ? (
-                <View style={styles.centeredContainer}><Text style={styles.statusText}>No titles found.</Text></View>
+                <View style={styles.centeredContainer}><Text style={[styles.statusText, { color: colors.textMuted }]}>No titles found.</Text></View>
             ) : (
                 <NativeStackList
                     data={visibleItems}
@@ -258,6 +267,7 @@ const MediaGrid: React.FC<MediaGridProps> = ({
                     nativeItems
                     keyExtractor={(item) => String(item.moviedbid)}
                     renderItem={renderItem}
+                    bottomContentInset={safeAreaEdges.includes('bottom') ? insets.bottom : 0}
                     style={styles.listContent}
                 />
             )}
@@ -266,21 +276,21 @@ const MediaGrid: React.FC<MediaGridProps> = ({
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#000000' },
-    listContent: { flex: 1, paddingTop: 8, paddingBottom: 24 },
-    poster: { width: 88, height: 132, backgroundColor: '#1c1c1e' },
+    container: { flex: 1 },
+    listContent: { flex: 1, paddingTop: spacing.sm },
+    poster: { width: 88, height: 132 },
     posterFrame: { width: 88, height: 132 },
-    mediaTitle: { fontSize: 17, lineHeight: 22, fontWeight: '600', color: '#ffffff' },
-    compactMediaTitle: { fontSize: 17, lineHeight: 24, color: '#ffffff' },
-    mediaMetadata: { fontSize: 15, lineHeight: 20, color: '#d1d1d6' },
-    compactMediaMetadata: { fontSize: 13, lineHeight: 18, color: '#d1d1d6' },
+    mediaTitle: { ...typography.headline },
+    compactMediaTitle: { ...typography.body },
+    mediaMetadata: { ...typography.subhead },
+    compactMediaMetadata: { ...typography.caption },
     divider: { height: StyleSheet.hairlineWidth, backgroundColor: 'rgba(255,255,255,0.12)' },
     menuButton: { width: 40, minWidth: 40, minHeight: 48, alignItems: 'center', justifyContent: 'center' },
     menuActionSlot: { flexShrink: 0, alignItems: 'center', justifyContent: 'center' },
-    posterPlaceholder: { alignItems: 'center', justifyContent: 'center', backgroundColor: '#1c1c1e' },
+    posterPlaceholder: { alignItems: 'center', justifyContent: 'center' },
     centeredContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, gap: 16 },
-    statusText: { color: '#d1d1d6', fontSize: 16, textAlign: 'center' },
-    retryText: { color: '#0a84ff', fontSize: 16, fontWeight: '600', padding: 8 },
+    statusText: { ...typography.body, textAlign: 'center', opacity: 0.7 },
+    retryText: { fontSize: 16, fontWeight: '600', padding: 8 },
 });
 
 export default MediaGrid;

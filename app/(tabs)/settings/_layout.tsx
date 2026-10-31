@@ -1,0 +1,28 @@
+import { Stack } from 'expo-router';
+import { Platform, View } from 'react-native';
+import { systemDarkBackground } from '@/constants/theme';
+
+export default function SettingsLayout() {
+  const isIOS = Platform.OS === 'ios';
+  const TransparentHeaderBackground = () => (
+    <View style={{ flex: 1, backgroundColor: 'transparent' }} />
+  );
+
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: true,
+        headerBackVisible: false,
+        headerTransparent: isIOS,
+        headerBackground: TransparentHeaderBackground,
+        headerShadowVisible: true,
+        headerStyle: { backgroundColor: isIOS ? 'transparent' : systemDarkBackground },
+        headerLargeTitleEnabled: isIOS,
+        headerLargeStyle: { backgroundColor: 'transparent' },
+        headerLargeTitleShadowVisible: true,
+        headerBlurEffect: 'none',
+        contentStyle: { backgroundColor: systemDarkBackground },
+      }}
+    />
+  );
+}

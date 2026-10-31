@@ -12,11 +12,9 @@ const SeriesList = () => {
         headerTitle: pageTitle,
         headerTitleAlign: 'left',
         headerTransparent: true,
-        headerShadowVisible: false,
-        headerUserInterfaceStyle: 'dark',
-        headerStyle: { backgroundColor: 'transparent' },
+        headerShadowVisible: true,
       }} />
-      <MediaGrid apiUrl={apiUrl} detailsPath="/series/details" />
+      <MediaGrid apiUrl={apiUrl ?? ''} detailsPath="/series/details" />
     </>
   );
 };

@@ -1,6 +1,8 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { StyleSheet, Animated, ActivityIndicator, Platform } from 'react-native';
+import { StyleSheet, Animated, ActivityIndicator } from 'react-native';
 import { View } from './Themed';
+import { useTheme } from '@/context/ThemeContext';
+import { radius } from '@/constants/theme';
 
 interface MediaContentPosterProps {
   background: string;
@@ -8,6 +10,7 @@ interface MediaContentPosterProps {
 }
 
 const MediaContentPoster: React.FC<MediaContentPosterProps> = ({ background, isPortrait }) => {
+  const { colors } = useTheme();
   const [isLoading, setIsLoading] = useState(true);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -29,26 +32,14 @@ const MediaContentPoster: React.FC<MediaContentPosterProps> = ({ background, isP
     styles.poster,
     {
       opacity: fadeAnim,
-      borderRadius: isPortrait ? 0 : 10,
+      borderRadius: isPortrait ? 0 : radius.md,
     }
   ];
 
   const shadowContainerStyle = [
     styles.shadowContainer,
     {
-      borderRadius: isPortrait ? 0 : 10,
-      // Platform-specific shadows
-      ...Platform.select({
-        ios: {
-          shadowColor: '#000',
-          shadowOffset: { width: 0, height: 8 },
-          shadowOpacity: 0.44,
-          shadowRadius: 10.32,
-        },
-        android: {
-          elevation: 16,
-        },
-      }),
+      borderRadius: isPortrait ? 0 : radius.md,
     }
   ];
 
@@ -57,7 +48,7 @@ const MediaContentPoster: React.FC<MediaContentPosterProps> = ({ background, isP
       <Animated.View style={shadowContainerStyle}>
         {isLoading && (
           <Animated.View style={styles.loaderContainer}>
-            <ActivityIndicator color="#535aff" />
+            <ActivityIndicator color={colors.primary} />
           </Animated.View>
         )}
 
@@ -84,6 +75,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     backgroundColor: 'transparent',
+    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.24)',
   },
   poster: {
     width: '100%',

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import {
-  FlatList,
   Image,
+  ScrollView as RNScrollView,
   StyleSheet,
   useWindowDimensions,
   View as RNView,
@@ -14,14 +14,18 @@ import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { DefaultPosterImgXml } from '@/utils/Svg';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '@/context/ThemeContext';
 import { NativeButton } from '@/components/NativeUiControls';
+import PosterArtwork from '@/components/PosterArtwork';
+import { spacing, typography } from '@/constants/theme';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
-// Simple in-memory cache
 const posterCache = new Map<string, PosterItemData[]>();
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 5 * 60 * 1000;
 const cacheTimestamps = new Map<string, number>();
+const POSTER_IMAGE_SIZE = 'w500';
+const SKELETON_DATA = [1, 2, 3, 4, 5];
 
 interface PosterItemData {
   moviedbid: number;
@@ -32,96 +36,66 @@ interface PosterItemData {
   imdbRating: string;
 }
 
-const PosterItem = ({
+const PosterItem = React.memo(({
   item,
   posterWidth,
   posterHeight,
+  cardHeight,
   type,
-  spacing,
 }: {
   item: PosterItemData;
   posterWidth: number;
   posterHeight: number;
+  cardHeight: number;
   type: 'movie' | 'series';
-  spacing: number;
 }) => {
+  const { colors } = useTheme();
   const [imgError, setImgError] = useState(false);
   const year = item.year?.split('–')[0] || item.year;
 
-  const handlePress = async () => {
-    if (await isHapticsSupported()) {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    }
-    router.push({
-      pathname: `/${type}/details`,
-      params: { moviedbid: item.moviedbid },
-    });
-  };
+  const handlePress = useCallback(async () => {
+    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: `/${type}/details`, params: { moviedbid: item.moviedbid } });
+  }, [item.moviedbid, type]);
 
   return (
     <NativeButton
-      onPress={handlePress}
       variant="text"
-      style={[styles.posterContainer, { width: posterWidth, marginRight: spacing }]}
+      onPress={handlePress}
+      style={{ width: posterWidth, height: cardHeight, flexShrink: 0 }}
+      seedColor={colors.primary}
     >
-      {!imgError ? (
-        <Image
-          source={{ uri: item.poster }}
-          onError={() => setImgError(true)}
-          style={[
-            styles.posterImage,
-            { width: posterWidth, height: posterHeight },
-          ]}
-          resizeMode="cover"
-        />
-      ) : (
-        <View
-          style={[
-            styles.posterImage,
-            {
-              width: posterWidth,
-              height: posterHeight,
-              justifyContent: 'center',
-              alignItems: 'center',
-            },
-          ]}
-        >
-          <SvgXml xml={DefaultPosterImgXml} />
-        </View>
-      )}
-      <Text numberOfLines={1} style={[styles.posterTitle, { width: posterWidth }]}>
-        {item.name}
-      </Text>
-      <Text style={styles.posterYear}>{year}</Text>
+      <PosterArtwork key={item.poster} style={{ width: posterWidth, height: posterHeight }}>
+        {(onImageLoad) => !imgError ? (
+          <Image
+            source={{ uri: item.poster }}
+            onLoad={onImageLoad}
+            onError={() => setImgError(true)}
+            style={{ width: posterWidth, height: posterHeight }}
+            resizeMode="cover"
+          />
+        ) : (
+          <View style={{ width: posterWidth, height: posterHeight, justifyContent: 'center', alignItems: 'center' }}>
+            <SvgXml xml={DefaultPosterImgXml} />
+          </View>
+        )}
+      </PosterArtwork>
+      <Text numberOfLines={1} style={[styles.posterTitle, { width: posterWidth, color: colors.text }]}>{item.name}</Text>
+      <Text style={[styles.posterYear, { color: colors.textMuted }]}>{year}</Text>
     </NativeButton>
   );
-};
+});
 
-// Skeleton loader component
-const SkeletonPoster = ({
-  posterWidth,
-  posterHeight,
-  spacing
-}: {
+const SkeletonPoster = React.memo(({ posterWidth, posterHeight, cardHeight, bgColor }: {
   posterWidth: number;
   posterHeight: number;
-  spacing: number;
+  cardHeight: number;
+  bgColor: string;
 }) => (
-  <RNView style={[styles.posterContainer, { width: posterWidth, marginRight: spacing }]}>
-    <RNView
-      style={[
-        styles.posterImage,
-        styles.skeletonPoster,
-        {
-          width: posterWidth,
-          height: posterHeight,
-        },
-      ]}
-    />
-    {/* <RNView style={[styles.skeletonText, { width: posterWidth * 0.85, marginTop: 10 }]} />
-    <RNView style={[styles.skeletonText, { width: posterWidth * 0.5, marginTop: 6, height: 12 }]} /> */}
+  <RNView style={{ width: posterWidth, height: cardHeight, flexShrink: 0 }}>
+    <PosterArtwork style={{ width: posterWidth, height: posterHeight, backgroundColor: bgColor }} />
   </RNView>
-);
+));
 
 const PosterList = ({
   apiUrl,
@@ -134,6 +108,7 @@ const PosterList = ({
   type: 'movie' | 'series';
   compact?: boolean;
 }) => {
+  const { colors } = useTheme();
   const { width, height } = useWindowDimensions();
   const shortSide = Math.min(width, height);
   const isPortrait = height >= width;
@@ -141,32 +116,24 @@ const PosterList = ({
   const [data, setData] = useState<PosterItemData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Device category based on shortSide
-  const getPostersPerScreen = () => {
-    if (shortSide < 580) return isPortrait ? 3 : 5;       // mobile
-    if (shortSide < 1024) return isPortrait ? 6 : 8;      // tablet
-    if (shortSide < 1440) return isPortrait ? 7 : 9;      // laptop
-    return isPortrait ? 7 : 10;                           // desktop
-  };
+  const postersPerScreen = useMemo(() => {
+    if (shortSide < 580) return isPortrait ? 3 : 5;
+    if (shortSide < 1024) return isPortrait ? 6 : 8;
+    if (shortSide < 1440) return isPortrait ? 7 : 9;
+    return isPortrait ? 7 : 10;
+  }, [isPortrait, shortSide]);
+  const posterGap = spacing.sm + 4;
+  const containerMargin = compact ? spacing.mdLg : spacing.md;
 
-  const postersPerScreen = getPostersPerScreen();
-  const spacing = 10;
-
-  const containerMargin = 15;
   const posterWidth = useMemo(() => {
-    const totalSpacing = spacing * (postersPerScreen - 1);
-    const totalMargins = containerMargin * 2; // left + right
+    const totalSpacing = posterGap * (postersPerScreen - 1);
+    const totalMargins = containerMargin * 2;
     return (width - totalSpacing - totalMargins) / postersPerScreen;
-  }, [width, postersPerScreen]);
+  }, [containerMargin, width, postersPerScreen]);
 
   const posterHeight = posterWidth * 1.5;
-
-  // Choose optimal image size based on display width
-  const getImageSize = useCallback(() => {
-    return 'w780';
-  }, [posterWidth]);
-
-  const imageSize = getImageSize();
+  const posterCardHeight = posterHeight + 58;
+  const listContentStyle = useMemo(() => ({ height: posterCardHeight + 10 }), [posterCardHeight]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -193,7 +160,7 @@ const PosterList = ({
           .map((item: any) => ({
             moviedbid: item.id,
             name: item.title || item.name,
-            poster: `https://image.tmdb.org/t/p/${imageSize}${item.poster_path}`,
+            poster: `https://image.tmdb.org/t/p/${POSTER_IMAGE_SIZE}${item.poster_path}`,
             background: `https://image.tmdb.org/t/p/w780${item.backdrop_path}`,
             year: getYear(item.release_date || item.first_air_date),
             imdbRating: item.vote_average?.toFixed(1),
@@ -212,7 +179,7 @@ const PosterList = ({
     };
 
     fetchData();
-  }, [apiUrl, imageSize]);
+  }, [apiUrl]);
 
   const handleSeeAllPress = useCallback(async () => {
     if (await isHapticsSupported()) {
@@ -222,29 +189,31 @@ const PosterList = ({
       pathname: `/${type}/list`,
       params: { apiUrl, title },
     });
-  }, [apiUrl, type]);
+  }, [apiUrl, title, type]);
 
   // Show skeleton loader while loading
   if (loading) {
     return (
       <RNView style={[styles.container, compact && styles.compactContainer]}>
         <RNView style={styles.header}>
-          <Text style={styles.title}>{title}</Text>
+          <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
         </RNView>
-        <FlatList
-          data={[1, 2, 3, 4, 5]}
+        <RNScrollView
           horizontal
-          renderItem={() => (
+          showsHorizontalScrollIndicator={false}
+          style={listContentStyle}
+          contentContainerStyle={{ flexDirection: 'row', gap: posterGap, paddingRight: containerMargin }}
+        >
+          {SKELETON_DATA.map((item, index) => (
             <SkeletonPoster
+              key={`skeleton-${index}`}
               posterWidth={posterWidth}
               posterHeight={posterHeight}
-              spacing={spacing}
+              cardHeight={posterCardHeight}
+              bgColor={colors.backgroundOverlay}
             />
-          )}
-          keyExtractor={(item, index) => `skeleton-${index}`}
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingRight: 4 }}
-        />
+          ))}
+        </RNScrollView>
       </RNView>
     );
   }
@@ -254,106 +223,44 @@ const PosterList = ({
   return (
     <RNView style={[styles.container, compact && styles.compactContainer]}>
       <RNView style={styles.header}>
-        <Text style={styles.title}>{title}</Text>
-        <NativeButton onPress={handleSeeAllPress} style={styles.seeAllButton} variant="text">
-          <Text style={styles.seeAllText}>See All</Text>
-          <Ionicons name="chevron-forward" size={16} color="#cccccc" style={styles.chevronIcon} />
+        <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+        <NativeButton variant="text" onPress={handleSeeAllPress} style={styles.seeAllButton} seedColor={colors.primary}>
+          <Text style={[styles.seeAllText, { color: colors.textMuted }]}>See All</Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.textMuted} style={styles.chevronIcon} />
         </NativeButton>
       </RNView>
 
-      <FlatList
-        data={data}
+      <RNScrollView
         horizontal
-        renderItem={({ item }) => (
+        showsHorizontalScrollIndicator={false}
+        style={listContentStyle}
+        contentContainerStyle={{ flexDirection: 'row', gap: posterGap, paddingRight: containerMargin }}
+      >
+        {data.map((item, index) => (
           <PosterItem
+            key={`${item.moviedbid}-${index}`}
             item={item}
             posterWidth={posterWidth}
             posterHeight={posterHeight}
+            cardHeight={posterCardHeight}
             type={type}
-            spacing={spacing}
           />
-        )}
-        keyExtractor={(item, index) => `${item.moviedbid}-${index}`}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingRight: 4 }}
-        initialNumToRender={postersPerScreen}
-        maxToRenderPerBatch={postersPerScreen}
-        windowSize={3}
-      />
+        ))}
+      </RNScrollView>
     </RNView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    paddingTop: 10,
-    marginBottom: 20,
-    marginHorizontal: 15
-  },
-  compactContainer: {
-    paddingTop: 4,
-    marginBottom: 4,
-    marginHorizontal: 20,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 5,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '500',
-    letterSpacing: 0.2,
-    color: '#ffffff',
-  },
-  seeAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 4,
-    paddingHorizontal: 4,
-  },
-  seeAllText: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#cccccc',
-    letterSpacing: -0.1,
-  },
-  chevronIcon: {
-    marginLeft: 2,
-  },
-  posterContainer: {
-    marginBottom: 10,
-  },
-  posterImage: {
-    borderRadius: 6,
-    backgroundColor: '#101010',
-    overflow: 'hidden',
-  },
-  posterTitle: {
-    marginTop: 10,
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#ffffff',
-    letterSpacing: -0.2,
-    lineHeight: 20,
-  },
-  posterYear: {
-    marginTop: 4,
-    fontSize: 12,
-    color: '#8E8E93',
-    fontWeight: '500',
-    letterSpacing: -0.1,
-  },
-  skeletonPoster: {
-    backgroundColor: '#101010',
-  },
-  skeletonText: {
-    height: 14,
-    backgroundColor: '#101010',
-    borderRadius: 6,
-  },
+  container: { paddingTop: spacing.sm, marginBottom: spacing.lg, marginHorizontal: spacing.md },
+  compactContainer: { paddingTop: spacing.xs, marginBottom: spacing.xs, marginHorizontal: spacing.mdLg },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.md },
+  title: { ...typography.headline },
+  seeAllButton: { flexDirection: 'row', alignItems: 'center', paddingVertical: 4, paddingHorizontal: 4 },
+  seeAllText: { fontSize: 15, fontWeight: '500', letterSpacing: -0.1 },
+  chevronIcon: { marginLeft: 2 },
+  posterTitle: { height: 20, marginTop: spacing.sm, ...typography.caption, fontWeight: '600' },
+  posterYear: { height: 18, marginTop: spacing.xs, ...typography.caption, color: '#8E8E93' },
 });
 
-export default PosterList;
+export default React.memo(PosterList);

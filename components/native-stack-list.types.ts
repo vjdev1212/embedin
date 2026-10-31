@@ -8,6 +8,7 @@ export interface NativeStackListProps<T> {
   axis: NativeStackAxis;
   spacing?: number;
   horizontalContentInset?: number;
+  bottomContentInset?: number;
   scrollable?: boolean;
   nativeItems?: boolean;
   keyExtractor: (item: T, index: number) => string;

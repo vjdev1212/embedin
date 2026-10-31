@@ -1,10 +1,12 @@
-import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
+import { ActivityIndicator, StatusBar, Text, TextInput, View } from '@/components/Themed';
 import MediaGrid, { GENRE_NAMES, type MediaGridItem } from '@/components/MediaGrid';
+import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
+import { Stack } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { Keyboard, Pressable, StyleSheet } from 'react-native';
+import { Keyboard, Platform, Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { NativeTextInput } from '@/components/NativeUiControls';
+import { radius, spacing, systemDarkBackground, typography } from '@/constants/theme';
 
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 type SearchFilter = 'all' | 'movie' | 'series';
@@ -18,6 +20,7 @@ interface TMDBSearchItem {
   release_date?: string;
   first_air_date?: string;
   vote_average?: number;
+  imdb_id?: string;
   genre_ids?: number[];
   popularity?: number;
 }
@@ -31,6 +34,7 @@ function toMediaItem(item: TMDBSearchItem, type: 'movie' | 'series'): MediaGridI
     poster: item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : '',
     background: item.backdrop_path ? `https://image.tmdb.org/t/p/w1280${item.backdrop_path}` : '',
     imdbRating: item.vote_average?.toFixed(1),
+    imdbid: item.imdb_id,
     genres: (item.genre_ids ?? [])
       .map((id) => GENRE_NAMES[id])
       .filter((genre): genre is string => Boolean(genre)),
@@ -59,6 +63,7 @@ async function fetchSearchResults(query: string, signal: AbortSignal): Promise<M
 }
 
 export default function SearchScreen() {
+  const { colors } = useTheme();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MediaGridItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -105,33 +110,65 @@ export default function SearchScreen() {
   const showFilters = Boolean(trimmedQuery) && !loading && !error && !keyboardVisible;
 
   return (
-    <SafeAreaView edges={['top', 'left', 'right', 'bottom']} style={styles.container}>
+    <SafeAreaView
+      edges={Platform.OS === 'ios' ? ['left', 'right', 'bottom'] : ['top', 'left', 'right', 'bottom']}
+      style={[styles.container, { backgroundColor: systemDarkBackground }]}
+    >
       <StatusBar />
-      <View style={styles.searchHeader}>
-        <Text style={styles.screenTitle}>Search</Text>
-        <View style={styles.webSearchField}>
-          <Ionicons name="search-outline" size={22} color="#ffffff" />
-          <NativeTextInput
-            accessibilityLabel="Search movies or series"
-            autoCapitalize="none"
-            autoCorrect={false}
-            onChangeText={changeQuery}
-            onFocus={() => setKeyboardVisible(true)}
-            onBlur={() => setKeyboardVisible(false)}
-            placeholder="Search movies or series"
-            placeholderTextColor="#8e8e93"
-            style={styles.searchInputHost}
-            inputStyle={styles.searchNativeInput}
-            textStyle={styles.searchNativeText}
-            value={query}
-          />
-          {query.length > 0 && (
-            <Pressable accessibilityLabel="Clear search text" accessibilityRole="button" hitSlop={8} onPress={clearSearch}>
-              <Ionicons name="close-circle" size={20} color="#d1d1d6" />
-            </Pressable>
-          )}
+      <Stack.Screen
+        options={{
+          headerShown: Platform.OS === 'ios',
+          headerBackVisible: false,
+          headerTransparent: false,
+          headerShadowVisible: true,
+          headerStyle: { backgroundColor: systemDarkBackground },
+          headerUserInterfaceStyle: 'dark',
+          headerTintColor: colors.text,
+          headerTitle: '',
+          headerSearchBarOptions: Platform.OS === 'ios' ? {
+            placeholder: 'Search movies or series',
+            autoCapitalize: 'none',
+            barTintColor: '#1C1C1E',
+            textColor: '#FFFFFF',
+            hintTextColor: '#8E8E93',
+            headerIconColor: '#FFFFFF',
+            tintColor: '#0A84FF',
+            hideWhenScrolling: false,
+            onChangeText: (event) => changeQuery(event.nativeEvent.text),
+            onFocus: () => setKeyboardVisible(true),
+            onBlur: () => setKeyboardVisible(false),
+            onCancelButtonPress: clearSearch,
+            onSearchButtonPress: (event) => changeQuery(event.nativeEvent.text),
+          } : undefined,
+        }}
+      />
+      {Platform.OS !== 'ios' && (
+        <View style={styles.searchHeader}>
+          <View style={styles.searchField}>
+            <Ionicons name="search-outline" size={22} color={colors.text} />
+            <TextInput
+              accessibilityLabel="Search movies or series"
+              autoCapitalize="none"
+              autoCorrect={false}
+              keyboardAppearance="dark"
+              onChangeText={changeQuery}
+              onFocus={() => setKeyboardVisible(true)}
+              onBlur={() => setKeyboardVisible(false)}
+              placeholder="Search movies or series"
+              placeholderTextColor={colors.textDim}
+              returnKeyType="search"
+              style={[styles.searchInput, { color: colors.text }]}
+              underlineColorAndroid="transparent"
+              value={query}
+            />
+            {query.length > 0 && (
+              <Pressable accessibilityLabel="Clear search text" accessibilityRole="button" hitSlop={8} onPress={clearSearch}>
+                <Ionicons name="close-circle" size={20} color="#D1D1D6" />
+              </Pressable>
+            )}
+          </View>
         </View>
-      </View>
+      )}
 
       {showFilters && (
         <View accessibilityRole="tablist" style={styles.filterBar}>
@@ -149,7 +186,7 @@ export default function SearchScreen() {
                 onPress={() => setSelectedFilter(filter.id)}
                 style={[styles.filterButton, selected && styles.selectedFilterButton]}
               >
-                <Text style={[styles.filterLabel, { color: selected ? '#000000' : '#d1d1d6' }]}>{filter.label}</Text>
+                <Text style={[styles.filterLabel, { color: selected ? '#000000' : colors.textMuted }]}>{filter.label}</Text>
               </Pressable>
             );
           })}
@@ -158,27 +195,27 @@ export default function SearchScreen() {
 
       <View style={styles.resultsContainer}>
         {loading ? (
-          <View style={styles.statusContainer}><ActivityIndicator size="large" color="#0a84ff" /></View>
+          <View style={styles.statusContainer}><ActivityIndicator size="large" color={colors.primary} /></View>
         ) : error ? (
           <View style={styles.statusContainer}>
-            <Text style={styles.statusText}>{error}</Text>
+            <Text style={[styles.statusText, { color: colors.textMuted }]}>{error}</Text>
             <Pressable accessibilityRole="button" onPress={() => setRetryCount((count) => count + 1)}>
-              <Text style={styles.retryText}>Try again</Text>
+              <Text style={[styles.retryText, { color: colors.primary }]}>Try again</Text>
             </Pressable>
           </View>
         ) : trimmedQuery && filteredResults.length > 0 ? (
           <MediaGrid compact detailsPath="/movie/details" items={filteredResults} safeAreaEdges={['left', 'right']} />
         ) : trimmedQuery ? (
           <View style={styles.statusContainer}>
-            <Text style={styles.statusText}>
+            <Text style={[styles.statusText, { color: colors.textMuted }]}>
               {results.length === 0 ? 'No results found' : selectedFilter === 'movie' ? 'No movies found' : 'No TV shows found'}
             </Text>
-            <Text style={styles.emptySubtitle}>Try searching with different keywords.</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textDim }]}>Try searching with different keywords.</Text>
           </View>
         ) : (
-          <View style={styles.emptyState}>
-            <Ionicons name="search-outline" size={30} color="#8e8e93" />
-            <Text style={styles.emptySubtitle}>What would you like to watch today?</Text>
+          <View style={styles.statusContainer}>
+            <Text style={[styles.statusText, { color: colors.textMuted }]}>Search movies and TV shows</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textDim }]}>Enter a title to get started.</Text>
           </View>
         )}
       </View>
@@ -187,24 +224,58 @@ export default function SearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000000' },
-  searchHeader: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 8, gap: 12 },
-  screenTitle: { fontSize: 34, lineHeight: 41, fontWeight: '700', color: '#ffffff' },
-  webSearchField: {
-    height: 44, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16,
-    borderRadius: 999, backgroundColor: '#1c1c1e', borderWidth: StyleSheet.hairlineWidth, borderColor: '#38383a',
+  container: { flex: 1 },
+  searchHeader: {
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
   },
-  searchInputHost: { flex: 1, minWidth: 0 },
-  searchNativeInput: { backgroundColor: 'transparent', paddingVertical: 0 },
-  searchNativeText: { fontSize: 17, color: '#ffffff' },
-  filterBar: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, paddingVertical: 8 },
-  filterButton: { minHeight: 36, justifyContent: 'center', paddingHorizontal: 16, borderRadius: 999, backgroundColor: '#1c1c1e' },
-  selectedFilterButton: { backgroundColor: '#ffffff' },
-  filterLabel: { fontSize: 15, lineHeight: 20, fontWeight: '600' },
+  searchField: {
+    minHeight: 48,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.capsule,
+    borderCurve: 'continuous',
+    overflow: 'hidden',
+    backgroundColor: '#1C1C1E',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#38383A',
+  },
+  searchInput: {
+    flex: 1,
+    minWidth: 0,
+    paddingVertical: 0,
+    fontSize: 17,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+  },
+  filterBar: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.sm,
+  },
+  filterButton: {
+    minHeight: 36,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.capsule,
+    backgroundColor: '#1C1C1E',
+  },
+  selectedFilterButton: { backgroundColor: '#FFFFFF' },
+  filterLabel: { ...typography.subhead, fontWeight: '600' },
   resultsContainer: { flex: 1 },
-  statusContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 28, gap: 10 },
-  emptyState: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 28, gap: 12 },
-  statusText: { color: '#d1d1d6', textAlign: 'center', fontSize: 22, lineHeight: 28, fontWeight: '700' },
-  retryText: { color: '#0a84ff', fontSize: 16, fontWeight: '600', padding: 8 },
-  emptySubtitle: { color: '#8e8e93', textAlign: 'center', fontSize: 14 },
+  statusContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 28,
+    gap: 10,
+  },
+  statusText: { textAlign: 'center', ...typography.title },
+  retryText: { fontSize: 16, fontWeight: '600', padding: 8 },
+  emptySubtitle: { textAlign: 'center', fontSize: 14 },
 });

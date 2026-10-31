@@ -1,7 +1,7 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, Theme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
+import { DarkTheme, ThemeProvider } from 'expo-router/react-navigation';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
@@ -47,7 +47,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
 
-  const GlassDarkTheme: Theme = {
+  const GlassDarkTheme = {
     ...DarkTheme,
     colors: {
       ...DarkTheme.colors,
@@ -72,22 +72,20 @@ function RootLayoutNav() {
     headerUserInterfaceStyle: 'dark' as const,
     headerTintColor: '#ffffff',
     headerBackTitle: '',
-    headerShadowVisible: false,
+    headerShadowVisible: true,
     headerStyle: { backgroundColor: 'transparent' },
   });
-
   return (
-    <View style={styles.container}>
-      {/* Global Background Gradient */}
-      <LinearGradient
-        colors={['#000000', '#101014', '#000000']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={styles.backgroundGradient}
-      />
+    <ThemeProvider value={theme}>
+      <View style={styles.container}>
+        <LinearGradient
+          colors={['#000000', '#101014', '#000000']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.backgroundGradient}
+        />
 
-      <ActionSheetProvider>
-        <ThemeProvider value={theme}>
+        <ActionSheetProvider>
           <Stack
             screenOptions={{
               headerUserInterfaceStyle: 'dark',
@@ -96,7 +94,7 @@ function RootLayoutNav() {
               headerTransparent: true,
               headerStyle: { backgroundColor: 'transparent' },
               headerBackground: InvisibleHeaderBackground,
-              headerShadowVisible: false,
+              headerShadowVisible: true,
               contentStyle: styles.screenContent,
             }}
           >
@@ -106,7 +104,7 @@ function RootLayoutNav() {
                 headerShown: false,
                 headerTransparent: true,
                 headerBackground: InvisibleHeaderBackground,
-                headerShadowVisible: false,
+                headerShadowVisible: true,
                 headerTitle: '',
                 headerTintColor: '#ffffff',
                 headerBackTitle: '',
@@ -130,7 +128,8 @@ function RootLayoutNav() {
                 headerTitle: '',
                 headerTintColor: '#ffffff',
                 headerBackTitle: '',
-                headerShadowVisible: false,
+                headerBackButtonDisplayMode: 'minimal',
+                headerShadowVisible: true,
                 headerStyle: {
                   backgroundColor: 'transparent',
                 }
@@ -145,7 +144,8 @@ function RootLayoutNav() {
                 headerTitle: '',
                 headerTintColor: '#ffffff',
                 headerBackTitle: '',
-                headerShadowVisible: false,
+                headerBackButtonDisplayMode: 'minimal',
+                headerShadowVisible: true,
                 headerStyle: {
                   backgroundColor: 'transparent',
                 }
@@ -160,7 +160,8 @@ function RootLayoutNav() {
                 headerTitle: '',
                 headerTintColor: '#ffffff',
                 headerBackTitle: '',
-                headerShadowVisible: false,
+                headerBackButtonDisplayMode: 'minimal',
+                headerShadowVisible: true,
                 headerStyle: {
                   backgroundColor: 'transparent',
                 }
@@ -175,7 +176,7 @@ function RootLayoutNav() {
                 headerTitle: '',
                 headerTintColor: '#ffffff',
                 headerBackTitle: '',
-                headerShadowVisible: false,
+                headerShadowVisible: true,
                 headerStyle: {
                   backgroundColor: 'transparent',
                 }
@@ -190,7 +191,7 @@ function RootLayoutNav() {
                 headerTitle: '',
                 headerTintColor: '#ffffff',
                 headerBackTitle: '',
-                headerShadowVisible: false,
+                headerShadowVisible: true,
                 headerStyle: {
                   backgroundColor: 'transparent',
                 }
@@ -204,9 +205,9 @@ function RootLayoutNav() {
             <Stack.Screen name="settings/donate" options={settingsScreenOptions('Support Embedin')} />
             <Stack.Screen name="settings/disclaimer" options={settingsScreenOptions('Disclaimer')} />
           </Stack>
-        </ThemeProvider>
-      </ActionSheetProvider>
-    </View>
+        </ActionSheetProvider>
+      </View>
+    </ThemeProvider>
   );
 }
 

@@ -1,11 +1,10 @@
-import { Linking, StyleSheet, View } from 'react-native';
+import { Linking, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar, Text } from '../../components/Themed';
 import { isHapticsSupported, showAlert } from '@/utils/platform';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from 'react';
 import { defaultTvShowUrlTemplate } from '@/constants/Embed';
-import { NativeTextInput } from '@/components/NativeUiControls';
 import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
 import { storageService } from '@/utils/StorageService';
 
@@ -56,22 +55,20 @@ const EmbedTvShowsSettingsScreen = () => {
         <View style={styles.container}>
             <StatusBar />
             <SettingsPage>
-                <SettingsSection title="Embed URL">
-                    <NativeTextInput
-                        style={styles.inputHost}
-                        inputStyle={styles.textInput}
-                        textStyle={styles.inputText}
+                <SettingsSection
+                    title="Embed URL"
+                    footer={'TMDB: https://player.videasy.net/tv/{TMDBID}/{SEASON}/{EPISODE}\nIMDb: https://player.videasy.net/tv/{IMDBID}/{SEASON}/{EPISODE}'}
+                >
+                    <TextInput
+                        style={styles.textInput}
                         value={tvShowsUrlTemplate}
                         onChangeText={setTvShowsUrlTemplate}
                         multiline
+                        textAlignVertical="top"
                         placeholder="Enter your TV shows embed URL template..."
                         placeholderTextColor="#8e8e93"
                     />
                 </SettingsSection>
-                <View style={styles.hints}>
-                    <Text style={styles.example}>TMDB: https://player.videasy.net/tv/{'{TMDBID}'}/{'{SEASON}'}/{'{EPISODE}'}</Text>
-                    <Text style={styles.example}>IMDb: https://player.videasy.net/tv/{'{IMDBID}'}/{'{SEASON}'}/{'{EPISODE}'}</Text>
-                </View>
                 <SettingsSection>
                     <SettingsRow
                         title="Save Settings"
@@ -97,22 +94,20 @@ const EmbedTvShowsSettingsScreen = () => {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: '#000000' },
-    inputHost: { width: '100%', minHeight: 120, marginBottom: 8 },
-    hints: { paddingHorizontal: 16, gap: 4 },
     sectionSubtitle: {
         fontSize: 14,
         color: '#888',
         lineHeight: 20,
     },
     textInput: {
+        width: '100%',
+        minHeight: 120,
         backgroundColor: '#1c1c1e',
         borderRadius: 10,
         padding: 12,
-        borderWidth: 1,
-        borderColor: '#38383a',
+        color: '#f2f2f7',
+        fontSize: 15,
     },
-    inputText: { color: '#f2f2f7', fontSize: 15 },
-    example: { fontSize: 13, color: '#8e8e93', fontFamily: 'monospace' },
     saveButton: {
         alignSelf: 'center',
         width: '100%',

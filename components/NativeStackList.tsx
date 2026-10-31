@@ -8,6 +8,7 @@ export default function NativeStackList<T>({
   axis,
   spacing = 0,
   horizontalContentInset = 0,
+  bottomContentInset = 0,
   scrollable = true,
   nativeItems = false,
   keyExtractor,
@@ -37,10 +38,15 @@ export default function NativeStackList<T>({
       <RNView style={{ width: insetSpacerWidth, height: 1 }} />
     </RNHostView>
   ) : null;
+  const bottomSpacer = axis === 'vertical' && bottomContentInset > 0 ? (
+    <RNHostView key="bottom-inset" matchContents>
+      <RNView style={{ height: bottomContentInset }} />
+    </RNHostView>
+  ) : null;
 
   const stack = axis === 'horizontal'
     ? <Row spacing={spacing}>{leadingInset}{items}{trailingInset}</Row>
-    : <Column spacing={spacing}>{items}</Column>;
+    : <Column spacing={spacing}>{items}{bottomSpacer}</Column>;
 
   return (
     <Host
