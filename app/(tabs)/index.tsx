@@ -1,63 +1,25 @@
 import { router, useFocusEffect } from 'expo-router';
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
-  ScrollView,
   StyleSheet,
   View,
   FlatList,
-  TouchableOpacity
+  Platform,
 } from 'react-native';
-import { StatusBar, Text } from '@/components/Themed';
-import PosterList from '@/components/PosterList';
-import BottomSpacing from '@/components/BottomSpacing';
-import AppleTVCarousel from '@/components/PosterCarousel';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StatusBar, Text, PosterList, BottomSpacing, BlurGradientBackground } from '@vjdev1212/media-ui-kit';
+import { PosterCarousel } from '@vjdev1212/media-ui-kit';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { CatalogUrl, MovieGneres, TvGneres } from '@/constants/Tmdb';
-import BlurGradientBackground from '@/components/BlurGradientBackground';
+import { NativeButton } from '@vjdev1212/media-ui-kit';
 
-// Lazy loading wrapper component
-const LazyPosterList = ({
-  apiUrl,
-  title,
-  type,
-  index
-}: {
-  apiUrl: string;
-  title: string;
-  type: 'movie' | 'series';
-  index: number;
-}) => {
-  const [shouldLoad, setShouldLoad] = useState(index < 2); // Load first 2 immediately
-
-  return (
-    <View
-      onLayout={() => {
-        if (!shouldLoad) {
-          setShouldLoad(true);
-        }
-      }}
-    >
-      {shouldLoad ? (
-        <PosterList apiUrl={apiUrl} title={title} type={type} />
-      ) : (
-        <View style={{ height: 280, marginBottom: 20 }} />
-      )}
-    </View>
-  );
-};
+const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
 export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
   const [filter, setFilter] = useState<'all' | 'movies' | 'series'>('all');
-  const [refreshKey, setRefreshKey] = useState(0);
-
-  // Refresh watch history when screen comes into focus
-  useFocusEffect(
-    useCallback(() => {
-      setRefreshKey(prev => prev + 1);
-    }, [])
-  );
 
   const filters = [
     { key: 'all', label: 'All', icon: 'albums-outline' },
@@ -124,78 +86,91 @@ export default function HomeScreen() {
     setFilter(newFilter);
   };
 
-  const handleCarouselItemPress = (item: any) => {
-    const type = item.type == 'movie' ? 'movie' : 'series'
-    router.push({
-      pathname: `/${type}/details`,
-      params: { moviedbid: item.moviedbid },
-    });
-  };
+  const handleCarouselItemPress = useCallback((item: any) => {
+    const type = item.type === 'movie' ? 'movie' : 'series';
+    router.push({ pathname: `/${type}/details`, params: { moviedbid: item.tmdbid } });
+  }, []);
+
+  const handlePosterItemPress = useCallback(async (tmdbId: number, type: 'movie' | 'series') => {
+    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: `/${type}/details`, params: { moviedbid: tmdbId } });
+  }, []);
+
+  const handlePosterSeeAllPress = useCallback(async (apiUrl: string, title: string, type: 'movie' | 'series') => {
+    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: `/${type}/list`, params: { apiUrl, title } });
+  }, []);
+
+  const renderCatalogList = useCallback(({ item }: { item: (typeof activeLists)[number] }) => (
+    <PosterList
+      apiUrl={item.apiUrl}
+      title={item.title}
+      type={item.type as 'movie' | 'series'}
+      onItemPress={handlePosterItemPress}
+      onSeeAllPress={handlePosterSeeAllPress}
+    />
+  ), [handlePosterItemPress, handlePosterSeeAllPress]);
+
+  const listHeader = (
+    <>
+      <PosterCarousel
+        apiKey={TMDB_API_KEY}
+        filter={filter}
+        onItemPress={handleCarouselItemPress}
+        autoPlay={true}
+        autoPlayInterval={6000}
+        topInset={Platform.OS === 'ios' ? insets.top : 0}
+      />
+      <View style={styles.contentContainer}>
+        <View style={styles.filtersContainer}>
+          {filters.map((item) => (
+            <NativeButton
+              key={item.key}
+              variant="text"
+              style={[
+                styles.filterButton,
+                filter === item.key && styles.filterButtonActive,
+              ]}
+              onPress={() => handleFilterChange(item.key as 'all' | 'movies' | 'series')}
+            >
+              <Ionicons
+                name={item.icon as any}
+                size={18}
+                color={filter === item.key ? '#000000' : '#8E8E93'}
+                style={styles.filterIcon}
+              />
+              <Text
+                style={[
+                  styles.filterButtonText,
+                  filter === item.key && styles.filterButtonTextActive,
+                ]}
+              >
+                {item.label}
+              </Text>
+            </NativeButton>
+          ))}
+        </View>
+      </View>
+    </>
+  );
 
   return (
     <View style={[styles.container]}>
       <StatusBar />
       <BlurGradientBackground />
-      {/* Scrollable content */}
-      <ScrollView showsVerticalScrollIndicator={false} key={filter}>
-
-        {/* Apple TV Carousel */}
-        <AppleTVCarousel
-          filter={filter}
-          onItemPress={handleCarouselItemPress}
-          autoPlay={true}
-          autoPlayInterval={6000}
-        />
-
-        <View style={styles.contentContainer}>
-          {/* Filter buttons */}
-          <View style={[styles.filtersContainer]}>
-            <FlatList
-              data={filters}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.filterRow}
-              keyExtractor={(item) => item.key}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[
-                    styles.filterButton,
-                    filter === item.key && styles.filterButtonActive
-                  ]}
-                  onPress={() => handleFilterChange(item.key as 'all' | 'movies' | 'series')}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons
-                    name={item.icon as any}
-                    size={18}
-                    color={filter === item.key ? '#000000' : '#8E8E93'}
-                    style={styles.filterIcon}
-                  />
-                  <Text
-                    style={[
-                      styles.filterButtonText,
-                      filter === item.key && styles.filterButtonTextActive
-                    ]}
-                  >
-                    {item.label}
-                  </Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-
-          {activeLists.map((list, i) => (
-            <LazyPosterList
-              key={`${filter}-${i}`}
-              apiUrl={list.apiUrl}
-              title={list.title}
-              type={list.type as 'movie' | 'series'}
-              index={i}
-            />
-          ))}
-        </View>
-        <BottomSpacing space={50} />
-      </ScrollView>
+      <FlatList
+        key={filter}
+        data={activeLists}
+        keyExtractor={(item) => `${filter}-${item.apiUrl}`}
+        renderItem={renderCatalogList}
+        ListHeaderComponent={listHeader}
+        ListFooterComponent={<BottomSpacing space={50} />}
+        initialNumToRender={2}
+        maxToRenderPerBatch={2}
+        windowSize={5}
+        removeClippedSubviews={false}
+        showsVerticalScrollIndicator={false}
+      />
     </View>
   );
 }
@@ -205,18 +180,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   filtersContainer: {
+    flexDirection: 'row',
     paddingVertical: 12,
-    paddingHorizontal: 5,
-  },
-  filterRow: {
-    paddingHorizontal: 10,
-    gap: 15,
+    paddingHorizontal: 15,
+    gap: 8,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 18,
+    minHeight: 40,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 20,
     backgroundColor: '#1a1a1a',
     borderWidth: 1,

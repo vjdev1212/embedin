@@ -7,6 +7,11 @@ workflows:
       groups:
         - EXPO
     scripts:
+      - name: Checkout media-ui-kit
+        script: |
+          git clone --depth 1 https://github.com/vjdev1212/media-ui-kit.git "$CM_BUILD_DIR/../media-ui-kit"
+          test -f "$CM_BUILD_DIR/../media-ui-kit/package.json"
+
       - name: Install dependencies
         script: npm install --force
       
@@ -113,6 +118,11 @@ workflows:
       groups:
         - EXPO
     scripts:
+      - name: Checkout media-ui-kit
+        script: |
+          git clone --depth 1 https://github.com/vjdev1212/media-ui-kit.git "$CM_BUILD_DIR/../media-ui-kit"
+          test -f "$CM_BUILD_DIR/../media-ui-kit/package.json"
+
       - name: Install dependencies
         script: npm install --force
 
@@ -192,6 +202,11 @@ workflows:
         - EXPO
         - ANDROID_KEYSTORE
     scripts:
+      - name: Checkout media-ui-kit
+        script: |
+          git clone --depth 1 https://github.com/vjdev1212/media-ui-kit.git "$CM_BUILD_DIR/../media-ui-kit"
+          test -f "$CM_BUILD_DIR/../media-ui-kit/package.json"
+
       - name: Install dependencies
         script: npm install --force
 
@@ -307,6 +322,11 @@ workflows:
       groups:
         - EXPO
     scripts:
+      - name: Checkout media-ui-kit
+        script: |
+          git clone --depth 1 https://github.com/vjdev1212/media-ui-kit.git "$CM_BUILD_DIR/../media-ui-kit"
+          test -f "$CM_BUILD_DIR/../media-ui-kit/package.json"
+
       - name: Install dependencies
         script: npm install --force
 

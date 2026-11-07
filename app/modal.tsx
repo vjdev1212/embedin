@@ -1,12 +1,12 @@
 import { StyleSheet } from 'react-native';
-import { StatusBar, Text, View } from '@/components/Themed';
+import { StatusBar, Text, View } from '@vjdev1212/media-ui-kit';
 
 export default function ModalScreen() {
   return (
     <View style={styles.container}>
       <StatusBar />
       <Text style={styles.title}>Modal</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <View style={styles.separator} />
     </View>
   );
 }

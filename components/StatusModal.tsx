@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, ActivityIndicator, StyleSheet, Pressable, TouchableWithoutFeedback } from 'react-native';
-import { View, Text } from './Themed';
+import { View, Text } from '@vjdev1212/media-ui-kit';
 
 interface StatusModalProps {
   visible: boolean;

@@ -2,12 +2,12 @@ import { useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { storageService } from '@/utils/StorageService';
 import {
   defaultMovieUrlTemplate,
   defaultTvShowUrlTemplate
 } from '@/constants/Embed';
-import { Text, View } from '@/components/Themed';
+import { Text, View } from '@vjdev1212/media-ui-kit';
 
 const EmbedPlayer = () => {
   const { imdbid, tmdbid, type, season, episode } = useLocalSearchParams();
@@ -18,12 +18,12 @@ const EmbedPlayer = () => {
   useEffect(() => {
     const loadEmbedSettings = async () => {
       try {
-        const storedSettings = await AsyncStorage.getItem('embedSettings');
-        if (storedSettings) {
-          const parsedSettings = JSON.parse(storedSettings);
-          setMovieUrlTemplate(parsedSettings.movie?.template ?? defaultMovieUrlTemplate);
-          setSeriesUrlTemplate(parsedSettings.tv?.template ?? defaultTvShowUrlTemplate);
-        }
+        const storedSettings = await storageService.getObject<{
+          movie?: { template?: string };
+          tv?: { template?: string };
+        }>('embedSettings');
+        setMovieUrlTemplate(storedSettings?.movie?.template ?? defaultMovieUrlTemplate);
+        setSeriesUrlTemplate(storedSettings?.tv?.template ?? defaultTvShowUrlTemplate);
       } catch (error) {
         console.error('Failed to load embed settings:', error);
       }
