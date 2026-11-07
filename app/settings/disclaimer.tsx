@@ -1,4 +1,4 @@
-import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
+import { SettingsPage, SettingsRow, SettingsSection } from '@vjdev1212/media-ui-kit';
 
 export default function DisclaimerScreen() {
     return (

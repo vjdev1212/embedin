@@ -1,14 +1,15 @@
-import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
-import MediaGrid, { GENRE_NAMES, type MediaGridItem } from '@/components/MediaGrid';
+import { ActivityIndicator, StatusBar, Text, View } from '@vjdev1212/media-ui-kit';
+import { MediaGrid, GENRE_NAMES, type MediaGridItem } from '@vjdev1212/media-ui-kit';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import SegmentedControl from '@expo/ui/community/segmented-control';
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useHeaderHeight } from 'expo-router/react-navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextInput as NativeTextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { radius, spacing, systemDarkBackground, typography } from '@/constants/theme';
+import { showAlert } from '@/utils/platform';
 
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 type SearchFilter = 'all' | 'movie' | 'series';
@@ -39,7 +40,7 @@ interface TMDBSearchItem {
 function toMediaItem(item: TMDBSearchItem, type: 'movie' | 'series'): MediaGridItem {
   const date = item.release_date || item.first_air_date || '';
   return {
-    moviedbid: item.id,
+    tmdbid: item.id,
     name: item.title || item.name || 'Untitled',
     year: date.slice(0, 4),
     poster: item.poster_path ? `https://image.tmdb.org/t/p/w342${item.poster_path}` : '',
@@ -194,7 +195,16 @@ export default function SearchScreen() {
             </Pressable>
           </View>
         ) : trimmedQuery && filteredResults.length > 0 ? (
-          <MediaGrid detailsPath="/movie/details" items={filteredResults} safeAreaEdges={['left', 'right']} />
+          <MediaGrid
+            detailsPath="/movie/details"
+            items={filteredResults}
+            safeAreaEdges={['left', 'right']}
+            onItemPress={(item) => router.push({
+              pathname: item.type === 'movie' ? '/movie/details' : '/series/details',
+              params: { moviedbid: String(item.tmdbid) },
+            })}
+            onActionError={showAlert}
+          />
         ) : trimmedQuery ? (
           <View style={styles.statusContainer}>
             <Text style={[styles.statusText, { color: colors.textMuted }]}>

@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { StatusBar, Text, View } from '@/components/Themed';
+import { StatusBar, Text, View } from '@vjdev1212/media-ui-kit';
 
 export default function ModalScreen() {
   return (

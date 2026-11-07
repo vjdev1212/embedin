@@ -1,5 +1,5 @@
-import { StatusBar, View } from '@/components/Themed';
-import { SettingsPage, SettingsTitle } from '@/components/NativeSettings';
+import { StatusBar, View } from '@vjdev1212/media-ui-kit';
+import { SettingsPage, SettingsTitle } from '@vjdev1212/media-ui-kit';
 import { systemDarkBackground } from '@/constants/theme';
 
 export default function ContactScreen() {

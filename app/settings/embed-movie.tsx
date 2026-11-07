@@ -1,11 +1,11 @@
 import { Linking, StyleSheet, TextInput, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { StatusBar, Text } from '../../components/Themed';
+import { StatusBar, Text } from '@vjdev1212/media-ui-kit';
 import { isHapticsSupported, showAlert } from '@/utils/platform';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from 'react';
 import { defaultMovieUrlTemplate } from '@/constants/Embed';
-import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
+import { SettingsPage, SettingsRow, SettingsSection } from '@vjdev1212/media-ui-kit';
 import { storageService } from '@/utils/StorageService';
 
 interface EmbedSettings {

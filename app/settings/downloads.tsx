@@ -1,11 +1,11 @@
-import { StatusBar, View, Text } from '@/components/Themed';
+import { StatusBar, View, Text } from '@vjdev1212/media-ui-kit';
 import React from 'react';
 import {
   StyleSheet,
   Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
+import { SettingsPage, SettingsRow, SettingsSection } from '@vjdev1212/media-ui-kit';
 
 const AppResourcesScreen = () => {
   const resources = [

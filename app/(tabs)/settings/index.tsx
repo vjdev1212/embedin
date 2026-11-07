@@ -4,7 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { Text } from '@expo/ui';
 import Constants from 'expo-constants';
-import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
+import { SettingsPage, SettingsRow, SettingsSection } from '@vjdev1212/media-ui-kit';
 
 const SettingsScreen = () => {
   const showContact = process.env.EXPO_PUBLIC_SHOW_CONTACT === 'true';

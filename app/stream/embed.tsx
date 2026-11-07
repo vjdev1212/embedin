@@ -7,7 +7,7 @@ import {
   defaultMovieUrlTemplate,
   defaultTvShowUrlTemplate
 } from '@/constants/Embed';
-import { Text, View } from '@/components/Themed';
+import { Text, View } from '@vjdev1212/media-ui-kit';
 
 const EmbedPlayer = () => {
   const { imdbid, tmdbid, type, season, episode } = useLocalSearchParams();
