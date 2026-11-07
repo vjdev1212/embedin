@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { MenuView } from '@expo/ui/community/menu';
 import type { MenuAction } from '@expo/ui/community/menu';
-import { Button as NativeButton, Column as NativeColumn, RNHostView, Row as NativeRow, Text as NativeText } from '@expo/ui';
+import { Column as NativeColumn, RNHostView, Row as NativeRow, Text as NativeText } from '@expo/ui';
 import { Ionicons } from '@expo/vector-icons';
 import { ActivityIndicator, StatusBar, Text, View } from '@/components/Themed';
 import { router } from 'expo-router';
@@ -211,39 +211,40 @@ const MediaGrid: React.FC<MediaGridProps> = ({
 
         return (
             <NativeColumn style={{ width: rowWidth }}>
-                <NativeRow alignment="start" spacing={posterTextGap} style={{ width: rowWidth, paddingHorizontal: rowHorizontalPadding, paddingVertical: compact ? 10 : 12 }}>
-                    <NativeButton variant="text" onPress={() => openDetails(item)} style={{ width: mediaButtonWidth }}>
-                        <NativeRow alignment="start" spacing={posterTextGap}>
-                            <RNHostView matchContents>
-                                <PosterArtwork key={item.poster || 'placeholder'} style={[styles.posterFrame, { width: posterWidth, height: posterHeight }]}>
-                                    {(onImageLoad) => item.poster ? (
-                                        <Image
-                                            source={{ uri: item.poster }}
-                                            onLoad={onImageLoad}
-                                            style={[styles.poster, { width: posterWidth, height: posterHeight, backgroundColor: colors.backgroundOverlay }]}
-                                            resizeMode="cover"
-                                        />
-                                    ) : (
-                                        <RNView style={[styles.posterPlaceholder, { width: posterWidth, height: posterHeight, backgroundColor: colors.backgroundOverlay }]}>
-                                            <Ionicons name="film-outline" size={compact ? 20 : 30} color={colors.textDim} />
-                                        </RNView>
-                                    )}
-                                </PosterArtwork>
-                            </RNHostView>
-                            <NativeColumn alignment="start" spacing={compact ? 3 : 7} style={{ width: mediaInfoWidth, paddingTop: 4 }}>
-                                <NativeText textStyle={compact ? styles.compactMediaTitle : styles.mediaTitle}>{item.name}</NativeText>
-                                {compact ? (
-                                    metadata.length > 0 && (
-                                        <NativeText textStyle={{ ...styles.compactMediaMetadata, color: `${colors.text}CC` }}>
-                                            {metadata}
-                                        </NativeText>
-                                    )
-                                ) : metadata.length > 0 && (
-                                    <NativeText textStyle={{ ...styles.mediaMetadata, color: `${colors.text}CC` }}>{metadata}</NativeText>
-                                )}
-                            </NativeColumn>
-                        </NativeRow>
-                    </NativeButton>
+                <NativeRow
+                    alignment="start"
+                    spacing={posterTextGap}
+                    onPress={() => openDetails(item)}
+                    style={{ width: rowWidth, paddingHorizontal: rowHorizontalPadding, paddingVertical: compact ? 10 : 12 }}
+                >
+                    <RNHostView matchContents>
+                        <PosterArtwork key={item.poster || 'placeholder'} style={[styles.posterFrame, { width: posterWidth, height: posterHeight }]}>
+                            {(onImageLoad) => item.poster ? (
+                                <Image
+                                    source={{ uri: item.poster }}
+                                    onLoad={onImageLoad}
+                                    style={[styles.poster, { width: posterWidth, height: posterHeight, backgroundColor: colors.backgroundOverlay }]}
+                                    resizeMode="cover"
+                                />
+                            ) : (
+                                <RNView style={[styles.posterPlaceholder, { width: posterWidth, height: posterHeight, backgroundColor: colors.backgroundOverlay }]}>
+                                    <Ionicons name="film-outline" size={compact ? 20 : 30} color={colors.textDim} />
+                                </RNView>
+                            )}
+                        </PosterArtwork>
+                    </RNHostView>
+                    <NativeColumn alignment="start" spacing={compact ? 3 : 7} style={{ width: mediaInfoWidth, paddingTop: 4 }}>
+                        <NativeText textStyle={compact ? styles.compactMediaTitle : styles.mediaTitle}>{item.name}</NativeText>
+                        {compact ? (
+                            metadata.length > 0 && (
+                                <NativeText textStyle={{ ...styles.compactMediaMetadata, color: `${colors.text}CC` }}>
+                                    {metadata}
+                                </NativeText>
+                            )
+                        ) : metadata.length > 0 && (
+                            <NativeText textStyle={{ ...styles.mediaMetadata, color: `${colors.text}CC` }}>{metadata}</NativeText>
+                        )}
+                    </NativeColumn>
                     <RNHostView matchContents>
                         <RNView style={[styles.menuActionSlot, { width: menuActionWidth, minWidth: menuActionWidth }]}>{menu}</RNView>
                     </RNHostView>

@@ -2,6 +2,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { Stack, useRouter } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
+import { Text } from '@expo/ui';
 import Constants from 'expo-constants';
 import { SettingsPage, SettingsRow, SettingsSection } from '@/components/NativeSettings';
 
@@ -100,12 +101,10 @@ const SettingsScreen = () => {
             isLast
           />
         </SettingsSection>
-        <SettingsSection title="EmbedIn">
+        <SettingsSection title="Version">
           <SettingsRow
             title="Version"
-            detail={version}
-            detailColor="#EBEBF599"
-            detailFontSize={13}
+            trailing={<Text textStyle={{ color: '#EBEBF599', fontSize: 13 }}>{version}</Text>}
             isLast
           />
         </SettingsSection>

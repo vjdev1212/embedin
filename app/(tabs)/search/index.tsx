@@ -119,7 +119,7 @@ export default function SearchScreen() {
         styles.container,
         {
           backgroundColor: systemDarkBackground,
-          paddingTop: Platform.OS === 'ios' ? headerHeight : 0,
+          paddingTop: headerHeight,
         },
       ]}
     >
@@ -128,11 +128,11 @@ export default function SearchScreen() {
         options={{
           headerShown: true,
           headerBackVisible: false,
-          headerTransparent: Platform.OS === 'ios',
+          headerTransparent: true,
           headerBackground: SearchHeaderBackground,
-          headerShadowVisible: true,
+          headerShadowVisible: false,
           headerTitle: 'Search',
-          headerStyle: { backgroundColor: Platform.OS === 'ios' ? 'transparent' : systemDarkBackground },
+          headerStyle: { backgroundColor: 'transparent' },
           headerBlurEffect: 'none',
           headerUserInterfaceStyle: 'dark',
           headerTintColor: colors.text,
@@ -140,6 +140,7 @@ export default function SearchScreen() {
             placeholder: 'Search movies or series',
             autoCapitalize: 'none',
             hideWhenScrolling: false,
+            placement: 'stacked',
             onChangeText: (event) => changeQuery(event.nativeEvent.text),
             onCancelButtonPress: () => changeQuery(''),
             onSearchButtonPress: (event) => changeQuery(event.nativeEvent.text),
@@ -172,6 +173,7 @@ export default function SearchScreen() {
           accessibilityLabel="Filter search results"
           appearance="dark"
           selectedIndex={FILTER_OPTIONS.findIndex((option) => option.id === selectedFilter)}
+          style={{ backgroundColor: 'transparent' }}
           tintColor={colors.primary}
           values={FILTER_OPTIONS.map((option) => option.title)}
           onValueChange={(value) => {
