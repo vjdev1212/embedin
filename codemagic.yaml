@@ -2,7 +2,7 @@ workflows:
   embedin-ios-build:
     name: EmbedIn iOS Build
     environment:
-      node: latest
+      node: 22.17.0
       xcode: latest
       groups:
         - EXPO
@@ -113,7 +113,7 @@ workflows:
   embedin-ios-dev:
     name: EmbedIn iOS Development Build
     environment:
-      node: latest
+      node: 22.17.0
       xcode: latest
       groups:
         - EXPO
@@ -196,7 +196,7 @@ workflows:
   embedin-android-build:
     name: EmbedIn Android Build
     environment:
-      node: latest
+      node: 22.17.0
       java: latest
       groups:
         - EXPO
@@ -317,7 +317,7 @@ workflows:
   embedin-android-dev:
     name: EmbedIn Android Development Build
     environment:
-      node: latest
+      node: 22.17.0
       java: latest
       groups:
         - EXPO
