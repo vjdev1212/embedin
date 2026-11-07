@@ -22,7 +22,6 @@
     "@expo/react-native-action-sheet": "^4.1.1",
     "@expo/ui": "~58.0.22",
     "@expo/vector-icons": "^15.0.3",
-    "@react-native-menu/menu": "^2.0.0",
     "@react-navigation/native": "^7.0.0-rc.20",
     "@vjdev1212/media-ui-kit": "file:../media-ui-kit",
     "expo": "~58.0.21",
