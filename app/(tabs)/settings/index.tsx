@@ -104,7 +104,7 @@ const SettingsScreen = () => {
         <SettingsSection title="Version">
           <SettingsRow
             title="Version"
-            trailing={<Text textStyle={{ color: '#EBEBF599', fontSize: 13 }}>{version}</Text>}
+            trailingNative={<Text textStyle={{ color: '#EBEBF599', fontSize: 13 }}>{version}</Text>}
             isLast
           />
         </SettingsSection>
