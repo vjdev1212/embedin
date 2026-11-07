@@ -4,7 +4,9 @@ import {
   StyleSheet,
   View,
   FlatList,
+  Platform,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar, Text, PosterList, BottomSpacing, BlurGradientBackground } from '@vjdev1212/media-ui-kit';
 import { PosterCarousel } from '@vjdev1212/media-ui-kit';
 import { Ionicons } from '@expo/vector-icons';
@@ -16,6 +18,7 @@ import { NativeButton } from '@vjdev1212/media-ui-kit';
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
 export default function HomeScreen() {
+  const insets = useSafeAreaInsets();
   const [filter, setFilter] = useState<'all' | 'movies' | 'series'>('all');
 
   const filters = [
@@ -116,6 +119,7 @@ export default function HomeScreen() {
         onItemPress={handleCarouselItemPress}
         autoPlay={true}
         autoPlayInterval={6000}
+        topInset={Platform.OS === 'ios' ? insets.top : 0}
       />
       <View style={styles.contentContainer}>
         <View style={styles.filtersContainer}>
