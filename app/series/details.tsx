@@ -162,6 +162,16 @@ const SeriesDetails = () => {
     }
   };
 
+  const handlePosterItemPress = useCallback(async (tmdbId: number, type: 'movie' | 'series') => {
+    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: `/${type}/details`, params: { moviedbid: tmdbId } });
+  }, []);
+
+  const handlePosterSeeAllPress = useCallback(async (apiUrl: string, title: string, type: 'movie' | 'series') => {
+    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: `/${type}/list`, params: { apiUrl, title } });
+  }, []);
+
   if (loading) {
     return (
       <View style={styles.centeredContainer}>
@@ -184,16 +194,6 @@ const SeriesDetails = () => {
       params: { imdbid: imdbid, tmdbid: moviedbid, type: 'series', name: data.name, season: season, episode: episode },
     });
   };
-
-  const handlePosterItemPress = useCallback(async (tmdbId: number, type: 'movie' | 'series') => {
-    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push({ pathname: `/${type}/details`, params: { moviedbid: tmdbId } });
-  }, []);
-
-  const handlePosterSeeAllPress = useCallback(async (apiUrl: string, title: string, type: 'movie' | 'series') => {
-    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push({ pathname: `/${type}/list`, params: { apiUrl, title } });
-  }, []);
 
   const handlePlayPress = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);

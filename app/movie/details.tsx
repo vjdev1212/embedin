@@ -131,6 +131,15 @@ const MovieDetails = () => {
     }
   };
 
+  const handlePosterItemPress = useCallback(async (tmdbId: number, type: 'movie' | 'series') => {
+    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: `/${type}/details`, params: { moviedbid: tmdbId } });
+  }, []);
+
+  const handlePosterSeeAllPress = useCallback(async (apiUrl: string, title: string, type: 'movie' | 'series') => {
+    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({ pathname: `/${type}/list`, params: { apiUrl, title } });
+  }, []);
 
   if (loading) {
     return (
@@ -156,16 +165,6 @@ const MovieDetails = () => {
       params: { imdbid: imdbid, tmdbid: moviedbid, type: 'movie', name: data.name, season: 0, episode: 0 },
     });
   };
-
-  const handlePosterItemPress = useCallback(async (tmdbId: number, type: 'movie' | 'series') => {
-    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push({ pathname: `/${type}/details`, params: { moviedbid: tmdbId } });
-  }, []);
-
-  const handlePosterSeeAllPress = useCallback(async (apiUrl: string, title: string, type: 'movie' | 'series') => {
-    if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.push({ pathname: `/${type}/list`, params: { apiUrl, title } });
-  }, []);
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} style={styles.container} ref={ref}>
