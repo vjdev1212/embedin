@@ -1,14 +1,14 @@
-import { ActivityIndicator, StatusBar, Text, View } from '@vjdev1212/media-ui-kit';
+import { ActivityIndicator, BlurGradientBackground, StatusBar, Text, View } from '@vjdev1212/media-ui-kit';
 import { MediaGrid, GENRE_NAMES, type MediaGridItem } from '@vjdev1212/media-ui-kit';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
 import SegmentedControl from '@expo/ui/community/segmented-control';
 import { router, Stack } from 'expo-router';
 import { useHeaderHeight } from 'expo-router/react-navigation';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Platform, Pressable, StyleSheet, TextInput as NativeTextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { radius, spacing, systemDarkBackground, typography } from '@/constants/theme';
+import { radius, spacing, typography } from '@/constants/theme';
 import { showAlert } from '@/utils/platform';
 
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
@@ -18,10 +18,6 @@ const FILTER_OPTIONS: { id: SearchFilter; title: string }[] = [
   { id: 'movie', title: 'Movies' },
   { id: 'series', title: 'Series' },
 ];
-
-const SearchHeaderBackground = () => (
-  <View style={{ flex: 1, backgroundColor: 'transparent' }} />
-);
 
 interface TMDBSearchItem {
   id: number;
@@ -114,27 +110,14 @@ export default function SearchScreen() {
   const changeQuery = (value: string) => { setQuery(value); setSelectedFilter('all'); };
 
   return (
-    <SafeAreaView
-      edges={['left', 'right', 'bottom']}
-      style={[
-        styles.container,
-        {
-          backgroundColor: systemDarkBackground,
-          paddingTop: headerHeight,
-        },
-      ]}
-    >
+    <View style={styles.container}>
+      <BlurGradientBackground />
       <StatusBar />
       <Stack.Screen
         options={{
           headerShown: true,
           headerBackVisible: false,
-          headerTransparent: true,
-          headerBackground: SearchHeaderBackground,
-          headerShadowVisible: false,
           headerTitle: 'Search',
-          headerStyle: { backgroundColor: 'transparent' },
-          headerBlurEffect: 'none',
           headerUserInterfaceStyle: 'dark',
           headerTintColor: colors.text,
           headerSearchBarOptions: Platform.OS === 'ios' ? {
@@ -166,60 +149,80 @@ export default function SearchScreen() {
               underlineColorAndroid="transparent"
               value={query}
             />
+            {query.length > 0 && (
+              <Pressable
+                accessibilityLabel="Clear search"
+                accessibilityRole="button"
+                hitSlop={8}
+                onPress={() => changeQuery('')}
+                style={styles.clearButton}
+              >
+                <Ionicons name="close" size={20} color={colors.textDim} />
+              </Pressable>
+            )}
           </View>
         </View>
       )}
-      <View style={styles.filterRow}>
-        <SegmentedControl
-          accessibilityLabel="Filter search results"
-          appearance="dark"
-          selectedIndex={FILTER_OPTIONS.findIndex((option) => option.id === selectedFilter)}
-          style={{ backgroundColor: 'transparent' }}
-          tintColor={colors.primary}
-          values={FILTER_OPTIONS.map((option) => option.title)}
-          onValueChange={(value) => {
-            const option = FILTER_OPTIONS.find((filter) => filter.title === value);
-            if (option) setSelectedFilter(option.id);
-          }}
-        />
-      </View>
 
-      <View style={styles.resultsContainer}>
-        {loading ? (
-          <View style={styles.statusContainer}><ActivityIndicator size="large" color={colors.primary} /></View>
-        ) : error ? (
-          <View style={styles.statusContainer}>
-            <Text style={[styles.statusText, { color: colors.textMuted }]}>{error}</Text>
-            <Pressable accessibilityRole="button" onPress={() => setRetryCount((count) => count + 1)}>
-              <Text style={[styles.retryText, { color: colors.primary }]}>Try again</Text>
-            </Pressable>
-          </View>
-        ) : trimmedQuery && filteredResults.length > 0 ? (
-          <MediaGrid
-            detailsPath="/movie/details"
-            items={filteredResults}
-            safeAreaEdges={['left', 'right']}
-            onItemPress={(item) => router.push({
-              pathname: item.type === 'movie' ? '/movie/details' : '/series/details',
-              params: { moviedbid: String(item.tmdbid) },
-            })}
-            onActionError={showAlert}
-          />
-        ) : trimmedQuery ? (
-          <View style={styles.statusContainer}>
-            <Text style={[styles.statusText, { color: colors.textMuted }]}>
-              {results.length === 0 ? 'No results found' : selectedFilter === 'movie' ? 'No movies found' : 'No TV shows found'}
-            </Text>
-            <Text style={[styles.emptySubtitle, { color: colors.textDim }]}>Try searching with different keywords.</Text>
-          </View>
-        ) : (
-          <View style={styles.statusContainer}>
-            <Text style={[styles.statusText, { color: colors.textMuted }]}>Search movies and TV shows</Text>
-            <Text style={[styles.emptySubtitle, { color: colors.textDim }]}>Enter a title to get started.</Text>
+      <SafeAreaView
+        edges={['left', 'right']}
+        style={[styles.container, { backgroundColor: 'transparent', paddingTop: headerHeight }]}
+      >
+        {trimmedQuery.length > 0 && (
+          <View style={styles.filterRow}>
+            <SegmentedControl
+              accessibilityLabel="Filter search results"
+              appearance="dark"
+              selectedIndex={FILTER_OPTIONS.findIndex((option) => option.id === selectedFilter)}
+              style={{ backgroundColor: 'transparent' }}
+              tintColor={colors.primary}
+              values={FILTER_OPTIONS.map((option) => option.title)}
+              onValueChange={(value) => {
+                const option = FILTER_OPTIONS.find((filter) => filter.title === value);
+                if (option) setSelectedFilter(option.id);
+              }}
+            />
           </View>
         )}
-      </View>
-    </SafeAreaView>
+        <View style={styles.resultsContainer}>
+          {loading ? (
+            <View style={styles.statusContainer}><ActivityIndicator size="large" color="#535aff" /></View>
+          ) : error ? (
+            <View style={styles.statusContainer}>
+              <Text style={[styles.statusText, { color: colors.textMuted }]}>{error}</Text>
+              <Pressable accessibilityRole="button" onPress={() => setRetryCount((count) => count + 1)}>
+                <Text style={[styles.retryText, { color: colors.primary }]}>Try again</Text>
+              </Pressable>
+            </View>
+          ) : trimmedQuery && filteredResults.length > 0 ? (
+            <MediaGrid
+              detailsPath="/movie/details"
+              items={filteredResults}
+              safeAreaEdges={['left', 'right']}
+              showGenres={false}
+              yearOnSeparateLine
+              onItemPress={(item) => router.push({
+                pathname: item.type === 'movie' ? '/movie/details' : '/series/details',
+                params: { moviedbid: String(item.tmdbid) },
+              })}
+              onActionError={showAlert}
+            />
+          ) : trimmedQuery ? (
+            <View style={styles.statusContainer}>
+              <Text style={[styles.statusText, { color: colors.textMuted }]}>
+                {results.length === 0 ? 'No results found' : selectedFilter === 'movie' ? 'No movies found' : 'No TV shows found'}
+              </Text>
+              <Text style={[styles.emptySubtitle, { color: colors.textDim }]}>Try searching with different keywords.</Text>
+            </View>
+          ) : (
+            <View style={styles.statusContainer}>
+              <Text style={[styles.statusText, { color: colors.textMuted }]}>Search movies and TV shows</Text>
+              <Text style={[styles.emptySubtitle, { color: colors.textDim }]}>Enter a title to get started.</Text>
+            </View>
+          )}
+        </View>
+      </SafeAreaView>
+    </View>
   );
 }
 
@@ -250,6 +253,12 @@ const styles = StyleSheet.create({
     fontSize: 17,
     backgroundColor: 'transparent',
     borderWidth: 0,
+  },
+  clearButton: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   filterRow: {
     paddingHorizontal: spacing.md,
