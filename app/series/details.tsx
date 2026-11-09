@@ -191,7 +191,16 @@ const SeriesDetails = () => {
   const handleEpisodeSelect = (season: number, episode: number) => {
     router.push({
       pathname: '/stream/embed',
-      params: { imdbid: imdbid, tmdbid: moviedbid, type: 'series', name: data.name, season: season, episode: episode },
+      params: {
+        imdbid,
+        tmdbid: moviedbid,
+        type: 'series',
+        name: data.name,
+        poster: data.poster,
+        background: data.background,
+        season,
+        episode,
+      },
     });
   };
 
@@ -200,7 +209,16 @@ const SeriesDetails = () => {
 
     router.push({
       pathname: '/stream/embed',
-      params: { imdbid: imdbid, tmdbid: moviedbid, type: 'series', name: data.name, season: 1, episode: 1 },
+      params: {
+        imdbid,
+        tmdbid: moviedbid,
+        type: 'series',
+        name: data.name,
+        poster: data.poster,
+        background: data.background,
+        season: 1,
+        episode: 1,
+      },
     });
   };
 

@@ -10,8 +10,65 @@ import {
 import { Text, View } from '@vjdev1212/media-ui-kit';
 
 const EmbedPlayer = () => {
-  const { imdbid, tmdbid, type, season, episode, name } = useLocalSearchParams();
+  const { imdbid, tmdbid, type, season, episode, name, poster, background } = useLocalSearchParams();
   const headerTitle = typeof name === 'string' && name.trim() ? name : 'Embed Player';
+  const htmlTitle = headerTitle.replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+  })[character]!);
+  const artworkUrl =
+    typeof poster === 'string' && poster.trim()
+      ? poster
+      : typeof background === 'string' && background.trim()
+        ? background
+        : '';
+  const nowPlayingArtworkScript = `
+    (() => {
+      const artworkUrl = ${JSON.stringify(artworkUrl)};
+      const fallbackTitle = ${JSON.stringify(headerTitle)};
+      if (!artworkUrl || typeof MediaSession === 'undefined' || typeof MediaMetadata === 'undefined') {
+        return true;
+      }
+
+      const metadataDescriptor = Object.getOwnPropertyDescriptor(MediaSession.prototype, 'metadata');
+      const addArtwork = (metadata) => {
+        if (!metadata || metadata.artwork?.length) return metadata;
+        return new MediaMetadata({
+          title: metadata.title || fallbackTitle,
+          artist: metadata.artist,
+          album: metadata.album,
+          artwork: [{ src: artworkUrl }],
+        });
+      };
+
+      if (metadataDescriptor?.set) {
+        const originalSetter = metadataDescriptor.set;
+        const originalGetter = metadataDescriptor.get;
+        Object.defineProperty(MediaSession.prototype, 'metadata', {
+          configurable: true,
+          enumerable: metadataDescriptor.enumerable,
+          get: originalGetter ? function() { return originalGetter.call(this); } : undefined,
+          set: function(metadata) { originalSetter.call(this, addArtwork(metadata)); },
+        });
+      }
+
+      const updateArtwork = () => {
+        const session = navigator.mediaSession;
+        if (!session || session.metadata?.artwork?.length) return;
+        session.metadata = addArtwork(session.metadata || new MediaMetadata({
+          title: document.title || fallbackTitle,
+        }));
+      };
+
+      document.addEventListener('play', updateArtwork, true);
+      updateArtwork();
+      return true;
+    })();
+    true;
+  `;
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
   const [seriesUrlTemplate, setSeriesUrlTemplate] = useState<string>(defaultTvShowUrlTemplate);
@@ -87,7 +144,7 @@ const EmbedPlayer = () => {
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-        <title>EmbedPlayer</title>
+        <title>${htmlTitle}</title>
         <style>
           * {
             margin: 0;
@@ -163,6 +220,8 @@ const EmbedPlayer = () => {
             originWhitelist={['*']}
             source={{ html: iframeHtml, baseUrl: videoUrl }}
             style={styles.webview}
+            injectedJavaScriptBeforeContentLoaded={nowPlayingArtworkScript}
+            injectedJavaScriptBeforeContentLoadedForMainFrameOnly={Platform.OS !== 'ios'}
             forceDarkOn={true}
             javaScriptEnabled={true}
             domStorageEnabled={true}
