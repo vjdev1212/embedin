@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
@@ -10,7 +10,8 @@ import {
 import { Text, View } from '@vjdev1212/media-ui-kit';
 
 const EmbedPlayer = () => {
-  const { imdbid, tmdbid, type, season, episode } = useLocalSearchParams();
+  const { imdbid, tmdbid, type, season, episode, name } = useLocalSearchParams();
+  const headerTitle = typeof name === 'string' && name.trim() ? name : 'Embed Player';
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
   const [seriesUrlTemplate, setSeriesUrlTemplate] = useState<string>(defaultTvShowUrlTemplate);
@@ -130,6 +131,18 @@ const EmbedPlayer = () => {
 
   return (
     <View style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          headerTitle,
+          title: headerTitle,
+          headerTransparent: false,
+          headerStyle: { backgroundColor: 'transparent' },
+          headerTintColor: '#ffffff',
+          headerShadowVisible: false,
+          headerBackButtonDisplayMode: 'minimal',
+        }}
+      />
       {videoUrl ? (
         Platform.OS === 'web' ? (
           <iframe
@@ -160,7 +173,7 @@ const EmbedPlayer = () => {
             allowsFullscreenVideo={true}
             allowsAirPlayForMediaPlayback={true}
             allowsPictureInPictureMediaPlayback={true}
-            allowsInlineMediaPlayback={false}
+            allowsInlineMediaPlayback={true}
             bounces={false}
             mixedContentMode="always"
             thirdPartyCookiesEnabled={true}
