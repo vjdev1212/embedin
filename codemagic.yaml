@@ -105,9 +105,23 @@ workflows:
             echo "❌ Failed to create IPA"
             exit 1
           fi
+
+      - name: Zip IPA for download
+        script: |
+          cd ios/build
+          IPA_FILE=$(find . -maxdepth 1 -type f -name "*.ipa" -print -quit)
+          if [ -z "$IPA_FILE" ]; then
+            echo "❌ No IPA file found to zip"
+            exit 1
+          fi
+
+          ZIP_NAME="${IPA_FILE#./}.zip"
+          zip -j "$ZIP_NAME" "$IPA_FILE"
+          echo "✅ IPA archive created: ios/build/$ZIP_NAME"
     
     artifacts:
       - ios/build/*.ipa
+      - ios/build/*.ipa.zip
       - ios/build/**/*.xcarchive
 
   embedin-ios-dev:
@@ -190,8 +204,22 @@ workflows:
             exit 1
           fi
 
+      - name: Zip IPA for download
+        script: |
+          cd ios/build
+          IPA_FILE=$(find . -maxdepth 1 -type f -name "*.ipa" -print -quit)
+          if [ -z "$IPA_FILE" ]; then
+            echo "❌ No IPA file found to zip"
+            exit 1
+          fi
+
+          ZIP_NAME="${IPA_FILE#./}.zip"
+          zip -j "$ZIP_NAME" "$IPA_FILE"
+          echo "✅ IPA archive created: ios/build/$ZIP_NAME"
+
     artifacts:
       - ios/build/*.ipa
+      - ios/build/*.ipa.zip
 
   embedin-android-build:
     name: EmbedIn Android Build
