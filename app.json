@@ -2,7 +2,7 @@
   "expo": {
     "name": "EmbedIn",
     "slug": "embedin",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "orientation": "default",
     "icon": "assets/images/icon.png",
     "scheme": "embedin",
@@ -58,9 +58,9 @@
             "usesCleartextTraffic": true,
             "networkSecurityConfig": "@xml/network_security_config",
             "minSdkVersion": 26,
-            "compileSdkVersion": 35,
+            "compileSdkVersion": 37,
             "targetSdkVersion": 35,
-            "buildToolsVersion": "35.0.0"
+            "buildToolsVersion": "37.0.0"
           }
         }
       ],
