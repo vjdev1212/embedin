@@ -6,7 +6,6 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { View, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { useTheme } from '@/context/ThemeContext';
 import { initializeUserInterfaceStyle } from '@/utils/UserInterfaceStyle';
@@ -50,6 +49,18 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const { colors, colorScheme } = useTheme();
   const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
+  const navigationTheme = {
+    ...theme,
+    colors: {
+      ...theme.colors,
+      primary: colors.primary,
+      background: colors.background,
+      card: colors.primaryCard,
+      text: colors.text,
+      border: colors.border,
+      notification: colors.primary,
+    },
+  };
   const headerTintColor = colorScheme === 'dark' ? '#ffffff' : '#000000';
   const screenContentStyle = { backgroundColor: colors.background };
 
@@ -76,15 +87,8 @@ function RootLayoutNav() {
     headerStyle: { backgroundColor: 'transparent' },
   });
   return (
-    <ThemeProvider value={theme}>
+    <ThemeProvider value={navigationTheme}>
       <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <LinearGradient
-          colors={colors.gradientBg}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.backgroundGradient}
-        />
-
         <ActionSheetProvider>
           <Stack
             screenOptions={{
@@ -216,9 +220,6 @@ function RootLayoutNav() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  backgroundGradient: {
-    ...StyleSheet.absoluteFill,
   },
   modalContent: {
     flex: 1,

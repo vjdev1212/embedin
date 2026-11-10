@@ -57,7 +57,6 @@ const PreferencesScreen = () => {
                 <SettingsSection title="Language and Region">
                     <SettingsRow
                         title="Language"
-                        detail="Language Code"
                         trailing={(
                             <NativeTextInput
                                 style={styles.inputHost}
@@ -73,7 +72,6 @@ const PreferencesScreen = () => {
                     />
                     <SettingsRow
                         title="Region"
-                        detail="Region Code"
                         trailing={(
                             <NativeTextInput
                                 style={styles.inputHost}
