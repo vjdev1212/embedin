@@ -71,7 +71,7 @@ async function fetchSearchResults(query: string, signal: AbortSignal): Promise<M
 }
 
 export default function SearchScreen() {
-  const { colors } = useTheme();
+  const { colors, colorScheme } = useTheme();
   const headerHeight = useHeaderHeight();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MediaGridItem[]>([]);
@@ -118,8 +118,8 @@ export default function SearchScreen() {
           headerShown: true,
           headerBackVisible: false,
           headerTitle: 'Search',
-          headerUserInterfaceStyle: 'dark',
-          headerTintColor: colors.text,
+          headerUserInterfaceStyle: colorScheme,
+          headerTintColor: colorScheme === 'dark' ? '#ffffff' : '#000000',
           headerSearchBarOptions: Platform.OS === 'ios' ? {
             placeholder: 'Search movies or series',
             autoCapitalize: 'none',
@@ -133,14 +133,14 @@ export default function SearchScreen() {
       />
       {Platform.OS !== 'ios' && (
         <View style={styles.searchHeader}>
-          <View style={styles.searchField}>
+          <View style={[styles.searchField, { backgroundColor: colors.primaryCard, borderColor: colors.border }]}>
             <Ionicons name="search-outline" size={22} color={colors.text} />
             <NativeTextInput
               accessibilityLabel="Search movies or series"
               autoCapitalize="none"
               autoCorrect={false}
               clearButtonMode="never"
-              keyboardAppearance="dark"
+              keyboardAppearance={colorScheme}
               onChangeText={changeQuery}
               placeholder="Search movies or series"
               placeholderTextColor={colors.textDim}
@@ -172,10 +172,10 @@ export default function SearchScreen() {
           <View style={styles.filterRow}>
             <SegmentedControl
               accessibilityLabel="Filter search results"
-              appearance="dark"
+              appearance={colorScheme}
               selectedIndex={FILTER_OPTIONS.findIndex((option) => option.id === selectedFilter)}
               style={{ backgroundColor: 'transparent' }}
-              tintColor={colors.primary}
+              tintColor={colorScheme === 'dark' ? '#ffffff' : '#000000'}
               values={FILTER_OPTIONS.map((option) => option.title)}
               onValueChange={(value) => {
                 const option = FILTER_OPTIONS.find((filter) => filter.title === value);
@@ -186,7 +186,7 @@ export default function SearchScreen() {
         )}
         <View style={styles.resultsContainer}>
           {loading ? (
-            <View style={styles.statusContainer}><ActivityIndicator size="large" color="#535aff" /></View>
+            <View style={styles.statusContainer}><ActivityIndicator size="large" color={colors.primary} /></View>
           ) : error ? (
             <View style={styles.statusContainer}>
               <Text style={[styles.statusText, { color: colors.textMuted }]}>{error}</Text>
@@ -242,9 +242,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.capsule,
     borderCurve: 'continuous',
     overflow: 'hidden',
-    backgroundColor: '#1C1C1E',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#38383A',
   },
   searchInput: {
     flex: 1,

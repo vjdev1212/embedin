@@ -65,10 +65,7 @@ export const confirmAction = async (
         { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
         { text: confirmText, style: 'default', onPress: () => resolve(true) },
       ],
-      {
-        cancelable: true,
-        userInterfaceStyle: 'dark'
-      }
+      { cancelable: true }
     );
   });
 };

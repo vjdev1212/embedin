@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import { defaultMovieUrlTemplate } from '@/constants/Embed';
 import { SettingsPage, SettingsRow, SettingsSection } from '@vjdev1212/media-ui-kit';
 import { storageService } from '@/utils/StorageService';
+import { settingsActionBlue } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 
 interface EmbedSettings {
     movie?: { template?: string };
@@ -14,6 +16,7 @@ interface EmbedSettings {
 }
 
 const EmbedMovieSettingsScreen = () => {
+    const { colors, colorScheme } = useTheme();
     const [movieUrlTemplate, setMovieUrlTemplate] = useState<string>(defaultMovieUrlTemplate);
 
     useEffect(() => {
@@ -52,7 +55,7 @@ const EmbedMovieSettingsScreen = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar />
             <SettingsPage>
                 <SettingsSection
@@ -60,28 +63,28 @@ const EmbedMovieSettingsScreen = () => {
                     footer={'TMDB: https://player.videasy.net/movie/{TMDBID}\nIMDb: https://player.videasy.net/movie/{IMDBID}'}
                 >
                     <TextInput
-                        style={styles.textInput}
+                        style={[styles.textInput, { backgroundColor: colors.primaryCard, color: colors.text }]}
                         value={movieUrlTemplate}
                         onChangeText={setMovieUrlTemplate}
                         multiline
                         textAlignVertical="top"
                         placeholder="Enter your movie embed URL template..."
-                        placeholderTextColor="#8e8e93"
+                        placeholderTextColor={colorScheme === 'dark' ? '#8E8E93' : '#6C6C70'}
                     />
                 </SettingsSection>
                 <SettingsSection>
                     <SettingsRow
                         title="Save Settings"
-                        titleColor="#0a84ff"
+                        titleColor={settingsActionBlue}
                         onPress={saveEmbedSettings}
-                        leading={<Ionicons name="checkmark-circle-outline" size={20} color="#0a84ff" />}
+                        leading={<Ionicons name="checkmark-circle-outline" size={20} color={settingsActionBlue} />}
                         isLast
                     />
                 </SettingsSection>
                 <SettingsSection title="Ad Blocking">
-                    <Text style={styles.sectionSubtitle}>
+                    <Text style={[styles.sectionSubtitle, { color: colors.textDim }]}>
                         We recommend AdGuard DNS for blocking ads and popups system-wide.{' '}
-                        <Text style={styles.linkText} onPress={() => Linking.openURL('https://adguard-dns.io/en/public-dns.html')}>
+                        <Text style={[styles.linkText, { color: settingsActionBlue }]} onPress={() => Linking.openURL('https://adguard-dns.io/en/public-dns.html')}>
                             Follow the guide here
                         </Text>
                         {' '}to set it up on your device.
@@ -93,19 +96,16 @@ const EmbedMovieSettingsScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#000000' },
+    container: { flex: 1 },
     sectionSubtitle: {
         fontSize: 14,
-        color: '#888',
         lineHeight: 20,
     },
     textInput: {
         width: '100%',
         minHeight: 120,
-        backgroundColor: '#1c1c1e',
         borderRadius: 10,
         padding: 12,
-        color: '#f2f2f7',
         fontSize: 15,
     },
     saveButton: {
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
         width: '100%',
         maxWidth: 340,
     },
-    linkText: { color: '#0a84ff', textDecorationLine: 'underline' },
+    linkText: { textDecorationLine: 'underline' },
 });
 
 export default EmbedMovieSettingsScreen;

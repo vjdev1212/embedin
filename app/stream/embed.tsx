@@ -8,10 +8,13 @@ import {
   defaultTvShowUrlTemplate
 } from '@/constants/Embed';
 import { Text, View } from '@vjdev1212/media-ui-kit';
+import { useTheme } from '@/context/ThemeContext';
 
 const EmbedPlayer = () => {
+  const { colorScheme } = useTheme();
   const { imdbid, tmdbid, type, season, episode, name, poster, background } = useLocalSearchParams();
   const headerTitle = typeof name === 'string' && name.trim() ? name : 'Embed Player';
+  const headerTitleColor = colorScheme === 'dark' ? '#ffffff' : '#000000';
   const htmlTitle = headerTitle.replace(/[&<>"']/g, (character) => ({
     '&': '&amp;',
     '<': '&lt;',
@@ -195,7 +198,9 @@ const EmbedPlayer = () => {
           title: headerTitle,
           headerTransparent: false,
           headerStyle: { backgroundColor: 'transparent' },
-          headerTintColor: '#ffffff',
+          headerTintColor: headerTitleColor,
+          headerTitleStyle: { color: headerTitleColor },
+          headerUserInterfaceStyle: colorScheme,
           headerShadowVisible: false,
           headerBackButtonDisplayMode: 'minimal',
         }}

@@ -3,9 +3,10 @@ import { StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Text } from '@vjdev1212/media-ui-kit';
 import { NativeButton } from '@vjdev1212/media-ui-kit';
+import { settingsActionBlue } from '@/constants/theme';
 
 const SearchButton = ({ onPress, text }: { onPress: () => void, text: string }) => (
-  <NativeButton style={styles.button} onPress={onPress} variant="filled">
+  <NativeButton style={[styles.button, { backgroundColor: settingsActionBlue }]} onPress={onPress} variant="filled">
     <Ionicons name="search" size={20} color="#fff" style={styles.icon} />
     <Text style={styles.text}>Search {text}</Text>
   </NativeButton>
@@ -21,7 +22,6 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    backgroundColor: '#535aff'
   },
   text: {
     color: '#fff',

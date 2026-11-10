@@ -7,8 +7,15 @@ import * as Haptics from 'expo-haptics';
 import { NativeTextInput } from '@vjdev1212/media-ui-kit';
 import { SettingsPage, SettingsRow, SettingsSection } from '@vjdev1212/media-ui-kit';
 import { storageService } from '@/utils/StorageService';
+import { settingsActionBlue } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 
 const PreferencesScreen = () => {
+    const { colors, colorScheme } = useTheme();
+    const inputTextStyle = {
+        ...styles.inputText,
+        color: colorScheme === 'dark' ? '#F2F2F7' : '#1C1C1E',
+    };
     const [language, setLanguage] = useState('en');
     const [region, setRegion] = useState('US');
 
@@ -44,7 +51,7 @@ const PreferencesScreen = () => {
         showAlert('Preferences Saved', 'Your preferences have been saved.'); // Moved outside the try-catch
     };
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar />
             <SettingsPage>
                 <SettingsSection title="Language and Region">
@@ -55,7 +62,7 @@ const PreferencesScreen = () => {
                             <NativeTextInput
                                 style={styles.inputHost}
                                 inputStyle={styles.inputStyle}
-                                textStyle={styles.inputText}
+                                textStyle={inputTextStyle}
                                 value={language}
                                 onChangeText={setLanguage}
                                 maxLength={2}
@@ -71,7 +78,7 @@ const PreferencesScreen = () => {
                             <NativeTextInput
                                 style={styles.inputHost}
                                 inputStyle={styles.inputStyle}
-                                textStyle={styles.inputText}
+                                textStyle={inputTextStyle}
                                 value={region}
                                 onChangeText={(text) => setRegion(text.toUpperCase())}
                                 maxLength={2}
@@ -85,9 +92,9 @@ const PreferencesScreen = () => {
                 <SettingsSection>
                     <SettingsRow
                         title="Save"
-                        titleColor="#0a84ff"
+                        titleColor={settingsActionBlue}
                         onPress={savePreferences}
-                        leading={<Ionicons name="checkmark-circle-outline" size={20} color="#0a84ff" />}
+                        leading={<Ionicons name="checkmark-circle-outline" size={20} color={settingsActionBlue} />}
                         isLast
                     />
                 </SettingsSection>
@@ -97,10 +104,10 @@ const PreferencesScreen = () => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#000000' },
+    container: { flex: 1 },
     inputHost: { width: 64, minHeight: 36 },
     inputStyle: { minHeight: 36, paddingHorizontal: 2, backgroundColor: 'transparent' },
-    inputText: { color: '#f2f2f7', fontSize: 16, textAlign: 'right' },
+    inputText: { fontSize: 16, textAlign: 'right' },
     saveButton: { width: '100%', maxWidth: 340, alignSelf: 'center' },
 });
 

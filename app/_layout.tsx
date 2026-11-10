@@ -1,13 +1,15 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import { DarkTheme, ThemeProvider } from 'expo-router/react-navigation';
+import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router/react-navigation';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
 import { View, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { useTheme } from '@/context/ThemeContext';
+import { initializeUserInterfaceStyle } from '@/utils/UserInterfaceStyle';
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -46,18 +48,16 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  const { colors, colorScheme } = useTheme();
+  const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
+  const headerTintColor = colorScheme === 'dark' ? '#ffffff' : '#000000';
+  const screenContentStyle = { backgroundColor: colors.background };
 
-  const GlassDarkTheme = {
-    ...DarkTheme,
-    colors: {
-      ...DarkTheme.colors,
-      background: '#0a0a0a',
-      card: 'rgba(18, 18, 18, 0.9)',
-      border: 'rgba(255, 255, 255, 0.1)',
-    }
-  };
-
-  const theme = GlassDarkTheme;
+  useEffect(() => {
+    void initializeUserInterfaceStyle().catch((error: unknown) => {
+      console.error('Failed to initialize appearance preference:', error);
+    });
+  }, []);
 
   const InvisibleHeaderBackground = () => (
     <View style={{ flex: 1, backgroundColor: 'transparent' }} />
@@ -69,17 +69,17 @@ function RootLayoutNav() {
     headerBackground: InvisibleHeaderBackground,
     headerTitle: title,
     title,
-    headerUserInterfaceStyle: 'dark' as const,
-    headerTintColor: '#ffffff',
+    headerUserInterfaceStyle: colorScheme,
+    headerTintColor,
     headerBackTitle: '',
     headerShadowVisible: true,
     headerStyle: { backgroundColor: 'transparent' },
   });
   return (
     <ThemeProvider value={theme}>
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
         <LinearGradient
-          colors={['#000000', '#101014', '#000000']}
+          colors={colors.gradientBg}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.backgroundGradient}
@@ -88,14 +88,14 @@ function RootLayoutNav() {
         <ActionSheetProvider>
           <Stack
             screenOptions={{
-              headerUserInterfaceStyle: 'dark',
-              headerTintColor: '#ffffff',
+              headerUserInterfaceStyle: colorScheme,
+              headerTintColor,
               headerBackTitle: '',
               headerTransparent: true,
               headerStyle: { backgroundColor: 'transparent' },
               headerBackground: InvisibleHeaderBackground,
               headerShadowVisible: true,
-              contentStyle: styles.screenContent,
+              contentStyle: screenContentStyle,
             }}
           >
             <Stack.Screen
@@ -106,17 +106,17 @@ function RootLayoutNav() {
                 headerBackground: InvisibleHeaderBackground,
                 headerShadowVisible: true,
                 headerTitle: '',
-                headerTintColor: '#ffffff',
+                headerTintColor,
                 headerBackTitle: '',
                 title: 'Home',
-                contentStyle: styles.screenContent,
+                contentStyle: screenContentStyle,
               }}
             />
             <Stack.Screen
               name="modal"
               options={{
                 presentation: 'modal',
-                contentStyle: styles.modalContent
+                contentStyle: [styles.modalContent, { backgroundColor: colors.background }]
               }}
             />
             <Stack.Screen
@@ -126,7 +126,7 @@ function RootLayoutNav() {
                 headerTransparent: true,
                 headerBackground: InvisibleHeaderBackground,
                 headerTitle: '',
-                headerTintColor: '#ffffff',
+                headerTintColor,
                 headerBackTitle: '',
                 headerBackButtonDisplayMode: 'minimal',
                 headerShadowVisible: true,
@@ -142,7 +142,7 @@ function RootLayoutNav() {
                 headerTransparent: true,
                 headerBackground: InvisibleHeaderBackground,
                 headerTitle: '',
-                headerTintColor: '#ffffff',
+                headerTintColor,
                 headerBackTitle: '',
                 headerBackButtonDisplayMode: 'minimal',
                 headerShadowVisible: true,
@@ -158,7 +158,7 @@ function RootLayoutNav() {
                 headerTransparent: true,
                 headerBackground: InvisibleHeaderBackground,
                 headerTitle: '',
-                headerTintColor: '#ffffff',
+                headerTintColor,
                 headerBackTitle: '',
                 headerBackButtonDisplayMode: 'minimal',
                 headerShadowVisible: true,
@@ -174,7 +174,7 @@ function RootLayoutNav() {
                 headerTransparent: true,
                 headerBackground: InvisibleHeaderBackground,
                 headerTitle: '',
-                headerTintColor: '#ffffff',
+                headerTintColor,
                 headerBackTitle: '',
                 headerShadowVisible: true,
                 headerStyle: {
@@ -190,6 +190,7 @@ function RootLayoutNav() {
                 headerBackground: InvisibleHeaderBackground,
                 headerTitle: '',
                 headerTintColor: '#ffffff',
+                headerUserInterfaceStyle: 'dark',
                 headerBackTitle: '',
                 headerShadowVisible: true,
                 headerStyle: {
@@ -200,6 +201,7 @@ function RootLayoutNav() {
             <Stack.Screen name="settings/embed-movie" options={settingsScreenOptions('Movie Embed')} />
             <Stack.Screen name="settings/embed-tv" options={settingsScreenOptions('TV Embed')} />
             <Stack.Screen name="settings/preferences" options={settingsScreenOptions('Language & Region')} />
+            <Stack.Screen name="settings/appearance" options={settingsScreenOptions('Appearance')} />
             <Stack.Screen name="settings/downloads" options={settingsScreenOptions('Downloads')} />
             <Stack.Screen name="settings/contact" options={settingsScreenOptions('Contact')} />
             <Stack.Screen name="settings/donate" options={settingsScreenOptions('Support Embedin')} />
@@ -214,14 +216,12 @@ function RootLayoutNav() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000000',
   },
   backgroundGradient: {
     ...StyleSheet.absoluteFill,
   },
-  screenContent: { backgroundColor: '#000000' },
   modalContent: {
-    backgroundColor: 'rgba(0, 0, 0, 0.95)',
+    flex: 1,
   },
 });
 
