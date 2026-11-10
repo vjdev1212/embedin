@@ -1,4 +1,4 @@
-import { ActivityIndicator, BlurGradientBackground, StatusBar, Text, View } from '@vjdev1212/media-ui-kit';
+import { ActivityIndicator, StatusBar, Text, View } from '@vjdev1212/media-ui-kit';
 import { MediaGrid, GENRE_NAMES, type MediaGridItem } from '@vjdev1212/media-ui-kit';
 import { useTheme } from '@/context/ThemeContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +18,10 @@ const FILTER_OPTIONS: { id: SearchFilter; title: string }[] = [
   { id: 'movie', title: 'Movies' },
   { id: 'series', title: 'Series' },
 ];
+
+const SearchHeaderBackground = () => (
+  <View style={{ flex: 1, backgroundColor: 'transparent' }} />
+);
 
 interface TMDBSearchItem {
   id: number;
@@ -71,7 +75,7 @@ async function fetchSearchResults(query: string, signal: AbortSignal): Promise<M
 }
 
 export default function SearchScreen() {
-  const { colors } = useTheme();
+  const { colors, colorScheme } = useTheme();
   const headerHeight = useHeaderHeight();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<MediaGridItem[]>([]);
@@ -111,36 +115,43 @@ export default function SearchScreen() {
 
   return (
     <View style={styles.container}>
-      <BlurGradientBackground />
       <StatusBar />
       <Stack.Screen
         options={{
           headerShown: true,
           headerBackVisible: false,
+          headerTransparent: true,
+          headerBackground: SearchHeaderBackground,
+          headerShadowVisible: false,
           headerTitle: 'Search',
-          headerUserInterfaceStyle: 'dark',
+          headerStyle: { backgroundColor: 'transparent' },
+          headerBlurEffect: 'none',
+          headerUserInterfaceStyle: colorScheme,
           headerTintColor: colors.text,
-          headerSearchBarOptions: Platform.OS === 'ios' ? {
-            placeholder: 'Search movies or series',
-            autoCapitalize: 'none',
-            hideWhenScrolling: false,
-            placement: 'stacked',
-            onChangeText: (event) => changeQuery(event.nativeEvent.text),
-            onCancelButtonPress: () => changeQuery(''),
-            onSearchButtonPress: (event) => changeQuery(event.nativeEvent.text),
-          } : undefined,
+          headerTitleStyle: { color: colors.text },
         }}
       />
+      {Platform.OS === 'ios' && (
+        <Stack.SearchBar
+          placeholder="Search movies or series"
+          autoCapitalize="none"
+          hideWhenScrolling={false}
+          placement="stacked"
+          onChangeText={(event) => changeQuery(event.nativeEvent.text)}
+          onCancelButtonPress={() => changeQuery('')}
+          onSearchButtonPress={(event) => changeQuery(event.nativeEvent.text)}
+        />
+      )}
       {Platform.OS !== 'ios' && (
         <View style={styles.searchHeader}>
-          <View style={styles.searchField}>
+          <View style={[styles.searchField, { backgroundColor: colors.primaryCard, borderColor: colors.border }]}>
             <Ionicons name="search-outline" size={22} color={colors.text} />
             <NativeTextInput
               accessibilityLabel="Search movies or series"
               autoCapitalize="none"
               autoCorrect={false}
               clearButtonMode="never"
-              keyboardAppearance="dark"
+              keyboardAppearance={colorScheme}
               onChangeText={changeQuery}
               placeholder="Search movies or series"
               placeholderTextColor={colors.textDim}
@@ -149,17 +160,6 @@ export default function SearchScreen() {
               underlineColorAndroid="transparent"
               value={query}
             />
-            {query.length > 0 && (
-              <Pressable
-                accessibilityLabel="Clear search"
-                accessibilityRole="button"
-                hitSlop={8}
-                onPress={() => changeQuery('')}
-                style={styles.clearButton}
-              >
-                <Ionicons name="close" size={20} color={colors.textDim} />
-              </Pressable>
-            )}
           </View>
         </View>
       )}
@@ -172,10 +172,9 @@ export default function SearchScreen() {
           <View style={styles.filterRow}>
             <SegmentedControl
               accessibilityLabel="Filter search results"
-              appearance="dark"
+              appearance={colorScheme}
               selectedIndex={FILTER_OPTIONS.findIndex((option) => option.id === selectedFilter)}
               style={{ backgroundColor: 'transparent' }}
-              tintColor={colors.primary}
               values={FILTER_OPTIONS.map((option) => option.title)}
               onValueChange={(value) => {
                 const option = FILTER_OPTIONS.find((filter) => filter.title === value);
@@ -186,7 +185,7 @@ export default function SearchScreen() {
         )}
         <View style={styles.resultsContainer}>
           {loading ? (
-            <View style={styles.statusContainer}><ActivityIndicator size="large" color="#535aff" /></View>
+            <View style={styles.statusContainer}><ActivityIndicator size="large" color={colors.primary} /></View>
           ) : error ? (
             <View style={styles.statusContainer}>
               <Text style={[styles.statusText, { color: colors.textMuted }]}>{error}</Text>
@@ -196,7 +195,7 @@ export default function SearchScreen() {
             </View>
           ) : trimmedQuery && filteredResults.length > 0 ? (
             <MediaGrid
-              detailsPath="/movie/details"
+              mediaType={selectedFilter === 'series' ? 'series' : 'movie'}
               items={filteredResults}
               safeAreaEdges={['left', 'right']}
               showGenres={false}
@@ -242,9 +241,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.capsule,
     borderCurve: 'continuous',
     overflow: 'hidden',
-    backgroundColor: '#1C1C1E',
     borderWidth: StyleSheet.hairlineWidth,
-    borderColor: '#38383A',
   },
   searchInput: {
     flex: 1,
@@ -253,12 +250,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     backgroundColor: 'transparent',
     borderWidth: 0,
-  },
-  clearButton: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   filterRow: {
     paddingHorizontal: spacing.md,

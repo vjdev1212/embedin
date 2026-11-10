@@ -5,28 +5,32 @@ import { isHapticsSupported } from '@/utils/platform';
 import { Text } from '@expo/ui';
 import Constants from 'expo-constants';
 import { SettingsPage, SettingsRow, SettingsSection } from '@vjdev1212/media-ui-kit';
+import { settingsIconColors } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 
 const SettingsScreen = () => {
+  const { colors, colorScheme } = useTheme();
   const showContact = process.env.EXPO_PUBLIC_SHOW_CONTACT === 'true';
   const router = useRouter();
   const version = Constants.expoConfig?.version ?? 'Unknown';
 
-  const contactList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { title: 'Contact', route: '/settings/contact', icon: 'mail-outline' },
-    { title: 'Donate', route: '/settings/donate', icon: 'heart-outline' },
+  const contactList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
+    { title: 'Contact', route: '/settings/contact', icon: 'mail-outline', color: settingsIconColors.contact },
+    { title: 'Donate', route: '/settings/donate', icon: 'heart-outline', color: settingsIconColors.donate },
   ];
 
-  const generalList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { title: 'Language & Region', route: '/settings/preferences', icon: 'globe-outline' },
+  const generalList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
+    { title: 'Appearance', route: '/settings/appearance', icon: 'contrast-outline', color: settingsIconColors.appearance },
+    { title: 'Language & Region', route: '/settings/preferences', icon: 'globe-outline', color: settingsIconColors.contact },
   ];
 
-  const preferencesList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { title: 'Movie', route: '/settings/embed-movie', icon: 'film-outline' },
-    { title: 'TV', route: '/settings/embed-tv', icon: 'tv-outline' },
+  const preferencesList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
+    { title: 'Movie', route: '/settings/embed-movie', icon: 'film-outline', color: settingsIconColors.mediaPlayer },
+    { title: 'TV', route: '/settings/embed-tv', icon: 'tv-outline', color: settingsIconColors.mediaPlayer },
   ];
 
-  const resourcesList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap }[] = [
-    { title: 'Downloads', route: '/settings/downloads', icon: 'download-outline' },
+  const resourcesList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
+    { title: 'Downloads', route: '/settings/downloads', icon: 'download-outline', color: settingsIconColors.downloads },
   ];
 
   const onSettingsItemPress = async (route: string) => {
@@ -45,8 +49,8 @@ const SettingsScreen = () => {
             <SettingsRow
               key={item.route}
               title={item.title}
-              leading={<Ionicons name={item.icon} size={20} color="#64d2ff" />}
-              trailing={<MaterialIcons name="chevron-right" size={22} color="#6e6e73" />}
+              leading={<Ionicons name={item.icon} size={20} color={item.color} />}
+              trailing={<MaterialIcons name="chevron-right" size={22} color={settingsIconColors.neutral} />}
               onPress={() => onSettingsItemPress(item.route)}
               isLast={index === generalList.length - 1}
             />
@@ -57,8 +61,8 @@ const SettingsScreen = () => {
               <SettingsRow
                 key={item.route}
                 title={item.title}
-                leading={<Ionicons name={item.icon} size={20} color="#0a84ff" />}
-                trailing={<MaterialIcons name="chevron-right" size={22} color="#6e6e73" />}
+                leading={<Ionicons name={item.icon} size={20} color={item.color} />}
+                trailing={<MaterialIcons name="chevron-right" size={22} color={settingsIconColors.neutral} />}
                 onPress={() => onSettingsItemPress(item.route)}
                 isLast={index === preferencesList.length - 1}
               />
@@ -70,8 +74,8 @@ const SettingsScreen = () => {
                 <SettingsRow
                   key={item.route}
                   title={item.title}
-                  leading={<Ionicons name={item.icon} size={20} color="#64d2ff" />}
-                  trailing={<MaterialIcons name="chevron-right" size={22} color="#6e6e73" />}
+                  leading={<Ionicons name={item.icon} size={20} color={item.color} />}
+                  trailing={<MaterialIcons name="chevron-right" size={22} color={settingsIconColors.neutral} />}
                   onPress={() => onSettingsItemPress(item.route)}
                   isLast={index === resourcesList.length - 1}
                 />
@@ -84,8 +88,8 @@ const SettingsScreen = () => {
                 <SettingsRow
                   key={item.route}
                   title={item.title}
-                  leading={<Ionicons name={item.icon} size={20} color="#64d2ff" />}
-                  trailing={<MaterialIcons name="chevron-right" size={22} color="#6e6e73" />}
+                  leading={<Ionicons name={item.icon} size={20} color={item.color} />}
+                  trailing={<MaterialIcons name="chevron-right" size={22} color={settingsIconColors.neutral} />}
                   onPress={() => onSettingsItemPress(item.route)}
                   isLast={index === contactList.length - 1}
                 />
@@ -95,8 +99,8 @@ const SettingsScreen = () => {
         <SettingsSection title="About">
           <SettingsRow
             title="Disclaimer"
-            leading={<Ionicons name="information-circle-outline" size={20} color="#ff9f0a" />}
-            trailing={<MaterialIcons name="chevron-right" size={22} color="#6e6e73" />}
+            leading={<Ionicons name="information-circle-outline" size={20} color={settingsIconColors.disclaimer} />}
+            trailing={<MaterialIcons name="chevron-right" size={22} color={settingsIconColors.neutral} />}
             onPress={() => onSettingsItemPress('/settings/disclaimer')}
             isLast
           />
@@ -104,7 +108,8 @@ const SettingsScreen = () => {
         <SettingsSection title="Version">
           <SettingsRow
             title="Version"
-            trailingNative={<Text textStyle={{ color: '#EBEBF599', fontSize: 13 }}>{version}</Text>}
+            leading={<Ionicons name="information-circle-outline" size={20} color={settingsIconColors.version} />}
+            trailingNative={<Text textStyle={{ color: colorScheme === 'dark' ? '#EBEBF599' : '#3C3C4399', fontSize: 13 }}>{version}</Text>}
             isLast
           />
         </SettingsSection>

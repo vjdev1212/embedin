@@ -6,15 +6,18 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SettingsPage, SettingsRow, SettingsSection } from '@vjdev1212/media-ui-kit';
+import { settingsIconColors } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 
 const AppResourcesScreen = () => {
+  const { colors } = useTheme();
   const resources = [
     {
       id: 1,
       title: 'Google Play Store',
       subtitle: 'Download for Android Devices',
       icon: 'logo-google-playstore' as const,
-      iconColor: '#34a853',
+      iconColor: settingsIconColors.googlePlay,
       url: 'https://play.google.com/store/apps/details?id=com.vijayyuvi.embedin',
     },
     {
@@ -22,7 +25,7 @@ const AppResourcesScreen = () => {
       title: 'Manual IPA Install',
       subtitle: 'Direct download for sideloading',
       icon: 'logo-apple' as const,
-      iconColor: '#ffffff',
+      iconColor: settingsIconColors.apple,
       url: 'https://github.com/vjdev1212/embedin/releases',
     },
     {
@@ -30,7 +33,7 @@ const AppResourcesScreen = () => {
       title: 'SideStore Source',
       subtitle: 'One-click install via SideStore',
       icon: 'cloud-download-outline' as const,
-      iconColor: '#5e5ce6',
+      iconColor: settingsIconColors.sideStore,
       url: 'sidestore://source?url=https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/sources/sidestore-source.json',
     },
     {
@@ -38,7 +41,7 @@ const AppResourcesScreen = () => {
       title: 'AltStore Source',
       subtitle: 'One-click install via AltStore',
       icon: 'cloud-download-outline' as const,
-      iconColor: '#0a84ff',
+      iconColor: settingsIconColors.altStore,
       url: 'altstore://source?url=https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/sources/sidestore-source.json',
     },
   ];
@@ -53,7 +56,7 @@ const AppResourcesScreen = () => {
 
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar />
       <SettingsPage>
           {resources.map((resource) => (
@@ -62,7 +65,7 @@ const AppResourcesScreen = () => {
                 title={resource.title}
                 onPress={() => handlePress(resource.url)}
                 leading={<Ionicons name={resource.icon} size={20} color={resource.iconColor} />}
-                trailing={<Ionicons name="open-outline" size={17} color="#8e8e93" />}
+                trailing={<Ionicons name="open-outline" size={17} color={settingsIconColors.neutral} />}
                 isLast
               />
             </SettingsSection>
@@ -73,7 +76,7 @@ const AppResourcesScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#000000' },
+  container: { flex: 1 },
 });
 
 export default AppResourcesScreen;

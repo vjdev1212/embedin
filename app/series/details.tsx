@@ -19,6 +19,9 @@ import {
 import { PersonDetailsScreen } from '@vjdev1212/media-ui-kit';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
+import { useTheme } from '@/context/ThemeContext';
+import { spacing } from '@/constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const EXPO_PUBLIC_TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
@@ -35,6 +38,7 @@ const SeriesDetails = () => {
   const ref = useRef<ScrollViewInstance | null>(null);
   const [season, setSeason] = useState<number>(1);
   const [episode, setEpisode] = useState<number>(1);
+  const { colors } = useTheme();
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -175,7 +179,7 @@ const SeriesDetails = () => {
   if (loading) {
     return (
       <View style={styles.centeredContainer}>
-        <ActivityIndicator size="large" style={styles.activityIndicator} color="#535aff" />
+        <ActivityIndicator size="large" style={styles.activityIndicator} color={colors.primary} />
       </View>
     );
   }
@@ -240,13 +244,22 @@ const SeriesDetails = () => {
           padding: isPortrait ? null : '2%'
         }]}>
           <MediaContentPoster background={data.background} isPortrait={isPortrait} />
+          <LinearGradient
+            pointerEvents="none"
+            colors={['transparent', 'rgba(0, 0, 0, 0.3)', 'rgba(0, 0, 0, 0.92)']}
+            locations={[0, 0.4, 1]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={styles.posterTitleOverlay}
+          >
+            <MediaLogo logo={data.logo} title={data.name} />
+          </LinearGradient>
         </View>
         <View style={[styles.detailsContainer, {
           width: isPortrait ? '100%' : '50%',
           paddingHorizontal: isPortrait ? null : 5,
           zIndex: 10
         }]}>
-          <MediaLogo logo={data.logo} title={data.name} />
           {!isPortrait && (
             <MediaContentHeader
               name={data.name}
@@ -315,6 +328,17 @@ const styles = StyleSheet.create({
   posterContainer: {
     flexDirection: 'column',
     alignItems: 'center',
+    position: 'relative',
+  },
+  posterTitleOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    justifyContent: 'flex-end',
+    paddingVertical: spacing.md,
   },
   landscapePosterContainer: {
   },
@@ -325,13 +349,14 @@ const styles = StyleSheet.create({
   },
   buttonsContainer: {
     flexDirection: 'row',
-    gap: 20,
+    gap: spacing.sm,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    paddingHorizontal: spacing.mdLg,
+    marginTop: spacing.md,
   },
   activityIndicator: {
     marginBottom: 10,
-    color: '#535aff',
   },
   centeredContainer: {
     flex: 1,

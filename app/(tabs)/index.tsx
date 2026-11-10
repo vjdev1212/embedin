@@ -7,21 +7,28 @@ import {
   Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { StatusBar, Text, PosterList, BottomSpacing, BlurGradientBackground } from '@vjdev1212/media-ui-kit';
+import { StatusBar, Text, PosterList, BottomSpacing } from '@vjdev1212/media-ui-kit';
 import { PosterCarousel } from '@vjdev1212/media-ui-kit';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { CatalogUrl, MovieGneres, TvGneres } from '@/constants/Tmdb';
 import { NativeButton } from '@vjdev1212/media-ui-kit';
+import { useTheme } from '@/context/ThemeContext';
+import { radius, spacing, typography } from '@/constants/theme';
 
 const TMDB_API_KEY = process.env.EXPO_PUBLIC_TMDB_API_KEY;
 
 export default function HomeScreen() {
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [filter, setFilter] = useState<'all' | 'movies' | 'series'>('all');
 
-  const filters = [
+  const filters: {
+    key: 'all' | 'movies' | 'series';
+    label: string;
+    icon: React.ComponentProps<typeof Ionicons>['name'];
+  }[] = [
     { key: 'all', label: 'All', icon: 'albums-outline' },
     { key: 'movies', label: 'Movies', icon: 'film-outline' },
     { key: 'series', label: 'Series', icon: 'tv-outline' }
@@ -129,19 +136,23 @@ export default function HomeScreen() {
               variant="text"
               style={[
                 styles.filterButton,
-                filter === item.key && styles.filterButtonActive,
+                {
+                  backgroundColor: filter === item.key ? colors.primary : colors.primaryCard,
+                  borderColor: filter === item.key ? colors.primary : colors.border,
+                },
               ]}
               onPress={() => handleFilterChange(item.key as 'all' | 'movies' | 'series')}
             >
               <Ionicons
-                name={item.icon as any}
+                name={item.icon}
                 size={18}
-                color={filter === item.key ? '#000000' : '#8E8E93'}
+                color={filter === item.key ? colors.onPrimary : colors.textMuted}
                 style={styles.filterIcon}
               />
               <Text
                 style={[
                   styles.filterButtonText,
+                  { color: filter === item.key ? colors.onPrimary : colors.textMuted },
                   filter === item.key && styles.filterButtonTextActive,
                 ]}
               >
@@ -157,7 +168,6 @@ export default function HomeScreen() {
   return (
     <View style={[styles.container]}>
       <StatusBar />
-      <BlurGradientBackground />
       <FlatList
         key={filter}
         data={activeLists}
@@ -181,39 +191,30 @@ const styles = StyleSheet.create({
   },
   filtersContainer: {
     flexDirection: 'row',
-    paddingVertical: 12,
-    paddingHorizontal: 15,
-    gap: 8,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    gap: spacing.sm,
   },
   filterButton: {
     flexDirection: 'row',
     alignItems: 'center',
     minHeight: 40,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    backgroundColor: '#1a1a1a',
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: radius.capsule,
     borderWidth: 1,
-    borderColor: '#2a2a2a',
-  },
-  filterButtonActive: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ffffff',
   },
   filterIcon: {
     marginRight: 6,
   },
   filterButtonText: {
-    fontSize: 15,
-    color: '#8E8E93',
+    ...typography.subhead,
     fontWeight: '600',
-    letterSpacing: -0.2,
   },
   filterButtonTextActive: {
-    color: '#000000',
-    fontWeight: '700',
+    fontWeight: '600',
   },
   contentContainer: {
-    marginTop: 16,
+    marginTop: spacing.sm,
   },
 });

@@ -1,8 +1,9 @@
 import { Stack } from 'expo-router';
 import { Platform, View } from 'react-native';
-import { systemDarkBackground } from '@/constants/theme';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function SettingsLayout() {
+  const { colors, colorScheme } = useTheme();
   const isIOS = Platform.OS === 'ios';
   const TransparentHeaderBackground = () => (
     <View style={{ flex: 1, backgroundColor: 'transparent' }} />
@@ -15,13 +16,15 @@ export default function SettingsLayout() {
         headerBackVisible: false,
         headerTransparent: isIOS,
         headerBackground: TransparentHeaderBackground,
+        headerUserInterfaceStyle: colorScheme,
+        headerTintColor: colorScheme === 'dark' ? '#ffffff' : '#000000',
         headerShadowVisible: true,
-        headerStyle: { backgroundColor: isIOS ? 'transparent' : systemDarkBackground },
+        headerStyle: { backgroundColor: isIOS ? 'transparent' : colors.background },
         headerLargeTitleEnabled: isIOS,
         headerLargeStyle: { backgroundColor: 'transparent' },
         headerLargeTitleShadowVisible: true,
         headerBlurEffect: 'none',
-        contentStyle: { backgroundColor: systemDarkBackground },
+        contentStyle: { backgroundColor: colors.background },
       }}
     />
   );
