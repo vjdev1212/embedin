@@ -1,11 +1,12 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, usePathname } from 'expo-router';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router/react-navigation';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import { View, StyleSheet } from 'react-native';
+import { Platform, View, StyleSheet } from 'react-native';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { useTheme } from '@/context/ThemeContext';
 import { initializeUserInterfaceStyle } from '@/utils/UserInterfaceStyle';
@@ -48,6 +49,7 @@ export default function RootLayout() {
 
 function RootLayoutNav() {
   const { colors, colorScheme } = useTheme();
+  const pathname = usePathname();
   const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme;
   const navigationTheme = {
     ...theme,
@@ -69,6 +71,18 @@ function RootLayoutNav() {
       console.error('Failed to initialize appearance preference:', error);
     });
   }, []);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+
+    const orientationLock = pathname === '/stream/embed'
+      ? ScreenOrientation.OrientationLock.DEFAULT
+      : ScreenOrientation.OrientationLock.PORTRAIT_UP;
+
+    ScreenOrientation.lockAsync(orientationLock).catch((error: unknown) => {
+      console.warn('Failed to update screen orientation:', error);
+    });
+  }, [pathname]);
 
   const InvisibleHeaderBackground = () => (
     <View style={{ flex: 1, backgroundColor: 'transparent' }} />

@@ -108,6 +108,7 @@ const SettingsScreen = () => {
         <SettingsSection title="Version">
           <SettingsRow
             title="Version"
+            leading={<Ionicons name="information-circle-outline" size={20} color={settingsIconColors.version} />}
             trailingNative={<Text textStyle={{ color: colorScheme === 'dark' ? '#EBEBF599' : '#3C3C4399', fontSize: 13 }}>{version}</Text>}
             isLast
           />
