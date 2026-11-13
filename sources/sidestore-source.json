@@ -18,7 +18,7 @@
       "subtitle": "EmbedIn - Your streaming companion for discovering and watching content from multiple sources.",
       "localizedDescription": "EmbedIn is your ultimate streaming companion, offering a simple and elegant way to explore and watch movies and TV shows from VidSrc and similar services. With a sleek interface and intuitive navigation, you can easily search for your favorite content, browse trending titles, and enjoy seamless playback—all in one place.",
       "iconURL": "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/assets/images/icon.png",
-      "downloadURL": "https://github.com/vjdev1212/embedin/releases/download/v1.3.0/EmbedIn_v1.3.0.ipa",
+      "downloadURL": "https://github.com/vjdev1212/embedin/releases/download/v1.4.0/EmbedIn_v1.4.0.ipa",
       "tintColor": "#535aff",
       "category": "entertainment",
       "screenshots": [
@@ -29,6 +29,14 @@
         "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/EmbedIn-screenshots/iPhone/4-Search.png"
       ],
       "versions": [
+        {
+          "version": "1.4.0",
+          "date": "2026-11-13",
+          "localizedDescription": "1. Added support for custom TMDB Catalogs.\n2. UI Improvements.",
+          "downloadURL": "https://github.com/vjdev1212/embedin/releases/download/v1.4.0/EmbedIn_v1.4.0.ipa",
+          "size": 8680000,
+          "minOSVersion": "26.0"
+        },
         {
           "version": "1.3.0",
           "date": "2026-11-10",
@@ -62,10 +70,10 @@
   ],
   "news": [
     {
-      "title": "EmbedIn v1.3.0 Released",
-      "identifier": "embedin-v1.3.0-release",
-      "caption": "1. Added support for light and dark mode.\n2. UI Improvements.",
-      "date": "2026-11-10",
+      "title": "EmbedIn v1.4.0 Released",
+      "identifier": "embedin-v1.4.0-release",
+      "caption": "1. Added support for custom TMDB Catalogs.\n2. UI Improvements.",
+      "date": "2026-11-13",
       "tintColor": "#535aff",
       "imageURL": "https://raw.githubusercontent.com/vjdev1212/embedin/refs/heads/main/assets/banners/EmbedIn-feature-graphic.png",
       "notify": true,
