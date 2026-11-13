@@ -60,7 +60,7 @@ const EmbedTvShowsSettingsScreen = () => {
             <SettingsPage>
                 <SettingsSection
                     title="Embed URL"
-                    footer={'TMDB: https://player.videasy.net/tv/{TMDBID}/{SEASON}/{EPISODE}\nIMDb: https://player.videasy.net/tv/{IMDBID}/{SEASON}/{EPISODE}'}
+                    footer={'TMDB: https://vidy.st/tv/{TMDBID}/{SEASON}/{EPISODE}\nIMDb: https://vidy.st/tv/{IMDBID}/{SEASON}/{EPISODE}'}
                 >
                     <TextInput
                         style={[styles.textInput, { backgroundColor: colors.primaryCard, color: colors.text }]}

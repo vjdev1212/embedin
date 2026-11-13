@@ -22,6 +22,7 @@ const SettingsScreen = () => {
   const generalList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
     { title: 'Appearance', route: '/settings/appearance', icon: 'contrast-outline', color: settingsIconColors.appearance },
     { title: 'Language & Region', route: '/settings/preferences', icon: 'globe-outline', color: settingsIconColors.contact },
+    { title: 'Home Screen', route: '/settings/home', icon: 'home-outline', color: settingsIconColors.configure },
   ];
 
   const preferencesList: { title: string; route: string; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
