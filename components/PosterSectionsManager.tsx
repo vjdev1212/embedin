@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Platform, Pressable, Text as RNText, View as RNView } from 'react-native';
+import { Platform, Pressable, View as RNView } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { Picker, RNHostView, Switch } from '@expo/ui';
 import { MenuView, type MenuAction } from '@expo/ui/community/menu';
@@ -10,9 +10,8 @@ import { settingsIconColors } from '@/constants/theme';
 import { useTheme } from '@/context/ThemeContext';
 import { confirmAction, isHapticsSupported, showAlert } from '@/utils/platform';
 import {
-  type HomeFilter,
   type HomeMediaType,
-  getOrderedHomeSections,
+  getHomeSectionDisplayTitle,
   loadHomePreferences,
   saveHomePreferences,
   type HomePreferences,
@@ -20,8 +19,8 @@ import {
 } from '@/utils/HomeCustomization';
 
 interface PosterSectionsManagerProps {
-  selectedMediaType: HomeFilter;
-  onSelectedMediaTypeChange: (mediaType: HomeFilter) => void;
+  selectedMediaType: 'movies' | 'series';
+  onSelectedMediaTypeChange: (mediaType: 'movies' | 'series') => void;
   onPreferencesChange: (preferences: HomePreferences) => void;
   onAddDiscoverList: (mediaType: HomeMediaType) => void;
   onEditDiscoverList: (section: HomeSection) => void;
@@ -112,14 +111,8 @@ export default function PosterSectionsManager({
 
   const displayedSections = useMemo(() => {
     const sections = preferences?.sections ?? [];
-    const filteredSections = sections.filter((section) => (
-      selectedMediaType === 'all'
-      || section.mediaType === 'any'
-      || section.mediaType === (selectedMediaType === 'movies' ? 'movie' : 'series')
-    ));
-    return selectedMediaType === 'all'
-      ? getOrderedHomeSections(filteredSections)
-      : filteredSections;
+    const mediaType = selectedMediaType === 'movies' ? 'movie' : 'series';
+    return sections.filter((section) => section.mediaType === 'any' || section.mediaType === mediaType);
   }, [preferences, selectedMediaType]);
 
   const commitMediaTypeOrder = useCallback(async (
@@ -140,7 +133,7 @@ export default function PosterSectionsManager({
   }, [preferences, savePreferences]);
 
   const moveSection = useCallback(async (sectionId: string, offset: -1 | 1) => {
-    if (!preferences || selectedMediaType === 'all') return;
+    if (!preferences) return;
     const section = preferences.sections.find((item) => item.id === sectionId);
     if (!section) return;
     const selectedType = selectedMediaType === 'movies' ? 'movie' : 'series';
@@ -219,15 +212,13 @@ export default function PosterSectionsManager({
     accessibilityLabel: string,
     showTriggerWithoutActions = true,
   ) => {
-    const selectedType = selectedMediaType === 'movies'
-      ? 'movie'
-      : selectedMediaType === 'series' ? 'series' : null;
+    const displayTitle = getHomeSectionDisplayTitle(section);
+    const selectedType = selectedMediaType === 'movies' ? 'movie' : 'series';
     const typeSections = preferences?.sections.filter(
       (item) => item.mediaType === section.mediaType,
     ) ?? [];
     const typeIndex = typeSections.findIndex((item) => item.id === section.id);
-    const canReorder = selectedType !== null
-      && (section.mediaType === 'any' || section.mediaType === selectedType);
+    const canReorder = section.mediaType === 'any' || section.mediaType === selectedType;
     const actions: MenuAction[] = [
       ...(canReorder
         ? [
@@ -277,7 +268,7 @@ export default function PosterSectionsManager({
 
     return (
       <MenuView
-        title={`Actions for ${section.title}`}
+        title={`Actions for ${displayTitle}`}
         actions={actions}
         colorScheme={colorScheme}
         shouldOpenOnLongPress={false}
@@ -297,6 +288,15 @@ export default function PosterSectionsManager({
 
   return (
     <SettingsPage>
+      <SettingsSection title="Manage Catalogues">
+        <SettingsRow
+          title="Add Catalogue"
+          leading={<MaterialIcons name="add" size={20} color={settingsIconColors.success} />}
+          onPress={() => onAddDiscoverList(selectedMediaType === 'movies' ? 'movie' : 'series')}
+          disabled={saving}
+          isLast
+        />
+      </SettingsSection>
       {loading ? (
         <SettingsSection title="Catalogues">
           <SettingsRow title="Loading catalogues…" disabled isLast />
@@ -313,30 +313,19 @@ export default function PosterSectionsManager({
         </SettingsSection>
       ) : preferences ? (
         <>
-          {selectedMediaType === 'all' ? (
-            <SettingsSection title="Manage Catalogues">
-            <SettingsRow
-              title="Add Catalogue"
-              leading={<MaterialIcons name="add" size={20} color={settingsIconColors.success} />}
-              onPress={() => onAddDiscoverList('movie')}
-              disabled={saving}
-              isLast
-            />
-            </SettingsSection>
-          ) : null}
           <SettingsSection title="Category">
             <SettingsRow
               title="Media Type"
+              leading={<Ionicons name="film-outline" size={20} color={settingsIconColors.mediaPlayer} />}
               trailingNative={
                 <Picker
                   selectedValue={selectedMediaType}
                   onValueChange={(value) => {
-                    if (value === 'all' || value === 'movies' || value === 'series') {
+                  if (value === 'movies' || value === 'series') {
                       onSelectedMediaTypeChange(value);
                     }
                   }}
                 >
-                  <Picker.Item label="All" value="all" />
                   <Picker.Item label="Movies" value="movies" />
                   <Picker.Item label="Series" value="series" />
                 </Picker>
@@ -346,57 +335,51 @@ export default function PosterSectionsManager({
           </SettingsSection>
           <SettingsSection
             title={`Catalogues (${displayedSections.length})`}
-            footer={selectedMediaType === 'all'
-              ? 'Catalogues are ordered by position within each media type. Use the action menu to edit or remove catalogues.'
-              : 'Use each action menu to reorder, edit, or remove catalogues; use the switches to enable or disable them.'}
+            footer="Use each action menu to reorder, edit, or remove catalogues; use the switches to enable or disable them."
           >
             {displayedSections.length === 0 ? (
               <SettingsRow title="No catalogues are available." disabled isLast />
-            ) : displayedSections.map((section, index) => (
-              <SettingsRow
-                key={section.id}
-                title=""
-                accessibilityLabel={section.title}
-                leading={
-                  renderActionMenu(
-                    section,
-                    <Ionicons
-                      name={section.kind === 'discover' ? 'options-outline' : 'albums-outline'}
-                      size={20}
-                      color={section.kind === 'discover'
-                        ? settingsIconColors.configure
-                        : settingsIconColors.mediaPlayer}
-                    />,
-                    `Actions for ${section.title}`,
-                  )
-                }
-                titleAccessory={renderActionMenu(
-                  section,
-                  <RNText numberOfLines={1} style={{ color: colors.text, fontSize: 16 }}>
-                    {section.title}
-                  </RNText>,
-                  `Actions for ${section.title}`,
-                )}
-                trailingNative={
-                  <>
-                    <RNHostView matchContents>
-                      {renderActionMenu(
-                        section,
-                        <Ionicons name="ellipsis-horizontal" size={20} color={colors.textDim} />,
-                        `Actions for ${section.title}`,
-                        false,
-                      )}
-                    </RNHostView>
-                    <Switch
-                      value={section.enabled}
-                      disabled={loading || saving}
-                      onValueChange={(enabled) => toggleSection(section, enabled)}
-                    />
-                  </>
-                }
-                isLast={index === displayedSections.length - 1}
-              />
-            ))}
+            ) : displayedSections.map((section, index) => {
+              const displayTitle = getHomeSectionDisplayTitle(section);
+              return (
+                <SettingsRow
+                  key={section.id}
+                  title={displayTitle}
+                  accessibilityLabel={displayTitle}
+                  leading={
+                    renderActionMenu(
+                      section,
+                      <Ionicons
+                        name={section.kind === 'discover' ? 'options-outline' : 'albums-outline'}
+                        size={20}
+                        color={section.kind === 'discover'
+                          ? settingsIconColors.configure
+                          : settingsIconColors.mediaPlayer}
+                      />,
+                      `Actions for ${displayTitle}`,
+                    )
+                  }
+                  trailingNative={
+                    <>
+                      <RNHostView matchContents>
+                        {renderActionMenu(
+                          section,
+                          <Ionicons name="ellipsis-horizontal" size={20} color={colors.textDim} />,
+                          `Actions for ${displayTitle}`,
+                          false,
+                        )}
+                      </RNHostView>
+                      <Switch
+                        value={section.enabled}
+                        disabled={loading || saving}
+                        onValueChange={(enabled) => toggleSection(section, enabled)}
+                      />
+                    </>
+                  }
+                  isLast={index === displayedSections.length - 1}
+                />
+              );
+            })}
           </SettingsSection>
         </>
       ) : null}
