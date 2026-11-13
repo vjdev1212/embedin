@@ -147,26 +147,19 @@ function RootLayoutNav() {
                 headerTintColor,
                 headerBackTitle: '',
                 headerBackButtonDisplayMode: 'minimal',
-                headerShadowVisible: true,
-                headerStyle: {
-                  backgroundColor: 'transparent',
-                }
+                headerShadowVisible: false,
               }}
             />
             <Stack.Screen
               name="movie/list"
               options={{
                 headerShown: true,
-                headerTransparent: true,
-                headerBackground: InvisibleHeaderBackground,
+                headerTransparent: false,
                 headerTitle: '',
                 headerTintColor,
                 headerBackTitle: '',
                 headerBackButtonDisplayMode: 'minimal',
-                headerShadowVisible: true,
-                headerStyle: {
-                  backgroundColor: 'transparent',
-                }
+                headerShadowVisible: false,
               }}
             />
             <Stack.Screen
@@ -189,15 +182,12 @@ function RootLayoutNav() {
               name="series/list"
               options={{
                 headerShown: true,
-                headerTransparent: true,
+                headerTransparent: false,
                 headerBackground: InvisibleHeaderBackground,
                 headerTitle: '',
                 headerTintColor,
                 headerBackTitle: '',
-                headerShadowVisible: true,
-                headerStyle: {
-                  backgroundColor: 'transparent',
-                }
+                headerShadowVisible: false,
               }}
             />
             <Stack.Screen
@@ -220,6 +210,16 @@ function RootLayoutNav() {
             <Stack.Screen name="settings/embed-tv" options={settingsScreenOptions('TV Embed')} />
             <Stack.Screen name="settings/preferences" options={settingsScreenOptions('Language & Region')} />
             <Stack.Screen name="settings/appearance" options={settingsScreenOptions('Appearance')} />
+            <Stack.Screen name="settings/home" options={settingsScreenOptions('Catalogues')} />
+            <Stack.Screen
+              name="settings/home-editor"
+              options={{
+                ...settingsScreenOptions('Add Catalogue'),
+                presentation: 'card',
+                headerBackButtonDisplayMode: 'minimal',
+                headerBackTitle: '',
+              }}
+            />
             <Stack.Screen name="settings/downloads" options={settingsScreenOptions('Downloads')} />
             <Stack.Screen name="settings/contact" options={settingsScreenOptions('Contact')} />
             <Stack.Screen name="settings/donate" options={settingsScreenOptions('Support Embedin')} />

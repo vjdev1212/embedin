@@ -60,7 +60,7 @@ const EmbedMovieSettingsScreen = () => {
             <SettingsPage>
                 <SettingsSection
                     title="Embed URL"
-                    footer={'TMDB: https://player.videasy.net/movie/{TMDBID}\nIMDb: https://player.videasy.net/movie/{IMDBID}'}
+                    footer={'TMDB: https://vidy.st/movie/{TMDBID}\nIMDb: https://vidy.st/movie/{IMDBID}'}
                 >
                     <TextInput
                         style={[styles.textInput, { backgroundColor: colors.primaryCard, color: colors.text }]}
