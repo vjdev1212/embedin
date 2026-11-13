@@ -17,6 +17,7 @@ import {
   WatchTrailerButton,
 } from '@vjdev1212/media-ui-kit';
 import { PersonDetailsScreen } from '@vjdev1212/media-ui-kit';
+import type { PosterListSource } from '@vjdev1212/media-ui-kit';
 import * as Haptics from 'expo-haptics';
 import { isHapticsSupported } from '@/utils/platform';
 import { useTheme } from '@/context/ThemeContext';
@@ -171,8 +172,28 @@ const SeriesDetails = () => {
     router.push({ pathname: `/${type}/details`, params: { moviedbid: tmdbId } });
   }, []);
 
-  const handlePosterSeeAllPress = useCallback(async (apiUrl: string, title: string, type: 'movie' | 'series') => {
+  const handlePosterSeeAllPress = useCallback(async (
+    apiUrl: string,
+    title: string,
+    type: 'movie' | 'series' | 'any',
+    minimumPopularity?: number,
+    sources?: PosterListSource[],
+  ) => {
     if (await isHapticsSupported()) Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (type === 'any') {
+      router.push({
+        pathname: '/movie/list',
+        params: {
+          apiUrl,
+          title,
+          mediaType: 'any',
+          movieApiUrl: sources?.find((source) => source.type === 'movie')?.apiUrl ?? '',
+          seriesApiUrl: sources?.find((source) => source.type === 'series')?.apiUrl ?? '',
+          ...(minimumPopularity !== undefined ? { minimumPopularity: String(minimumPopularity) } : {}),
+        },
+      });
+      return;
+    }
     router.push({ pathname: `/${type}/list`, params: { apiUrl, title } });
   }, []);
 

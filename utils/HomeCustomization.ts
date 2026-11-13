@@ -4,6 +4,7 @@ import { storageService } from '@/utils/StorageService';
 const HOME_PREFERENCES_KEY = 'homePreferences';
 
 export type HomeMediaType = 'movie' | 'series';
+export type HomeSectionMediaType = HomeMediaType | 'any';
 export type HomeFilter = 'all' | 'movies' | 'series';
 export type HomeSortOrder =
     | 'popularity.desc'
@@ -24,7 +25,7 @@ export type HomeSortOrder =
 export interface HomeSection {
     id: string;
     title: string;
-    mediaType: HomeMediaType;
+    mediaType: HomeSectionMediaType;
     kind: 'catalog' | 'discover';
     enabled: boolean;
     languageCode?: string;
@@ -54,8 +55,15 @@ export interface HomePreferences {
 export interface HomeListItem {
     id: string;
     title: string;
-    mediaType: HomeMediaType;
+    mediaType: HomeSectionMediaType;
     apiUrl: string;
+    minimumPopularity?: number;
+    sources?: HomeListSource[];
+}
+
+export interface HomeListSource {
+    apiUrl: string;
+    mediaType: HomeMediaType;
     minimumPopularity?: number;
 }
 
@@ -138,7 +146,7 @@ function isHomeSection(value: unknown): value is HomeSection {
         && typeof section.title === 'string'
         && section.title.trim().length > 0
         && section.title.length <= 60
-        && (section.mediaType === 'movie' || section.mediaType === 'series')
+        && (section.mediaType === 'movie' || section.mediaType === 'series' || section.mediaType === 'any')
         && (section.kind === 'catalog' || section.kind === 'discover')
         && typeof section.enabled === 'boolean'
         && (section.kind !== 'catalog'
@@ -266,17 +274,23 @@ function formatDateDaysAgo(daysAgo: number): string {
     return `${year}-${month}-${day}`;
 }
 
-export function buildHomeSectionApiUrl(section: HomeSection): string {
-    const endpoint = section.mediaType === 'movie' ? 'movie' : 'tv';
-    const sortBy = section.sortBy === 'release_date.desc'
-        ? section.mediaType === 'movie' ? 'primary_release_date.desc' : 'first_air_date.desc'
-        : section.sortBy === 'release_date.asc'
-            ? section.mediaType === 'movie' ? 'primary_release_date.asc' : 'first_air_date.asc'
-            : section.sortBy === 'title.asc' || section.sortBy === 'title.desc'
-                ? section.mediaType === 'movie' ? section.sortBy : section.sortBy.replace('title', 'name')
-                : section.sortBy === 'original_title.asc' || section.sortBy === 'original_title.desc'
-                    ? section.mediaType === 'movie' ? section.sortBy : section.sortBy.replace('original_title', 'original_name')
-                    : section.sortBy;
+export function buildHomeSectionApiUrl(
+    section: HomeSection,
+    mediaType: HomeMediaType = section.mediaType === 'series' ? 'series' : 'movie',
+): string {
+    const endpoint = mediaType === 'movie' ? 'movie' : 'tv';
+    const requestedSort = section.mediaType === 'any' && section.sortBy.startsWith('revenue.')
+        ? 'popularity.desc'
+        : section.sortBy;
+    const sortBy = requestedSort === 'release_date.desc'
+        ? mediaType === 'movie' ? 'primary_release_date.desc' : 'first_air_date.desc'
+        : requestedSort === 'release_date.asc'
+            ? mediaType === 'movie' ? 'primary_release_date.asc' : 'first_air_date.asc'
+            : requestedSort === 'title.asc' || requestedSort === 'title.desc'
+                ? mediaType === 'movie' ? requestedSort : requestedSort.replace('title', 'name')
+                : requestedSort === 'original_title.asc' || requestedSort === 'original_title.desc'
+                    ? mediaType === 'movie' ? requestedSort : requestedSort.replace('original_title', 'original_name')
+                    : requestedSort;
     const query = new URLSearchParams({ sort_by: sortBy, language: section.displayLanguage ?? 'en-US' });
 
     if (section.languageCode) query.set('with_original_language', section.languageCode);
@@ -306,7 +320,7 @@ export function buildHomeSectionApiUrl(section: HomeSection): string {
         query.set('with_watch_providers', section.watchProviders);
     }
 
-    const dateField = section.mediaType === 'movie' ? 'release_date' : 'first_air_date';
+    const dateField = mediaType === 'movie' ? 'release_date' : 'first_air_date';
     if (section.releaseAfterDaysAgo !== undefined) {
         query.set(`${dateField}.gte`, formatDateDaysAgo(section.releaseAfterDaysAgo));
     }
@@ -317,12 +331,32 @@ export function buildHomeSectionApiUrl(section: HomeSection): string {
     return `https://api.themoviedb.org/3/discover/${endpoint}?${query.toString()}`;
 }
 
+export function getOrderedHomeSections(sections: HomeSection[]): HomeSection[] {
+    const positions = new Map<HomeSectionMediaType, number>();
+    return sections
+        .map((section, originalIndex) => {
+            const position = positions.get(section.mediaType) ?? 0;
+            positions.set(section.mediaType, position + 1);
+            const typePriority = section.mediaType === 'movie' ? 0 : section.mediaType === 'any' ? 1 : 2;
+            return { section, originalIndex, position, typePriority };
+        })
+        .sort((left, right) => (
+            left.position - right.position
+            || left.typePriority - right.typePriority
+            || left.originalIndex - right.originalIndex
+        ))
+        .map(({ section }) => section);
+}
+
 export function getVisibleHomeSections(
     preferences: HomePreferences,
     filter: HomeFilter,
 ): HomeListItem[] {
     const catalogById = new Map(HOME_CATALOG.map((definition) => [definition.id, definition]));
-    return preferences.sections.flatMap((section) => {
+    const orderedSections = filter === 'all'
+        ? getOrderedHomeSections(preferences.sections)
+        : preferences.sections;
+    return orderedSections.flatMap<HomeListItem>((section) => {
         if (!section.enabled) return [];
 
         if (section.kind === 'catalog') {
@@ -333,6 +367,32 @@ export function getVisibleHomeSections(
                 title: filter === 'all' ? definition.allTitle ?? definition.title : definition.title,
                 mediaType: definition.mediaType,
                 apiUrl: definition.apiUrl,
+            }];
+        }
+
+        if (section.mediaType === 'any') {
+            if (filter === 'all') {
+                const movieApiUrl = buildHomeSectionApiUrl(section, 'movie');
+                const seriesApiUrl = buildHomeSectionApiUrl(section, 'series');
+                return [{
+                    id: section.id,
+                    title: section.title,
+                    mediaType: 'any',
+                    apiUrl: movieApiUrl,
+                    sources: [
+                        { apiUrl: movieApiUrl, mediaType: 'movie', minimumPopularity: 1 },
+                        { apiUrl: seriesApiUrl, mediaType: 'series', minimumPopularity: 1 },
+                    ],
+                }];
+            }
+
+            const mediaType = filter === 'movies' ? 'movie' : 'series';
+            return [{
+                id: section.id,
+                title: section.title,
+                mediaType,
+                apiUrl: buildHomeSectionApiUrl(section, mediaType),
+                minimumPopularity: 1,
             }];
         }
 

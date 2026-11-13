@@ -210,10 +210,15 @@ function RootLayoutNav() {
             <Stack.Screen name="settings/embed-tv" options={settingsScreenOptions('TV Embed')} />
             <Stack.Screen name="settings/preferences" options={settingsScreenOptions('Language & Region')} />
             <Stack.Screen name="settings/appearance" options={settingsScreenOptions('Appearance')} />
-            <Stack.Screen name="settings/home" options={settingsScreenOptions('Home Screen')} />
+            <Stack.Screen name="settings/home" options={settingsScreenOptions('Catalogues')} />
             <Stack.Screen
               name="settings/home-editor"
-              options={{ ...settingsScreenOptions('Add List'), presentation: 'card' }}
+              options={{
+                ...settingsScreenOptions('Add Catalogue'),
+                presentation: 'card',
+                headerBackButtonDisplayMode: 'minimal',
+                headerBackTitle: '',
+              }}
             />
             <Stack.Screen name="settings/downloads" options={settingsScreenOptions('Downloads')} />
             <Stack.Screen name="settings/contact" options={settingsScreenOptions('Contact')} />
